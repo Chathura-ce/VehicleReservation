@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>AdminLTE v4 | Dashboard</title><!--begin::Primary Meta Tags-->
+    <title>City Cab</title><!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="title" content="AdminLTE v4 | Dashboard">
     <meta name="author" content="Chathura">
@@ -39,6 +39,32 @@
                 <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Home</a></li>
                 <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Contact</a></li>
             </ul> <!--end::Start Navbar Links--> <!--begin::End Navbar Links-->
+            <ul class="navbar-nav ms-auto"> <!--begin::Navbar Search-->
+                <li class="nav-item dropdown user-menu"><a href="#" class="nav-link dropdown-toggle"
+                                                           data-bs-toggle="dropdown"> <img
+                        src="assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow"
+                        alt="User Image"> <span class="d-none d-md-inline">Alexander Pierce</span> </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end"> <!--begin::User Image-->
+                        <li class="user-header text-bg-primary"><img src="assets/img/user2-160x160.jpg"
+                                                                     class="rounded-circle shadow" alt="User Image">
+                            <p>
+                                Alexander Pierce - Web Developer
+                                <small>Member since Nov. 2023</small>
+                            </p>
+                        </li> <!--end::User Image--> <!--begin::Menu Body-->
+                        <li class="user-body"> <!--begin::Row-->
+                            <div class="row">
+                                <div class="col-4 text-center"><a href="#">Followers</a></div>
+                                <div class="col-4 text-center"><a href="#">Sales</a></div>
+                                <div class="col-4 text-center"><a href="#">Friends</a></div>
+                            </div> <!--end::Row-->
+                        </li> <!--end::Menu Body--> <!--begin::Menu Footer-->
+                        <li class="user-footer"><a href="#" class="btn btn-default btn-flat">Profile</a> <a href="#"
+                                                                                                            class="btn btn-default btn-flat float-end">Sign
+                            out</a></li> <!--end::Menu Footer-->
+                    </ul>
+                </li> <!--end::User Menu Dropdown-->
+            </ul> <!--end::End Navbar Links-->
         </div> <!--end::Container-->
     </nav> <!--end::Header--> <!--begin::Sidebar-->
     <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> <!--begin::Sidebar Brand-->
@@ -100,10 +126,9 @@
         </div> <!--end::App Content Header--> <!--begin::App Content-->
     </main> <!--end::App Main--> <!--begin::Footer-->
     <footer class="app-footer"> <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Anything you want</div> <!--end::To the end--> <!--begin::Copyright-->
         <strong>
             Copyright &copy; 2014-2024&nbsp;
-            <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+            <a href="https://adminlte.io" class="text-decoration-none">Chathura</a>.
         </strong>
         All rights reserved.
         <!--end::Copyright-->
