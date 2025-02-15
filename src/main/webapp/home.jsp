@@ -5,5 +5,6 @@
 </head>
 <body>
 <h1>Welcome to City Cab</h1>
+<a href="register.jsp">Register</a>
 </body>
 </html>

@@ -49,7 +49,7 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect("index.jsp");
                         break;
                     case 2:  // Customer role
-                        response.sendRedirect("customer-home.jsp");
+                        response.sendRedirect("home.jsp");
                         break;
                     case 3:  // Driver role
                         response.sendRedirect("driver-dashboard.jsp");

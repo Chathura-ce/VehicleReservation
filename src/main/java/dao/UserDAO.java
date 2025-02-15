@@ -46,4 +46,26 @@ public class UserDAO {
         }
         return -1;
     }
+
+    public boolean checkUsernameExists(String username) throws SQLException {
+        String sql = "SELECT username FROM users WHERE username = ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // Returns true if a record is found
+            }
+        }
+    }
+
+    public boolean checkEmailExists(String email) throws SQLException {
+        String sql = "SELECT email FROM users WHERE email = ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // Returns true if a record is found
+            }
+        }
+    }
 }
