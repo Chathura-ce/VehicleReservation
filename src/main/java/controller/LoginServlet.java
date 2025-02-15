@@ -19,6 +19,19 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
+        if (username == null || username.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Username is required.");
+            request.setAttribute("password", password);
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
+        if (password == null || password.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Password is required.");
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
+
         try {
             // Authenticate the user
             UserDAO userDAO = new UserDAO();
@@ -33,7 +46,7 @@ public class LoginServlet extends HttpServlet {
                 // Role-based redirection
                 switch (user.getRoleId()) {
                     case 1:  // Admin role
-                        response.sendRedirect("admin-dashboard.jsp");
+                        response.sendRedirect("index.jsp");
                         break;
                     case 2:  // Customer role
                         response.sendRedirect("customer-home.jsp");
@@ -47,6 +60,7 @@ public class LoginServlet extends HttpServlet {
                 }
             } else {
                 // Invalid login
+                request.setAttribute("username", username);
                 request.setAttribute("errorMessage", "Invalid username or password.");
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
