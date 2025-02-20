@@ -1,10 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="model.User" %>
+<%@ page import="java.util.Objects" %>
 <%
     User loggedInUser = (User) session.getAttribute("loggedInUser");
-    if (loggedInUser == null || loggedInUser.getRoleId() != 1) {
-        response.sendRedirect("login.jsp");
-    }
 %>
 <!DOCTYPE html>
 <html lang="en"> <!--begin::Head-->
@@ -29,7 +27,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css"
           integrity="sha256-Qsx5lrStHZyR9REqhUF8iQt73X06c8LGIUPzpOhwRrI=" crossorigin="anonymous">
     <!--end::Third Party Plugin(Bootstrap Icons)--><!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="css/adminlte.css"><!--end::Required Plugin(AdminLTE)--><!-- apexcharts -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminlte.css">
+    <!--end::Required Plugin(AdminLTE)--><!-- apexcharts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
           integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous"><!-- jsvectormap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
@@ -66,8 +65,9 @@
                                 <div class="col-4 text-center"><a href="#">Friends</a></div>
                             </div> <!--end::Row-->
                         </li> <!--end::Menu Body--> <!--begin::Menu Footer-->
-                        <li class="user-footer"><a href="#" class="btn btn-default btn-flat">Profile</a> <a href="logout"
-                                                                                                            class="btn btn-default btn-flat float-end">Sign out</a></li> <!--end::Menu Footer-->
+                        <li class="user-footer"><a href="#" class="btn btn-default btn-flat">Profile</a> <a
+                                href="logout"
+                                class="btn btn-default btn-flat float-end">Sign out</a></li> <!--end::Menu Footer-->
                     </ul>
                 </li> <!--end::User Menu Dropdown-->
             </ul> <!--end::End Navbar Links-->
@@ -82,28 +82,27 @@
         <div class="sidebar-wrapper">
             <nav class="mt-2"> <!--begin::Sidebar Menu-->
                 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                    <%
+                    if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "admin")) { %>
                     <li class="nav-item menu-open"><a href="#" class="nav-link active"> <i
                             class="nav-icon bi bi-speedometer"></i>
                         <p>
-                            Dashboard
+                            Driver
                             <i class="nav-arrow bi bi-chevron-right"></i>
                         </p>
                     </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="./index.html" class="nav-link active"> <i
+                            <li class="nav-item"><a href="driver/add-driver.jsp" class="nav-link active"> <i
                                     class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard v1</p>
+                                <p>Add Driver</p>
                             </a></li>
-                            <li class="nav-item"><a href="./index2.html" class="nav-link"> <i
+                            <li class="nav-item"><a href="driver/drivers-list.jsp" class="nav-link"> <i
                                     class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard v2</p>
-                            </a></li>
-                            <li class="nav-item"><a href="./index3.html" class="nav-link"> <i
-                                    class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard v3</p>
+                                <p>Drivers List</p>
                             </a></li>
                         </ul>
                     </li>
+                    <% } %>
                     <li class="nav-item"><a href="./generate/theme.html" class="nav-link"> <i
                             class="nav-icon bi bi-palette"></i>
                         <p>Theme Generate</p>
