@@ -10,4 +10,14 @@
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>AddDriverServlet</servlet-name>
+    <servlet-class>controller.AddDriverServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>AddDriverServlet</servlet-name>
+    <url-pattern>/add-driver</url-pattern>
+  </servlet-mapping>
+
 </web-app>
