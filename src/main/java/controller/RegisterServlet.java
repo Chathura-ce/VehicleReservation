@@ -21,9 +21,9 @@ public class RegisterServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
+        String phoneNumber = request.getParameter("phoneNumber");
         String address = request.getParameter("address");
         String nic = request.getParameter("nic");
-        String phoneNumber = request.getParameter("phoneNumber");
         String email = request.getParameter("email");
 
         UserDAO userDAO = new UserDAO();
@@ -114,10 +114,10 @@ public class RegisterServlet extends HttpServlet {
             //  Register the user
             User user = new User();
             user.setUsername(username);
-            user.setPasswordHash(password);  // Use proper password hashing in production
+            user.setPassword(password);
             user.setFullName(fullName);
             user.setEmail(email);
-            user.setRoleId(2);  // 2 = Customer role
+            user.setRole("customer");
 
             int userId = userDAO.addUser(user);
 

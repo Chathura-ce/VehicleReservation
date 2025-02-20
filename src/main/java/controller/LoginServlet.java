@@ -35,8 +35,7 @@ public class LoginServlet extends HttpServlet {
         try {
             // Authenticate the user
             UserDAO userDAO = new UserDAO();
-            String passwordHash = password;  // Placeholder: Add password hashing here
-            User user = userDAO.authenticate(username, passwordHash);
+            User user = userDAO.authenticate(username, password);
 
             if (user != null) {
                 // Store the user in the session
@@ -44,18 +43,21 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("loggedInUser", user);
 
                 // Role-based redirection
-                switch (user.getRoleId()) {
-                    case 1:  // Admin role
+                switch (user.getRole()) {
+                    case "admin":  // Admin role
                         response.sendRedirect("index.jsp");
                         break;
-                    case 2:  // Customer role
+                    case "customer":  // Customer role
                         response.sendRedirect("home.jsp");
                         break;
-                    case 3:  // Driver role
+                    case "driver":  // Driver role
                         response.sendRedirect("driver-dashboard.jsp");
                         break;
                     default:  // Default path if no role matches
-                        response.sendRedirect("error.jsp");
+//                        response.sendRedirect("error.jsp");
+                        // Invalid login
+                        request.setAttribute("errorMessage", "Invalid user credentials");
+                        request.getRequestDispatcher("/login.jsp").forward(request, response);
                         break;
                 }
             } else {
@@ -65,8 +67,12 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("error.jsp");
+//            e.printStackTrace();
+//            response.sendRedirect("error.jsp");
+            // Invalid login
+            request.setAttribute("username", username);
+            request.setAttribute("errorMessage", "Internal server error. Please try again later.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 
