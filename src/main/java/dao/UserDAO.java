@@ -84,4 +84,84 @@ public class UserDAO {
             }
         }
     }
+
+    public void updateUser(User user) throws SQLException {
+        String salt = PasswordUtil.generateSalt(); // Generate salt
+        String hashedPassword = PasswordUtil.hashPassword(user.getPassword(), salt);
+
+        // Base SQL query
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, status = ?";
+
+        // Check if password should be updated
+        boolean updatePassword = (user.getPassword() != null && !user.getPassword().isEmpty());
+        if (updatePassword) {
+            sql += ", password_hash = ?";
+        }
+        sql += " WHERE user_id = ?";
+
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Set required parameters
+            statement.setString(1, user.getFullName());
+            statement.setString(2, user.getEmail());
+            statement.setString(3, user.getPhone());
+            statement.setInt(4, user.getStatus().equalsIgnoreCase("Active") ? 1 : 0);
+
+            int index = 5;
+
+            // If password needs to be updated, set it dynamically
+            if (updatePassword) {
+                statement.setString(index++, hashedPassword); // Use the hashed password
+            }
+
+            // Set the user ID in the correct position
+            statement.setInt(index, user.getUserId());
+
+            statement.executeUpdate();
+        }
+    }
+
+
+    public boolean isUsernameExists(int userId,String username) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ? AND user_id <> ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, username);
+            statement.setInt(2, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isEmailExists(int userId,String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND user_id <> ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            statement.setInt(2, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteUser(int userId) throws SQLException {
+        String sql = "DELETE FROM users WHERE user_id = ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
+            int rowsDeleted = statement.executeUpdate();
+            return rowsDeleted > 0;
+        }
+    }
 }

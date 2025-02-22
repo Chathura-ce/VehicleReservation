@@ -85,13 +85,13 @@
                         </div>
                     </div>
 
-                    <div class="input-group mb-3">
+                    <%--<div class="input-group mb-3">
                         <input type="text" class="form-control" name="nic" placeholder="NIC"
                                value="${nic != null ? nic : ''}" required>
                         <div class="input-group-text">
                             <span class="bi bi-file-person"></span>
                         </div>
-                    </div>
+                    </div>--%>
 
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" name="phoneNumber" placeholder="Phone Number"

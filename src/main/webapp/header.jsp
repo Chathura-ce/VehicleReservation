@@ -96,7 +96,7 @@
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Add Driver</p>
                             </a></li>
-                            <li class="nav-item"><a href="driver/drivers-list.jsp" class="nav-link"> <i
+                            <li class="nav-item"><a href="${pageContext.request.contextPath}/list-drivers" class="nav-link"> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Drivers List</p>
                             </a></li>

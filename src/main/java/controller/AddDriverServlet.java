@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import util.FlashMessageUtil;
 
 import java.io.IOException;
 
@@ -20,14 +21,12 @@ public class AddDriverServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
-        String address = request.getParameter("address");
-        String nic = request.getParameter("nic");
+//        String address = request.getParameter("address");
+//        String nic = request.getParameter("nic");
         String phoneNumber = request.getParameter("phoneNumber");
         String email = request.getParameter("email");
         String licenseNumber = request.getParameter("licenseNumber");
         String role = "driver";
-
-        HttpSession session = request.getSession();
 
         try {
             // Create the user
@@ -37,6 +36,7 @@ public class AddDriverServlet extends HttpServlet {
             user.setFullName(fullName);
             user.setEmail(email);
             user.setRole(role);
+            user.setPhone(phoneNumber);
 
             UserDAO userDAO = new UserDAO();
             int userId = userDAO.addUser(user);
@@ -47,13 +47,13 @@ public class AddDriverServlet extends HttpServlet {
             driverDAO.addDriver(driver);
 
             // Set success message and redirect to driver list
-            session.setAttribute("successMessage", "New Driver created successfully.");
-            response.sendRedirect("driver/add-driver.jsp");
+            FlashMessageUtil.setFlashMessage("successMessage",request, "New Driver created successfully.");
+            response.sendRedirect("list-drivers");
 
         } catch (Exception e) {
             e.printStackTrace();
             // Set error message and redirect back to add-driver page
-            session.setAttribute("errorMessage", "Failed to create new Driver.");
+            FlashMessageUtil.setFlashMessage("errorMessage",request, "Failed to create new Driver.");
             response.sendRedirect("driver/add-driver.jsp");
         }
     }

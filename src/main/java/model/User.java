@@ -8,6 +8,7 @@ public class User {
     private String email;
     private String role;
     private String phone;
+    private int status;
 
     // Getters and Setters
     public int getUserId() { return userId; }
@@ -30,4 +31,12 @@ public class User {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public String getStatus() {
+        return status == 1 ? "Active" : "Inactive";
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 }
