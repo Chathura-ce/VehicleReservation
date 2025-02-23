@@ -149,6 +149,31 @@ public class DriverDAO {
         return -1; // Return -1 if no user ID is found
     }
 
+    public List<Driver> getAvailableDrivers() {
+        List<Driver> drivers = new ArrayList<>();
+        String sql = "SELECT  d.driver_id,          u.full_name  FROM  drivers AS d  INNER JOIN users AS u ON d.user_id = u.user_id  WHERE  u.status = 1  ORDER BY  u.full_name ASC;";
+
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                String driverId = resultSet.getString("driver_id");
+                String fullName = resultSet.getString("full_name");
+                User user = new User();
+                Driver driver = new Driver();
+
+                user.setFullName(fullName);
+
+                driver.setDriverId(driverId);
+                driver.setUser(user);
+                drivers.add(driver); // Assuming Driver has a constructor for ID & Name
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return drivers;
+    }
 
 
 

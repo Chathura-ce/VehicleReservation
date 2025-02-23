@@ -64,7 +64,7 @@ public class EditDriverServlet extends HttpServlet {
         String statusStr = request.getParameter("status");
 
         // Validate inputs
-        Map<String, String> errors = ValidationUtil.validateDriverInput(Integer.parseInt(userId),driverId, username, fullName,
+        Map<String, String> errors = ValidationUtil.validateDriverInput(Integer.parseInt(userId), driverId, username, fullName,
                 phoneNumber, licenseNumber, email,
                 statusStr, driverDAO, userDAO);
 
@@ -75,14 +75,14 @@ public class EditDriverServlet extends HttpServlet {
                 errorMessage.append(error).append("<br>"); // Append each error with a line break
             }
 
-            FlashMessageUtil.setFlashMessage("errorMessage",request, errorMessage.toString());
+            FlashMessageUtil.setFlashMessage("errorMessage", request, errorMessage.toString());
 //            request.setAttribute("errorMessage", errorMessage.toString());
 //            request.setAttribute("fullName", fullName);
 //            request.setAttribute("phoneNumber", phoneNumber);
 //            request.setAttribute("licenseNumber", licenseNumber);
 //            request.setAttribute("email", email);
 //            request.setAttribute("status", statusStr);
-            response.sendRedirect("edit-driver?driverId="+driverId);
+            response.sendRedirect("edit-driver?driverId=" + driverId);
             return;
         }
 
@@ -117,12 +117,12 @@ public class EditDriverServlet extends HttpServlet {
             // Save changes to database
             userDAO.updateUser(user);
             driverDAO.updateDriver(driver);
-            FlashMessageUtil.setFlashMessage("successMessage",request, "Driver updated successfully");
+            FlashMessageUtil.setFlashMessage("successMessage", request, "Driver updated successfully");
             response.sendRedirect("list-drivers");
         } catch (SQLException e) {
             e.printStackTrace();
-            FlashMessageUtil.setFlashMessage("errorMessage",request, "Error while updating driver details");
-            response.sendRedirect("edit-driver?driverId="+driverId);
+            FlashMessageUtil.setFlashMessage("errorMessage", request, "Error while updating driver details");
+            response.sendRedirect("edit-driver?driverId=" + driverId);
         }
     }
 
