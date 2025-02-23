@@ -240,3 +240,9 @@
 </body><!--end::Body-->
 
 </html>
+
+<%
+    // Remove the attribute so it doesn't persist
+    session.removeAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+%>
