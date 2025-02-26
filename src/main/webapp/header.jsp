@@ -4,6 +4,11 @@
 <%@ page import="java.util.Objects" %>
 <%
     User loggedInUser = (User) session.getAttribute("loggedInUser");
+    if (loggedInUser == null) {
+        session.setAttribute("errorMessage","Your session expired. Please Login.");
+        response.sendRedirect("login.jsp"); // Redirect to login page
+        return; // Stop further execution
+    }
 %>
 <!DOCTYPE html>
 <html lang="en"> <!--begin::Head-->
@@ -43,8 +48,10 @@
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"> <i
                         class="bi bi-list"></i> </a></li>
-                <li class="nav-item d-none d-md-block"><a href="${pageContext.request.contextPath}/home.jsp" class="nav-link">Home</a></li>
-<li class="nav-item d-none d-md-block"><a href="${pageContext.request.contextPath}/contact.jsp" class="nav-link">Contact</a></li>
+                <li class="nav-item d-none d-md-block"><a href="${pageContext.request.contextPath}/home.jsp"
+                                                          class="nav-link">Home</a></li>
+                <li class="nav-item d-none d-md-block"><a href="${pageContext.request.contextPath}/contact.jsp"
+                                                          class="nav-link">Contact</a></li>
             </ul> <!--end::Start Navbar Links--> <!--begin::End Navbar Links-->
             <ul class="navbar-nav ms-auto"> <!--begin::Navbar Search-->
                 <li class="nav-item dropdown user-menu"><a href="#" class="nav-link dropdown-toggle"
@@ -84,7 +91,7 @@
             <nav class="mt-2"> <!--begin::Sidebar Menu-->
                 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                     <%
-                    if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "admin")) { %>
+                        if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "admin")) { %>
                     <li class="nav-item menu-open"><a href="#" class="nav-link active"> <i
                             class="nav-icon bi bi-speedometer"></i>
                         <p>
@@ -97,7 +104,8 @@
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Add Driver</p>
                             </a></li>
-                            <li class="nav-item"><a href="${pageContext.request.contextPath}/list-drivers" class="nav-link"> <i
+                            <li class="nav-item"><a href="${pageContext.request.contextPath}/list-drivers"
+                                                    class="nav-link"> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Drivers List</p>
                             </a></li>
@@ -112,15 +120,40 @@
                         </p>
                     </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="${pageContext.request.contextPath}/add-car" class="nav-link active"> <i
+                            <li class="nav-item"><a href="${pageContext.request.contextPath}/add-car"
+                                                    class="nav-link active"> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Add Car</p>
                             </a></li>
-                            <li class="nav-item"><a href="${pageContext.request.contextPath}/list-cars" class="nav-link"> <i
+                            <li class="nav-item"><a href="${pageContext.request.contextPath}/list-cars"
+                                                    class="nav-link"> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Cars List</p>
                             </a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item menu-open"><a href="#" class="nav-link active"> <i
+                            class="nav-icon bi bi-calendar-check"></i>
+                        <p>
+                            Bookings
+                            <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                        <% if (loggedInUser != null && Objects.equals(loggedInUser.getRole(), "admin")) { %>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a
+                                    href="${pageContext.request.contextPath}/booking/new"
+                                    class="nav-link active"> <i
+                                    class="nav-icon bi bi-plus-circle"></i>
+                                <p>Create Booking</p>
+                            </a></li>
+                            <li class="nav-item"><a href="${pageContext.request.contextPath}/all-bookings"
+                                                    class="nav-link"> <i
+                                    class="nav-icon bi bi-list-ul"></i>
+                                <p>All Bookings</p>
+                            </a></li>
+                        </ul>
+                        <% } %>
                     </li>
                     <li class="nav-item"><a href="./generate/theme.html" class="nav-link"> <i
                             class="nav-icon bi bi-palette"></i>

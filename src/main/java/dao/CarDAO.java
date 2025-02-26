@@ -1,6 +1,7 @@
 package dao;
 
 import model.Car;
+import model.CarModel;
 import util.DatabaseUtil;
 
 import java.sql.*;
@@ -121,5 +122,50 @@ public class CarDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<Car> searchCars(String query) throws SQLException {
+        List<Car> cars = new ArrayList<>();
+        String sql = "SELECT * FROM cars WHERE reg_number LIKE ? OR model LIKE ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            String searchTerm = "%" + query + "%";
+            stmt.setString(1, searchTerm);
+            stmt.setString(2, searchTerm);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Car car = new Car();
+                    car.setCarId(rs.getString("car_id"));
+                    car.setType(rs.getString("type"));
+                    car.setCarModel(rs.getString("model"));
+                    car.setRegNumber(rs.getString("reg_number"));
+                    car.setSeatingCapacity(rs.getInt("capacity"));
+                    car.setAvailable(rs.getString("available"));
+                    car.setDriverId(rs.getString("driver_id"));
+                    // Optionally, set imagePath if your table has this column
+                    cars.add(car);
+                }
+            }
+        }
+        return cars;
+    }
+
+    public List<CarModel> getCarModelsByTypeId(int typeId) throws SQLException {
+        List<CarModel> models = new ArrayList<>();
+        String sql = "SELECT model_id, model_name, type_id FROM car_models WHERE type_id = ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, typeId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    CarModel model = new CarModel();
+                    model.setModelId(rs.getInt("model_id"));
+                    model.setModelName(rs.getString("model_name"));
+                    model.setTypeId(rs.getInt("type_id"));
+                    models.add(model);
+                }
+            }
+        }
+        return models;
     }
 }

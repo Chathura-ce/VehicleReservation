@@ -7,6 +7,10 @@ public class Customer {
     private String nic;
     private String phoneNumber;
 
+    private String username;
+    private String email;
+    private User user;
+
     // Getters and Setters
     public int getCustomerId() {
         return customerId;
@@ -57,5 +61,25 @@ public class Customer {
                 ", nic='" + nic + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public String getUsername() {
+        return username;
+    }
+
+    public void setEmail(String email) {
+        this.email  = email;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setUser(User user) {
+        this.user  = user;
+    }
+    public User getUser() {
+        return user;
     }
 }

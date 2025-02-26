@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>New Booking with Search Modals</title>
+  <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+  />
+  <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css"
+  />
+</head>
+<body>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-md-12">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>New Booking</h4>
+        </div>
+        <div class="card-body p-4">
+          <form id="bookingForm">
+            <!-- Customer Information -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="customerName" class="form-label">Customer Name</label>
+                <div class="input-group">
+                  <input
+                          type="text"
+                          class="form-control"
+                          id="customerName"
+                          required
+                  />
+                  <button
+                          type="button"
+                          class="btn btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#customerSearchModal"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="customerPhone" class="form-label">Phone Number</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="customerPhone"
+                        required
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="customerNIC" class="form-label">NIC</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="customerNIC"
+                        required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="customerAddress" class="form-label">Address</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="customerAddress"
+                        required
+                />
+              </div>
+            </div>
+
+            <!-- Booking Details -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="bookingNumber" class="form-label">Booking Number</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="bookingNumber"
+                        readonly
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="cabType" class="form-label">Cab Type</label>
+                <select class="form-select" id="cabType" required>
+                  <option value="Sedan">Sedan</option>
+                  <option value="SUV">SUV</option>
+                  <option value="Mini">Mini</option>
+                  <option value="Luxury">Luxury</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="pickupLocation" class="form-label">Pickup Location</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="pickupLocation"
+                        required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="destination" class="form-label">Destination</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="destination"
+                        required
+                />
+              </div>
+            </div>
+
+            <!-- Car selection via popup (optional) -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="carRegNo" class="form-label">Car Registration Number</label>
+                <div class="input-group">
+                  <input
+                          type="text"
+                          class="form-control"
+                          id="carRegNo"
+                          required
+                  />
+                  <button
+                          type="button"
+                          class="btn btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#carSearchModal"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="driver" class="form-label">Assign Driver</label>
+                <select class="form-select" id="driver">
+                  <option value="Auto">Auto-Assign</option>
+                  <option value="John Doe">John Doe</option>
+                  <option value="Jane Smith">Jane Smith</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="availability" class="form-label">Booking Status</label>
+              <select class="form-select" id="availability">
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
+            <!-- Fare Calculation -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="distance" class="form-label">Distance (km)</label>
+                <input
+                        type="number"
+                        class="form-control"
+                        id="distance"
+                        required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="totalFare" class="form-label">Total Fare</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="totalFare"
+                        readonly
+                />
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex justify-content-end gap-2">
+              <button
+                      type="button"
+                      class="btn btn-success"
+                      onclick="calculateFare()"
+              >
+                Calculate Fare
+              </button>
+              <button type="submit" class="btn btn-primary">Confirm Booking</button>
+              <button type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Search Modal -->
+<div
+        class="modal fade"
+        id="customerSearchModal"
+        tabindex="-1"
+        aria-labelledby="customerSearchModalLabel"
+        aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="customerSearchModalLabel">Search Customer</h5>
+        <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Search field -->
+        <div class="mb-3">
+          <label for="customerSearchInput" class="form-label">
+            Search by NIC or Name
+          </label>
+          <input
+                  type="text"
+                  class="form-control"
+                  id="customerSearchInput"
+                  onkeyup="filterCustomerResults()"
+                  placeholder="Type NIC or Name..."
+          />
+        </div>
+        <!-- Results table -->
+        <table class="table table-bordered" id="customerTable">
+          <thead>
+          <tr>
+            <th>NIC</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Address</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- Example data, normally loaded from DB or JS array -->
+          <tr onclick="selectCustomer(this)">
+            <td>123456789V</td>
+            <td>John Doe</td>
+            <td>0712345678</td>
+            <td>Colombo</td>
+          </tr>
+          <tr onclick="selectCustomer(this)">
+            <td>987654321V</td>
+            <td>Jane Smith</td>
+            <td>0776543210</td>
+            <td>Kandy</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Car Search Modal -->
+<div
+        class="modal fade"
+        id="carSearchModal"
+        tabindex="-1"
+        aria-labelledby="carSearchModalLabel"
+        aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="carSearchModalLabel">Search Car</h5>
+        <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Search field -->
+        <div class="mb-3">
+          <label for="carSearchInput" class="form-label">
+            Search by Registration No. or Model
+          </label>
+          <input
+                  type="text"
+                  class="form-control"
+                  id="carSearchInput"
+                  onkeyup="filterCarResults()"
+                  placeholder="Type registration no. or model..."
+          />
+        </div>
+        <!-- Results table -->
+        <table class="table table-bordered" id="carTable">
+          <thead>
+          <tr>
+            <th>Reg. No.</th>
+            <th>Model</th>
+            <th>Type</th>
+            <th>Availability</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- Example data, normally loaded from DB or JS array -->
+          <tr onclick="selectCar(this)">
+            <td>ABC-1234</td>
+            <td>Toyota Prius</td>
+            <td>Hybrid</td>
+            <td>Available</td>
+          </tr>
+          <tr onclick="selectCar(this)">
+            <td>XYZ-7890</td>
+            <td>Nissan Sunny</td>
+            <td>Sedan</td>
+            <td>In Use</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+<script>
+  // Generate Booking Number on page load (simple random logic)
+  document.getElementById('bookingNumber').value =
+          'BKG' + Math.floor(Math.random() * 1000000);
+
+  // Fare Calculation (example logic)
+  function calculateFare() {
+    const distance = document.getElementById('distance').value;
+    const baseFare = 100; // base fare
+    const perKmRate = 50; // rate per km
+    const totalFare = baseFare + distance * perKmRate;
+    document.getElementById('totalFare').value = totalFare.toFixed(2) + ' LKR';
+  }
+
+  // -- Modal: Customer Search --
+  function filterCustomerResults() {
+    // Basic client-side filter for example
+    const input = document.getElementById('customerSearchInput').value.toLowerCase();
+    const table = document.getElementById('customerTable');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+      const cells = rows[i].getElementsByTagName('td');
+      if (cells.length > 0) {
+        const rowText = (cells[0].innerText + cells[1].innerText).toLowerCase();
+        rows[i].style.display = rowText.includes(input) ? '' : 'none';
+      }
+    }
+  }
+
+  function selectCustomer(row) {
+    // Fill main form fields
+    const nic = row.cells[0].innerText;
+    const name = row.cells[1].innerText;
+    const phone = row.cells[2].innerText;
+    const address = row.cells[3].innerText;
+
+    document.getElementById('customerNIC').value = nic;
+    document.getElementById('customerName').value = name;
+    document.getElementById('customerPhone').value = phone;
+    document.getElementById('customerAddress').value = address;
+
+    // Close modal
+    bootstrap.Modal.getInstance(
+            document.getElementById('customerSearchModal')
+    ).hide();
+  }
+
+  // -- Modal: Car Search --
+  function filterCarResults() {
+    // Basic client-side filter for example
+    const input = document.getElementById('carSearchInput').value.toLowerCase();
+    const table = document.getElementById('carTable');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+      const cells = rows[i].getElementsByTagName('td');
+      if (cells.length > 0) {
+        const rowText = (cells[0].innerText + cells[1].innerText).toLowerCase();
+        rows[i].style.display = rowText.includes(input) ? '' : 'none';
+      }
+    }
+  }
+
+  function selectCar(row) {
+    // Fill main form fields
+    const regNo = row.cells[0].innerText;
+    document.getElementById('carRegNo').value = regNo;
+
+    // Optionally fill in other fields or logic
+    // E.g., if you want to auto-detect type from the second cell:
+    // const model = row.cells[1].innerText;
+    // const cartype = row.cells[2].innerText;
+    // ...
+
+    // Close modal
+    bootstrap.Modal.getInstance(
+            document.getElementById('carSearchModal')
+    ).hide();
+  }
+</script>
+</body>
+</html>
+
+
