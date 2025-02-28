@@ -1,5 +1,6 @@
 package service;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class CustomerService {
         return customerDAO.selectAllCustomers();
     }
 
-    public void insertCustomer(Customer customer) throws SQLException {
-        customerDAO.insertCustomer(customer);
+    public int insertCustomer(Customer customer, Connection conn) throws SQLException {
+       return customerDAO.addCustomer(customer,conn);
     }
 
     public Customer selectCustomer(int id) throws SQLException {

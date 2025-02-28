@@ -1,39 +1,40 @@
 package dao;
 
 import model.Booking;
+import util.BookingUtil;
 import util.DatabaseUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BookingDAO {
-    public int insertBooking(Booking booking) throws SQLException {
-        String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, booking_time, amount, status_id, price_for_hr, time_hr, total_fare, created_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+    public String insertBooking(Booking booking,Connection connection) throws SQLException {
+        String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, pickup_time,dropoff_time, status_id, price_for_hr, time_hr, total_fare, created_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, CURRENT_TIMESTAMP)";
 
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, booking.getBookingNumber());
+            String bookingId = BookingUtil.generateBookingId(connection);
+            stmt.setString(1, bookingId);
             stmt.setInt(2, booking.getCustomerId());
             stmt.setObject(3, booking.getDriverId());
             stmt.setString(4, booking.getCarId());
             stmt.setString(5, booking.getDestination());
-            stmt.setTimestamp(6, booking.getBookingTime());
-            stmt.setDouble(7, booking.getTotalFare()); // we can store total fare in amount
+            stmt.setTimestamp(6, booking.getPickupTime());
+            stmt.setTimestamp(7, booking.getDropOffTime());
             stmt.setInt(8, booking.getStatusId());
             stmt.setDouble(9, booking.getPriceForHr());
-            stmt.setInt(10, booking.getTimeHr());
+            stmt.setDouble(10, booking.getTimeHr());
             stmt.setDouble(11, booking.getTotalFare());
 
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
-                return rs.getInt(1);
+                return bookingId;
             }
         }
-        return -1;
+        return "";
     }
 
     public Booking selectBooking(String id) throws SQLException {
@@ -53,7 +54,7 @@ public class BookingDAO {
 
     public List<Booking> selectAllBookings() throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM bookings ORDER BY booking_time DESC";
+        String sql = "SELECT * FROM bookings ORDER BY pickup_time DESC";
 
         try (Connection connection = DatabaseUtil.getConnection();
              Statement stmt = connection.createStatement();
@@ -67,7 +68,7 @@ public class BookingDAO {
     }
 
     public boolean updateBooking(Booking booking) throws SQLException {
-        String sql = "UPDATE bookings SET booking_number = ?, customer_id = ?, driver_id = ?, car_id = ?, destination = ?, booking_time = ?, amount = ?, status_id = ?, price_for_hr = ?, time_hr = ?, total_fare = ? " +
+        String sql = "UPDATE bookings SET booking_number = ?, customer_id = ?, driver_id = ?, car_id = ?, destination = ?, pickup_time = ?,  status_id = ?, price_for_hr = ?, time_hr = ?, total_fare = ? " +
                 "WHERE booking_id = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
@@ -78,13 +79,12 @@ public class BookingDAO {
             stmt.setObject(3, booking.getDriverId());
             stmt.setString(4, booking.getCarId());
             stmt.setString(5, booking.getDestination());
-            stmt.setTimestamp(6, booking.getBookingTime());
-            stmt.setDouble(7, booking.getTotalFare());
-            stmt.setInt(8, booking.getStatusId());
-            stmt.setDouble(9, booking.getPriceForHr());
-            stmt.setInt(10, booking.getTimeHr());
-            stmt.setDouble(11, booking.getTotalFare());
-            stmt.setInt(12, booking.getBookingId());
+            stmt.setTimestamp(6, booking.getPickupTime());
+            stmt.setInt(7, booking.getStatusId());
+            stmt.setDouble(8, booking.getPriceForHr());
+            stmt.setDouble(9, booking.getTimeHr());
+            stmt.setDouble(10, booking.getTotalFare());
+            stmt.setInt(11, booking.getBookingId());
 
             return stmt.executeUpdate() > 0;
         }
@@ -109,13 +109,28 @@ public class BookingDAO {
         booking.setDriverId(rs.getString("driver_id"));
         booking.setCarId(rs.getString("car_id"));
         booking.setDestination(rs.getString("destination"));
-        booking.setBookingTime(rs.getTimestamp("booking_time"));
-        booking.setAmount(rs.getDouble("amount"));
+        booking.setPickupTime(rs.getTimestamp("pickup_time"));
         booking.setStatusId(rs.getInt("status_id"));
         booking.setPriceForHr(rs.getDouble("price_for_hr"));
         booking.setTimeHr(rs.getInt("time_hr"));
         booking.setTotalFare(rs.getDouble("total_fare"));
         booking.setCreatedAt(rs.getTimestamp("created_at"));
         return booking;
+    }
+
+    public int getMaxBookingId(Connection conn) {
+        String sql = "SELECT COALESCE(MAX(booking_id), 0) FROM bookings";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0; // Start from 0 if no bookings exist
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }

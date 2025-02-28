@@ -2,6 +2,7 @@ package dao;
 
 import model.Customer;
 import model.User;
+import util.CustomerUtil;
 import util.DatabaseUtil;
 
 import java.sql.*;
@@ -10,58 +11,53 @@ import java.util.List;
 
 public class CustomerDAO {
 
-    public void addCustomer(Customer customer) throws SQLException {
-        String sql = "INSERT INTO customers (user_id, address, nic, phone_number) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, customer.getUserId());
-            stmt.setString(2, customer.getAddress());
-            stmt.setString(3, customer.getNic());
-            stmt.setString(4, customer.getPhoneNumber());
+    public int addCustomer(Customer customer) throws SQLException {
+        Connection connection = DatabaseUtil.getConnection();
+        return   addCustomer(customer,connection);
+    }
+    public int addCustomer(Customer customer,Connection connection) throws SQLException {
+        String sql = "INSERT INTO customers (customer_number,user_id, address) VALUES (?, ?, ?)";
+        try (
+             PreparedStatement stmt = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
+            String customerNumber = CustomerUtil.generateCustomerNumber(customer.getUserId());
+            customer.setCustomerNumber(customerNumber);
+
+            stmt.setString(1, customer.getCustomerNumber());
+            stmt.setInt(2, customer.getUserId());
+            stmt.setString(3, customer.getAddress());
             stmt.executeUpdate();
-        }
-    }
 
-    public boolean customerExistsByNIC(String nic) throws SQLException {
-        String sql = "SELECT customer_id FROM customers WHERE nic = ?";
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nic);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next(); // Returns true if a record is found
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                int generatedId = rs.getInt(1);
+                customer.setCustomerId(generatedId);
+                return generatedId;
             }
         }
+        return -1;
     }
 
-    public boolean customerPhoneNumberExists(String phone_number) throws SQLException {
-        String sql = "SELECT phone_number FROM customers WHERE phone_number = ?";
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, phone_number);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next(); // Returns true if a record is found
-            }
-        }
-    }
 
     public List<Customer> selectAllCustomers() throws SQLException {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT c.*, u.user_id, u.username, u.email,u.full_name FROM customers c JOIN users u ON c.user_id = u.user_id";
+        String sql = "SELECT c.*, u.* FROM customers c JOIN users u ON c.user_id = u.user_id";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Customer customer = new Customer();
-                User user = new User();
                 customer.setCustomerId(rs.getInt("customer_id"));
                 customer.setUserId(rs.getInt("user_id"));
                 customer.setUsername(rs.getString("username"));
-                customer.setEmail(rs.getString("email"));
                 customer.setAddress(rs.getString("address"));
-                customer.setNic(rs.getString("nic"));
-                customer.setPhoneNumber(rs.getString("phone_number"));
 
+                User user = new User();
                 user.setFullName(rs.getString("full_name"));
+                user.setUsername(rs.getString("username"));
+                user.setNic(rs.getString("nic"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+
                 customer.setUser(user);
 
                 customers.add(customer);
@@ -70,9 +66,6 @@ public class CustomerDAO {
         return customers;
     }
 
-    public void insertCustomer(Customer customer) throws SQLException {
-        addCustomer(customer); // Reuse existing addCustomer method
-    }
 
     public Customer selectCustomer(int id) throws SQLException {
         String sql = "SELECT c.*, u.user_id, u.username, u.email FROM customers c JOIN users u ON c.user_id = u.user_id WHERE c.customer_id = ?";
@@ -85,10 +78,17 @@ public class CustomerDAO {
                     customer.setCustomerId(rs.getInt("customer_id"));
                     customer.setUserId(rs.getInt("user_id"));
                     customer.setUsername(rs.getString("username"));
-                    customer.setEmail(rs.getString("email"));
                     customer.setAddress(rs.getString("address"));
-                    customer.setNic(rs.getString("nic"));
-                    customer.setPhoneNumber(rs.getString("phone_number"));
+
+                    User user = new User();
+                    user.setFullName(rs.getString("full_name"));
+                    user.setUsername(rs.getString("username"));
+                    user.setNic(rs.getString("nic"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+
+                    customer.setUser(user);
+
                     return customer;
                 }
             }

@@ -2,6 +2,7 @@ package model;
 
 public class Customer {
     private int customerId;
+    private String customerNumber;
     private int userId;
     private String address;
     private String nic;
@@ -18,6 +19,14 @@ public class Customer {
 
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public void setCustomerNumber(String customerNumber) {
+        this.customerNumber = customerNumber;
     }
 
     public int getUserId() {
@@ -66,19 +75,23 @@ public class Customer {
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getUsername() {
         return username;
     }
 
     public void setEmail(String email) {
-        this.email  = email;
+        this.email = email;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setUser(User user) {
-        this.user  = user;
+        this.user = user;
     }
+
     public User getUser() {
         return user;
     }

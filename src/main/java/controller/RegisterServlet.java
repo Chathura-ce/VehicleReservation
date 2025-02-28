@@ -60,7 +60,7 @@ public class RegisterServlet extends HttpServlet {
 
         //check if the username is already registered
         try {
-            if (userDAO.checkUsernameExists(username)) {
+            if (userDAO.checkUsernameExists(username,0)) {
                 errorMessage.append("Username  already exists.");
             }
         } catch (SQLException e) {
@@ -69,29 +69,11 @@ public class RegisterServlet extends HttpServlet {
 
         //check if the email is already registered
         try {
-            if (userDAO.checkEmailExists(email)) {
+            if (userDAO.checkEmailExists(email,0)) {
                 errorMessage.append("Email already exists. <br>");
             }
         } catch (SQLException e) {
             errorMessage.append("Error checking email. Please try again. <br>");
-        }
-
-        //check if the phone is already registered
-        try {
-            if (customerDAO.customerPhoneNumberExists(phoneNumber)) {
-                errorMessage.append("Phone number already exists. <br>");
-            }
-        } catch (SQLException e) {
-            errorMessage.append("Error checking phone number. Please try again. ");
-        }
-
-        //check if the NIC is already registered
-        try {
-            if (customerDAO.customerExistsByNIC(nic)) {
-                errorMessage.append("NIC already exists. <br>");
-            }
-        } catch (SQLException e) {
-            errorMessage.append("Error checking NIC. Please try again. <br>");
         }
 
         // If there are any errors, forward back to registration page with the error message

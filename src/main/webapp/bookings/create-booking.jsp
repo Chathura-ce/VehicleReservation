@@ -17,6 +17,8 @@
 %>
 
 <jsp:include page="../header.jsp"/>
+<%--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">--%>
+<%--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>--%>
 
 <div class="container-fluid">
     <div class="card">
@@ -32,6 +34,7 @@
                             type="text"
                             class="form-control"
                             id="bookingNumber"
+                            name="bookingNumber"
                             placeholder="Auto-generated or manual"
                     />
                 </div>
@@ -45,10 +48,12 @@
                                     type="text"
                                     class="form-control"
                                     id="customerRegNo"
+                                    name="customerRegNo"
                                     placeholder="CUST0001"
                             />
                             <button
                                     id="openCustomerModal"
+                                    name="openCustomerModal"
                                     type="button"
                                     class="btn btn-outline-secondary"
                                     title="Search Customer"
@@ -64,6 +69,7 @@
                                 type="text"
                                 class="form-control"
                                 id="customerName"
+                                name="customerName"
                                 placeholder="Customer Name"
                         />
                     </div>
@@ -73,6 +79,7 @@
                                 type="text"
                                 class="form-control"
                                 id="customerNIC"
+                                name="customerNIC"
                                 placeholder="123456789V"
                         />
                     </div>
@@ -80,21 +87,33 @@
 
                 <!-- Row 3: Address, Phone No -->
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="address" class="form-label">Address</label>
                         <input
                                 type="text"
                                 class="form-control"
                                 id="address"
+                                name="address"
                                 placeholder="Street, City"
                         />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="customerEmail" class="form-label">Email</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="customerEmail"
+                                name="customerEmail"
+                                placeholder="e.g. jhone@gmail.com"
+                        />
+                    </div>
+                    <div class="col-md-4">
                         <label for="phoneNo" class="form-label">Phone No</label>
                         <input
                                 type="text"
                                 class="form-control"
                                 id="phoneNo"
+                                name="phoneNo"
                                 placeholder="077xxxxxxx"
                         />
                     </div>
@@ -109,6 +128,7 @@
                                     type="text"
                                     class="form-control"
                                     id="carId"
+                                    name="carId"
                                     placeholder="CAR0001"
                             />
                             <button
@@ -127,12 +147,13 @@
                                 type="text"
                                 class="form-control"
                                 id="carRegNo"
+                                name="carRegNo"
                                 placeholder="ABC-1234"
                         />
                     </div>
                     <div class="col-md-4">
                         <label for="carType" class="form-label">Car Type</label>
-                        <select class="form-select" id="carType">
+                        <select class="form-select" id="carType" name="carType">
                             <option>Sedan</option>
                             <option>SUV</option>
                             <option>Mini</option>
@@ -145,19 +166,19 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="carModel" class="form-label">Car Model</label>
-                        <select class="form-select" id="carModel">
+                        <select class="form-select" id="carModel" name="carModel">
                             <option>-- Select Car Model --</option>
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label for="driver" class="form-label">Driver</label>
-                        <select class="form-select" id="driver">
+                        <select class="form-select" id="driver" name="driver">
                             <option value="">-- Select Driver --</option>
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label for="bookingStatus" class="form-label">Booking Status</label>
-                        <select class="form-select" id="bookingStatus">
+                        <select class="form-select" id="bookingStatus" name="bookingStatus">
                             <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
                             <option value="completed">Completed</option>
@@ -167,38 +188,86 @@
 
                 <!-- Row 6: Time (Hr), Total Fare, Buttons -->
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="totalFare" class="form-label">Price for Hr</label>
                         <input
                                 type="text"
                                 class="form-control"
                                 id="priceForHr"
+                                name="priceForHr"
                                 placeholder="e.g. 1"
                         />
                     </div>
-                    <div class="col-md-4">
-                        <label for="timeHr" class="form-label">Time (Hr)</label>
+                    <div class="col-md-3">
+                        <label for="pickupTime" class="form-label">Pickup Time</label>
                         <input
-                                type="number"
+                                type="datetime-local"
                                 class="form-control"
-                                id="timeHr"
+                                id="pickupTime"
+                                name="pickupTime"
                                 placeholder="e.g. 2"
                         />
                     </div>
-                    <div class="col-md-4">
-                        <label for="totalFare" class="form-label">Total Fare</label>
+                    <div class="col-md-3">
+                        <label for="dropOffTime" class="form-label">Drop-off Time</label>
+                        <input
+                                type="datetime-local"
+                                class="form-control"
+                                id="dropOffTime"
+                                name="dropOffTime"
+                                placeholder="e.g. 2"
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="timeHr" class="form-label">Time(Hr)</label>
                         <input readonly
+                               value="0"
                                 type="text"
                                 class="form-control"
-                                id="totalFare"
-                                placeholder="Auto-calculate"
+                                id="timeHr"
+                               name="timeHr"
+                                placeholder=""
                         />
                     </div>
                 </div>
 
                 <!-- Row 7: Buttons -->
                 <div class="row mb-3">
-                    <div class="col-md-4 d-flex align-items-start">
+                    <div class="col-md-3">
+                        <label for="pickupLocation" class="form-label">Pickup Location</label>
+                        <input 
+                               value=""
+                               type="text"
+                               class="form-control"
+                               id="pickupLocation"
+                               name="pickupLocation"
+                               placeholder=""
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="destination" class="form-label">Destination</label>
+                        <input
+                               value=""
+                               type="text"
+                               class="form-control"
+                               id="destination"
+                               name="destination"
+                               placeholder=""
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="totalFare" class="form-label">Total Fare</label>
+                        <input readonly
+                               value="0"
+                               type="text"
+                               class="form-control"
+                               id="totalFare"
+                               name="totalFare"
+                               placeholder="Auto-calculate"
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label  class="form-label">&nbsp;</label>
                         <div class="">
                             <button type="submit" class="btn btn-primary me-2">Confirm</button>
                             <button type="reset" class="btn btn-secondary">Clear</button>
@@ -209,8 +278,8 @@
         </div>
     </div>
 </div>
-<!--  Modal -->
 
+<!--  Modal -->
 <div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -291,10 +360,50 @@
 </div>
 <jsp:include page="../footer.jsp"/>
 <!-- AJAX and Table Update Script -->
+<%--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.0.0/dist/css/tempus-dominus.min.css">--%>
+<%--<script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.0.0/dist/js/tempus-dominus.min.js"></script>--%>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('searchInput');
-        const searchResults = document.getElementById('searchResults');
+        const pickupTimeInput = document.getElementById("pickupTime");
+        const dropOffTimeInput = document.getElementById("dropOffTime");
+        const timeHrInput = document.getElementById("timeHr");
+        const priceForHrInput = document.getElementById("priceForHr");
+        const totalFareInput = document.getElementById("totalFare");
+
+        function calculateTimeAndFare() {
+            const pickupTime = new Date(pickupTimeInput.value);
+            const dropOffTime = new Date(dropOffTimeInput.value);
+            const pricePerHour = parseFloat(priceForHrInput.value) || 0;
+
+            if (!isNaN(pickupTime) && !isNaN(dropOffTime)) {
+                if (dropOffTime < pickupTime) {
+                    alert("Drop-off time cannot be earlier than Pickup time!");
+                    dropOffTimeInput.value = ""; // Reset drop-off time
+                    timeHrInput.value = "0";
+                    totalFareInput.value = "0";
+                    return;
+                }
+
+                // Calculate the time difference in hours
+                const timeDifference = dropOffTime - pickupTime;
+                const hoursDifference = timeDifference / (1000 * 60 * 60); // Convert ms to hours
+
+                // Update the hours field
+                timeHrInput.value = hoursDifference.toFixed(2);
+
+                // Calculate total fare
+                const totalFare = hoursDifference * pricePerHour;
+                totalFareInput.value = totalFare.toFixed(2); // Round to 2 decimal places
+            } else {
+                timeHrInput.value = "0";
+                totalFareInput.value = "0";
+            }
+        }
+
+        // Attach event listeners to input fields
+        pickupTimeInput.addEventListener("change", calculateTimeAndFare);
+        dropOffTimeInput.addEventListener("change", calculateTimeAndFare);
+        priceForHrInput.addEventListener("input", calculateTimeAndFare);
 
         // Trigger search when user types in the input
         searchInput.addEventListener('keyup', function() {
@@ -442,18 +551,23 @@
         });
 
         $("#bookingForm").submit(function(e){
-            alert()
             e.preventDefault(); // Prevent the default form submission
+            // console.log($(this).serialize())
+            let url = '${pageContext.request.contextPath}/booking/insert';
+            if($("#bookingNumber").val().trim() != "") {
+                url = '${pageContext.request.contextPath}/booking/update';
+            }
             $.ajax({
-                url: '${pageContext.request.contextPath}/booking/insert',
+                url: url,
                 type: 'POST',
                 data: $(this).serialize(), // Serialize form data
-                dataType: 'json',
+                // dataType: 'json',
                 success: function(response) {
                     if(response.status === "success") {
-                        alert("Booking saved successfully! Booking ID: " + response.bookingId);
+                        alert("Booking saved successfully! Booking ID: " + response.bookingNumber);
+                        $("#bookingNumber").val(response.bookingNumber);
                         // Optionally, clear the form or redirect the user:
-                        $("#bookingForm")[0].reset();
+                        // $("#bookingForm")[0].reset();
                     } else {
                         alert("Error: " + response.message);
                     }

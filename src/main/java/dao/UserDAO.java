@@ -1,5 +1,7 @@
 package dao;
 
+import exception.ValidationException;
+import model.Booking;
 import util.DatabaseUtil;
 import model.User;
 import util.PasswordUtil;
@@ -8,9 +10,15 @@ import java.sql.*;
 
 public class UserDAO {
 
-    public int addUser(User user) throws SQLException {
+    public int addUser(User user) throws SQLException, ValidationException {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            return addUser(user, connection);
+        }
+    }
+
+    public int addUser(User user,Connection connection) throws SQLException {
         String sql = "INSERT INTO users (username, password_hash,salt, full_name, email, role,phone) VALUES (?, ?,?, ?, ?, ?,?)";
-        try (Connection connection = DatabaseUtil.getConnection();
+        try (
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             String salt = PasswordUtil.generateSalt(); // Generate salt
             String hashedPassword = PasswordUtil.hashPassword(user.getPassword(), salt); // Hash password
@@ -63,22 +71,35 @@ public class UserDAO {
     }
 
 
-    public boolean checkUsernameExists(String username) throws SQLException {
-        String sql = "SELECT username FROM users WHERE username = ?";
+    public boolean checkUsernameExists(String username, int userId) throws SQLException {
+        String sql = "SELECT username FROM users WHERE username = ? AND user_id<>?";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, username);
+            stmt.setInt(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next(); // Returns true if a record is found
             }
         }
     }
 
-    public boolean checkEmailExists(String email) throws SQLException {
-        String sql = "SELECT email FROM users WHERE email = ?";
+    public boolean checkEmailExists(String email,int userId) throws SQLException {
+        String sql = "SELECT email FROM users WHERE email = ? AND user_id<>?";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, email);
+            stmt.setInt(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // Returns true if a record is found
+            }
+        }
+    }
+    public boolean checkNICExists(String nic,int userId) throws SQLException {
+        String sql = "SELECT nic FROM users WHERE nic = ? AND user_id<>?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, nic);
+            stmt.setInt(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next(); // Returns true if a record is found
             }
@@ -123,7 +144,7 @@ public class UserDAO {
     }
 
 
-    public boolean isUsernameExists(int userId,String username) {
+    public boolean isUsernameExists(int userId, String username) {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ? AND user_id <> ?";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -139,7 +160,7 @@ public class UserDAO {
         return false;
     }
 
-    public boolean isEmailExists(int userId,String email) {
+    public boolean isEmailExists(int userId, String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND user_id <> ?";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

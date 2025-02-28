@@ -1,12 +1,22 @@
 package service;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import dao.BookingDAO;
+import dao.CustomerDAO;
+import dao.UserDAO;
+import exception.ValidationException;
 import model.Booking;
+import model.Customer;
+import model.User;
+import util.DatabaseUtil;
+import validator.BookingValidator;
+import validator.CustomerValidator;
+import validator.UserValidator;
 
 public class BookingService {
     private BookingDAO bookingDAO;
@@ -19,25 +29,70 @@ public class BookingService {
         return bookingDAO.selectAllBookings();
     }
 
-    public int createBooking(Booking booking) throws SQLException {
-        validateBooking(booking);
-        validateBookingTime(booking.getBookingTime());
-        validatePriceAndTime(booking.getPriceForHr(), booking.getTimeHr());
-        // Calculate total fare if not provided or to ensure consistency
+    // Non-transactional version: used in the servlet for existing customers.
+    public String createBooking(Booking booking) throws SQLException, ValidationException {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            return createBooking(booking, connection);
+        }
+    }
+
+    public String createBooking(Booking booking,Connection connection) throws SQLException {
         double totalFare = booking.getPriceForHr() * booking.getTimeHr();
         booking.setTotalFare(totalFare);
-        // Also store total fare in amount column if desired
-        booking.setAmount(totalFare);
 
-        // Set default status for new booking (e.g., 1 for 'Pending')
         booking.setStatusId(1);
         booking.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
-        return bookingDAO.insertBooking(booking);
+        return bookingDAO.insertBooking(booking,connection);
     }
 
+    public String createBookingTransaction(Booking booking, User user, Customer customer)
+            throws SQLException, ValidationException {
+        Connection connection = null;
+        try {
+            connection = DatabaseUtil.getConnection();
+            connection.setAutoCommit(false); // Start transaction
+
+            // Validate the user and customer before inserting
+            UserValidator userValidator = new UserValidator(new UserDAO());
+            userValidator.validateUser(user);
+            CustomerValidator customerValidator = new CustomerValidator(new CustomerDAO());
+            customerValidator.validateCustomer(customer);
+
+            // Insert the user using the connection-aware DAO method
+            UserService userService = new UserService();
+            int userId = userService.insertUser(user, connection);  // Overloaded to accept Connection
+            user.setUserId(userId);
+
+            // Insert the customer using the connection-aware DAO method
+            customer.setUserId(userId);
+            CustomerService customerService = new CustomerService();
+            int customerId = customerService.insertCustomer(customer, connection);  // Overloaded to accept Connection
+            booking.setCustomerId(customerId);
+
+            BookingValidator bookingValidator = new BookingValidator();
+            bookingValidator.validateBooking(booking);
+
+            // Insert the booking using the connection-aware method on this instance
+            String bookingNumber = this.createBooking(booking, connection);  // Overloaded to accept Connection
+
+            connection.commit(); // Commit the transaction
+            return bookingNumber;
+        } catch (SQLException | ValidationException e) {
+            if (connection != null) {
+                connection.rollback(); // Roll back on error
+            }
+            throw e;
+        } finally {
+            if (connection != null) {
+                connection.setAutoCommit(true);
+                connection.close();
+            }
+        }
+    }
+
+
     public Booking getBookingById(int id) throws SQLException {
-        validateId(id);
         Booking booking = bookingDAO.selectBooking(String.valueOf(id));
         if (booking == null) {
             throw new IllegalArgumentException("Booking not found with ID: " + id);
@@ -46,7 +101,6 @@ public class BookingService {
     }
 
     public boolean deleteBooking(int id) throws SQLException {
-        validateId(id);
         Booking existingBooking = getBookingById(id);
         if (existingBooking.getStatusId() != 1) { // Assuming 1 is 'Pending'
             throw new IllegalStateException("Cannot delete booking that is not in Pending status");
@@ -55,10 +109,6 @@ public class BookingService {
     }
 
     public boolean updateBooking(Booking booking) throws SQLException {
-        validateBooking(booking);
-        validateId(booking.getBookingId());
-        validateBookingTime(booking.getBookingTime());
-        validateAmount(booking.getAmount());
 
         Booking existingBooking = getBookingById(booking.getBookingId());
         if (existingBooking.getStatusId() != 1) { // Assuming 1 is 'Pending'
@@ -68,53 +118,8 @@ public class BookingService {
         return bookingDAO.updateBooking(booking);
     }
 
-    private void validateBooking(Booking booking) {
-        if (booking == null) {
-            throw new IllegalArgumentException("Booking cannot be null.");
-        }
-        if (booking.getBookingNumber() == null || booking.getBookingNumber().trim().isEmpty()) {
-            throw new IllegalArgumentException("Booking Number is required.");
-        }
-        if (booking.getCustomerId() <= 0) {
-            throw new IllegalArgumentException("A valid Customer is required.");
-        }
-        if (booking.getCarId() == null || booking.getCarId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Car ID is required.");
-        }
-        if (booking.getDestination() == null || booking.getDestination().trim().isEmpty()) {
-            throw new IllegalArgumentException("Destination is required.");
-        }
-    }
 
-    private void validateId(int id) {
-        if (id <= 0) {
-            throw new IllegalArgumentException("ID must be positive");
-        }
-    }
 
-    private void validateBookingTime(Timestamp bookingTime) {
-        if (bookingTime == null) {
-            throw new IllegalArgumentException("Booking Time cannot be null.");
-        }
-        if (bookingTime.before(Timestamp.valueOf(LocalDateTime.now()))) {
-            throw new IllegalArgumentException("Booking Time cannot be in the past.");
-        }
-    }
-
-    private void validateAmount(double amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
-    }
-
-    private void validatePriceAndTime(double priceForHr, int timeHr) {
-        if (priceForHr <= 0) {
-            throw new IllegalArgumentException("Price per hour must be positive.");
-        }
-        if (timeHr <= 0) {
-            throw new IllegalArgumentException("Time (Hr) must be positive.");
-        }
-    }
 
 
 }

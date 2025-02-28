@@ -4,6 +4,7 @@ public class User {
     private int userId;
     private String username;
     private String password;
+    private String nic;
     private String fullName;
     private String email;
     private String role;
@@ -38,5 +39,13 @@ public class User {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getNic() {
+        return nic;
+    }
+
+    public void setNic(String nic) {
+        this.nic = nic;
     }
 }

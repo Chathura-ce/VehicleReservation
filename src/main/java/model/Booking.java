@@ -4,31 +4,31 @@ import java.sql.Timestamp;
 
 public class Booking {
     private int bookingId;
-    private String bookingNumber; // new
+    private String bookingNumber;
     private int customerId;
     private String driverId;
     private String carId;
     private String destination;
-    private Timestamp bookingTime;
-    private double amount; // can hold total fare (or be redundant with totalFare)
+    private Timestamp pickupTime;
+    private Timestamp dropOffTime;
     private int statusId;
     private Timestamp createdAt;
-    private double priceForHr; // new
-    private int timeHr;        // new
-    private double totalFare;  // new
+    private double priceForHr;
+    private double timeHr;
+    private double totalFare;
 
     public Booking() {
     }
 
     public Booking(int customerId, String driverId, String carId, String destination,
-                   Timestamp bookingTime, double amount, int statusId,
-                   double priceForHr, int timeHr, double totalFare) {
+                   Timestamp pickupTime, Timestamp dropOffTime,   int statusId,
+                   double priceForHr, double timeHr, double totalFare) {
         this.customerId = customerId;
         this.driverId = driverId;
         this.carId = carId;
         this.destination = destination;
-        this.bookingTime = bookingTime;
-        this.amount = amount;
+        this.pickupTime = pickupTime;
+        this.dropOffTime = dropOffTime;
         this.statusId = statusId;
         this.priceForHr = priceForHr;
         this.timeHr = timeHr;
@@ -79,19 +79,20 @@ public class Booking {
         this.destination = destination;
     }
 
-    public Timestamp getBookingTime() {
-        return bookingTime;
+    public Timestamp getPickupTime() {
+        return pickupTime;
     }
-    public void setBookingTime(Timestamp bookingTime) {
-        this.bookingTime = bookingTime;
+    public void setPickupTime(Timestamp pickupTime) {
+        this.pickupTime = pickupTime;
     }
 
-    public double getAmount() {
-        return amount;
+    public Timestamp getDropOffTime() {
+        return dropOffTime;
     }
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public void setDropOffTime(Timestamp dropOffTime) {
+        this.dropOffTime = dropOffTime;
     }
+
 
     public int getStatusId() {
         return statusId;
@@ -114,10 +115,10 @@ public class Booking {
         this.priceForHr = priceForHr;
     }
 
-    public int getTimeHr() {
+    public double getTimeHr() {
         return timeHr;
     }
-    public void setTimeHr(int timeHr) {
+    public void setTimeHr(double timeHr) {
         this.timeHr = timeHr;
     }
 
