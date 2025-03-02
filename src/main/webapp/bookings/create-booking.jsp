@@ -1,5 +1,3 @@
-
-
 <%--<%@ page isErrorPage="true" %>--%>
 <%--<%= exception %>--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -30,26 +28,21 @@
                 <!-- Row 1: Booking Number -->
                 <div class="mb-3">
                     <label for="bookingNumber" class="form-label">Booking Number</label>
-                    <input
-                            type="text"
-                            class="form-control"
-                            id="bookingNumber"
-                            name="bookingNumber"
-                            placeholder="Auto-generated or manual"
-                    />
+                    <select onchange="getBookingDetails()" class="form-control" name="bookingNumber" id="bookingNumber">
+                        <option value="">--Select One--</option>
+                    </select>
                 </div>
 
                 <!-- Row 2: Customer Reg No (with search), Name, NIC -->
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <label for="customerRegNo" class="form-label">Customer Reg No</label>
+                        <label for="customerId" class="form-label">Customer ID</label>
                         <div class="input-group">
-                            <input
-                                    type="text"
-                                    class="form-control"
-                                    id="customerRegNo"
-                                    name="customerRegNo"
-                                    placeholder="CUST0001"
+                            <input readonly
+                                   type="text"
+                                   class="form-control"
+                                   id="customerId"
+                                   name="customerId"
                             />
                             <button
                                     id="openCustomerModal"
@@ -70,7 +63,6 @@
                                 class="form-control"
                                 id="customerName"
                                 name="customerName"
-                                placeholder="Customer Name"
                         />
                     </div>
                     <div class="col-md-4">
@@ -80,7 +72,6 @@
                                 class="form-control"
                                 id="customerNIC"
                                 name="customerNIC"
-                                placeholder="123456789V"
                         />
                     </div>
                 </div>
@@ -94,7 +85,6 @@
                                 class="form-control"
                                 id="address"
                                 name="address"
-                                placeholder="Street, City"
                         />
                     </div>
                     <div class="col-md-4">
@@ -104,7 +94,6 @@
                                 class="form-control"
                                 id="customerEmail"
                                 name="customerEmail"
-                                placeholder="e.g. jhone@gmail.com"
                         />
                     </div>
                     <div class="col-md-4">
@@ -114,7 +103,6 @@
                                 class="form-control"
                                 id="phoneNo"
                                 name="phoneNo"
-                                placeholder="077xxxxxxx"
                         />
                     </div>
                 </div>
@@ -124,12 +112,11 @@
                     <div class="col-md-4">
                         <label for="carId" class="form-label">Car ID</label>
                         <div class="input-group">
-                            <input
-                                    type="text"
-                                    class="form-control"
-                                    id="carId"
-                                    name="carId"
-                                    placeholder="CAR0001"
+                            <input readonly
+                                   type="text"
+                                   class="form-control"
+                                   id="carId"
+                                   name="carId"
                             />
                             <button
                                     data-bs-toggle="modal" data-bs-target="#searchCarModal"
@@ -142,33 +129,38 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label for="carRegNo" class="form-label">Car Reg No</label>
-                        <input
-                                type="text"
-                                class="form-control"
-                                id="carRegNo"
-                                name="carRegNo"
-                                placeholder="ABC-1234"
+                        <label for="carType" class="form-label">Car Type</label>
+                        <input readonly
+                               type="text"
+                               class="form-control"
+                               id="carType"
+                               name="carType"
                         />
                     </div>
                     <div class="col-md-4">
-                        <label for="carType" class="form-label">Car Type</label>
-                        <select class="form-select" id="carType" name="carType">
-                            <option>Sedan</option>
-                            <option>SUV</option>
-                            <option>Mini</option>
-                            <option>Luxury</option>
-                        </select>
+                        <label for="carModel" class="form-label">Car Model</label>
+                        <%--<select class="form-select" id="carModel" name="carModel">
+                            <option>-- Select Car Model --</option>
+                        </select>--%>
+                        <input readonly
+                               type="text"
+                               class="form-control"
+                               id="carModel"
+                               name="carModel"
+                        />
                     </div>
                 </div>
 
                 <!-- Row 5: Car Model (ComboBox), Driver, Booking Status -->
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <label for="carModel" class="form-label">Car Model</label>
-                        <select class="form-select" id="carModel" name="carModel">
-                            <option>-- Select Car Model --</option>
-                        </select>
+                        <label for="seatingCapacity" class="form-label">Seating Capacity</label>
+                        <input readonly
+                               type="text"
+                               class="form-control"
+                               id="seatingCapacity"
+                               name="seatingCapacity"
+                        />
                     </div>
                     <div class="col-md-4">
                         <label for="driver" class="form-label">Driver</label>
@@ -179,9 +171,10 @@
                     <div class="col-md-4">
                         <label for="bookingStatus" class="form-label">Booking Status</label>
                         <select class="form-select" id="bookingStatus" name="bookingStatus">
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="completed">Completed</option>
+                            <option value="1">Pending</option>
+                            <option value="2">Confirmed</option>
+                            <option value="3">Completed</option>
+                            <option value="4">Cancelled</option>
                         </select>
                     </div>
                 </div>
@@ -195,7 +188,6 @@
                                 class="form-control"
                                 id="priceForHr"
                                 name="priceForHr"
-                                placeholder="e.g. 1"
                         />
                     </div>
                     <div class="col-md-3">
@@ -205,7 +197,6 @@
                                 class="form-control"
                                 id="pickupTime"
                                 name="pickupTime"
-                                placeholder="e.g. 2"
                         />
                     </div>
                     <div class="col-md-3">
@@ -215,18 +206,16 @@
                                 class="form-control"
                                 id="dropOffTime"
                                 name="dropOffTime"
-                                placeholder="e.g. 2"
                         />
                     </div>
                     <div class="col-md-3">
                         <label for="timeHr" class="form-label">Time(Hr)</label>
                         <input readonly
                                value="0"
-                                type="text"
-                                class="form-control"
-                                id="timeHr"
+                               type="text"
+                               class="form-control"
+                               id="timeHr"
                                name="timeHr"
-                                placeholder=""
                         />
                     </div>
                 </div>
@@ -235,27 +224,25 @@
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <label for="pickupLocation" class="form-label">Pickup Location</label>
-                        <input 
-                               value=""
-                               type="text"
-                               class="form-control"
-                               id="pickupLocation"
-                               name="pickupLocation"
-                               placeholder=""
+                        <input
+                                value=""
+                                type="text"
+                                class="form-control"
+                                id="pickupLocation"
+                                name="pickupLocation"
                         />
                     </div>
                     <div class="col-md-3">
                         <label for="destination" class="form-label">Destination</label>
                         <input
-                               value=""
-                               type="text"
-                               class="form-control"
-                               id="destination"
-                               name="destination"
-                               placeholder=""
+                                value=""
+                                type="text"
+                                class="form-control"
+                                id="destination"
+                                name="destination"
                         />
                     </div>
-                    <div class="col-md-3">
+                    <div style="display:none" class="col-md-3">
                         <label for="totalFare" class="form-label">Total Fare</label>
                         <input readonly
                                value="0"
@@ -263,44 +250,50 @@
                                class="form-control"
                                id="totalFare"
                                name="totalFare"
-                               placeholder="Auto-calculate"
                         />
                     </div>
-                    <div class="col-md-3">
-                        <label  class="form-label">&nbsp;</label>
+                    <div class="col-md-6">
+                        <label class="form-label">&nbsp;</label>
                         <div class="">
-                            <button type="submit" class="btn btn-primary me-2">Confirm</button>
-                            <button type="reset" class="btn btn-secondary">Clear</button>
+                            <button type="submit" class="btn btn-primary me-2">Create</button>
+                            <button type="button" class="btn btn-success me-2">Print</button>
+                            <button onclick="window.location.reload();" type="reset" class="btn btn-secondary">New
+                            </button>
                         </div>
                     </div>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
 
-<!--  Modal -->
-<div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- Modal -->
+<div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <!-- Modal header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="searchCustomerModalLabel">Search by NIC or Name</h5>
+                <h5 class="modal-title" id="searchCustomerModalLabel">Search Customer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- Modal body -->
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="searchInput" class="form-label">Type NIC or Name:</label>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Type NIC or Name...">
+                    <label for="searchInput" class="form-label">Type Customer ID, Name, NIC, Email or Phone No :</label>
+                    <input type="text" class="form-control" id="searchInput">
                 </div>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>NIC</th>
+                        <th>Customer ID</th>
                         <th>Name</th>
-                        <th>Phone</th>
+                        <th>NIC</th>
                         <th>Address</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody id="searchResults">
@@ -320,7 +313,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="searchCarModal" tabindex="-1" aria-labelledby="searchCarModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
@@ -332,18 +325,20 @@
                 <!-- Search Input -->
                 <div class="mb-3">
                     <label for="carSearchInput" class="form-label">Enter Car Registration Number or Model:</label>
-                    <input type="text" class="form-control" id="carSearchInput" placeholder="Type your search query here...">
+                    <input type="text" class="form-control" id="carSearchInput">
                 </div>
                 <!-- Results Table -->
                 <table class="table table-bordered">
                     <thead>
                     <tr>
                         <th>Car ID</th>
-                        <th>Model</th>
                         <th>Type</th>
+                        <th>Model</th>
                         <th>Registration Number</th>
                         <th>Seating Capacity</th>
+                        <th>Driver</th>
                         <th>Status</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody id="carSearchResults">
@@ -359,9 +354,7 @@
     </div>
 </div>
 <jsp:include page="../footer.jsp"/>
-<!-- AJAX and Table Update Script -->
-<%--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.0.0/dist/css/tempus-dominus.min.css">--%>
-<%--<script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.0.0/dist/js/tempus-dominus.min.js"></script>--%>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const pickupTimeInput = document.getElementById("pickupTime");
@@ -369,6 +362,12 @@
         const timeHrInput = document.getElementById("timeHr");
         const priceForHrInput = document.getElementById("priceForHr");
         const totalFareInput = document.getElementById("totalFare");
+
+        pickupTimeInput.addEventListener("change", calculateTimeAndFare);
+        dropOffTimeInput.addEventListener("change", calculateTimeAndFare);
+        priceForHrInput.addEventListener("input", calculateTimeAndFare);
+
+        getBookingNumbers();
 
         function calculateTimeAndFare() {
             const pickupTime = new Date(pickupTimeInput.value);
@@ -400,107 +399,24 @@
             }
         }
 
-        // Attach event listeners to input fields
-        pickupTimeInput.addEventListener("change", calculateTimeAndFare);
-        dropOffTimeInput.addEventListener("change", calculateTimeAndFare);
-        priceForHrInput.addEventListener("input", calculateTimeAndFare);
 
-        // Trigger search when user types in the input
-        searchInput.addEventListener('keyup', function() {
-            let query = searchInput.value.trim();
-
-            // If empty, clear results
-            if (query.length === 0) {
-                searchResults.innerHTML = '';
-                return;
-            }
-
-            // Example jQuery AJAX call (replace '/searchCustomer' with your endpoint)
-            $.ajax({
-                url: '${pageContext.request.contextPath}/searchCustomer',
-                type: 'GET',
-                data: { q: query }, // The query parameter
-                dataType: 'json',
-                success: function(data) {
-                    let rows = '';
-                    if (data && data.length > 0) {
-                        data.forEach(function(customer) {
-                            rows += `
-                  <tr>
-                    <td>${customer.nic}</td>
-                    <td>${customer.name}</td>
-                    <td>${customer.phone}</td>
-                    <td>${customer.address}</td>
-                  </tr>
-                `;
-                        });
-                    } else {
-                        rows = '<tr><td colspan="4">No results found.</td></tr>';
-                    }
-                    searchResults.innerHTML = rows;
-                },
-                error: function() {
-                    searchResults.innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>';
-                }
-            });
+        $("#searchCustomerModal").on("shown.bs.modal", function () {
+            loadPopupCustomers();
         });
 
-        $("#carSearchInput").on("keyup", function() {
-            var query = $(this).val().trim();
-
-            // If the search input is empty, clear the results
-            if(query.length === 0) {
-                $("#carSearchResults").html("");
-                return;
-            }
-
-            // AJAX call to search for cars
-            $.ajax({
-                url: '${pageContext.request.contextPath}/searchCar',  // Ensure this matches your servlet mapping
-                type: 'GET',
-                data: { q: query },
-                dataType: 'json',
-                success: function(data) {
-                    var rows = "";
-                    if(data && data.length > 0) {
-                        $.each(data, function(index, car) {
-                            rows += "<tr>";
-                            rows += "<td>" + car.carId + "</td>";
-                            rows += "<td>" + car.model + "</td>";
-                            rows += "<td>" + car.type + "</td>";
-                            rows += "<td>" + car.regNumber + "</td>";
-                            rows += "<td>" + car.seatingCapacity + "</td>";
-                            rows += "<td>" + car.available + "</td>";
-                            rows += "</tr>";
-                        });
-                    } else {
-                        rows = "<tr><td colspan='6'>No results found.</td></tr>";
-                    }
-                    $("#carSearchResults").html(rows);
-                },
-                error: function() {
-                    $("#carSearchResults").html("<tr><td colspan='6'>Error loading data.</td></tr>");
-                }
-            });
+        $("#searchInput").on("keyup", function () {
+            loadPopupCustomers();
         });
 
-        $.ajax({
-            url: '${pageContext.request.contextPath}/getCarTypes',
-            type: 'GET',
-            dataType: 'json',
-            success: function(data){
-                var options = '<option value="">-- Select Car Type --</option>';
-                $.each(data, function(index, carType){
-                    options += '<option value="' + carType.typeId + '">' + carType.typeName + '</option>';
-                });
-                $("#carType").html(options);
-            },
-            error: function(){
-                $("#carType").html('<option value="">Error loading car types</option>');
-            }
+        $("#searchCarModal").on("shown.bs.modal", function () {
+            loadPopupCars();
         });
 
-        $('#carType').on('change', function() {
+        $("#carSearchInput").on("keyup", function () {
+            loadPopupCars();
+        });
+
+        $('#carType').on('change', function () {
             var typeId = $(this).val();
             // Clear the car model dropdown if no car type is selected
             if (!typeId) {
@@ -510,12 +426,12 @@
             $.ajax({
                 url: '${pageContext.request.contextPath}/getCarModels', // adjust your context path as needed
                 type: 'GET',
-                data: { typeId: typeId },
+                data: {typeId: typeId},
                 dataType: 'json',
-                success: function(data) {
+                success: function (data) {
                     var options = '<option value="">-- Select Car Model --</option>';
-                    if(data && data.length > 0) {
-                        $.each(data, function(index, carModel) {
+                    if (data && data.length > 0) {
+                        $.each(data, function (index, carModel) {
                             options += '<option value="' + carModel.modelId + '">' + carModel.modelName + '</option>';
                         });
                     } else {
@@ -523,20 +439,54 @@
                     }
                     $('#carModel').html(options);
                 },
-                error: function() {
+                error: function () {
                     $('#carModel').html('<option value="">Error loading models</option>');
                 }
             });
         });
 
+        $("#bookingForm").submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            // console.log($(this).serialize())
+            let url = '${pageContext.request.contextPath}/booking/insert';
+            if ($("#bookingNumber").val().trim() != "") {
+                url = '${pageContext.request.contextPath}/booking/update';
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: $(this).serialize(), // Serialize form data
+                // dataType: 'json',
+                success: function (response) {
+                    if (response.status === "success") {
+                        alert("Booking saved successfully! Booking ID: " + response.bookingNumber);
+                        $("#bookingNumber").val(response.bookingNumber);
+
+                        // Show print button
+                        $("#printButton").show();
+                        // $("#bookingForm")[0].reset();
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Ajax error: " + error);
+                }
+            });
+        });
+
+        loadDrivers();
+    });
+
+    function loadDrivers() {
         $.ajax({
             url: '${pageContext.request.contextPath}/loadDrivers', // Replace with your actual context path
             type: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 var options = '<option value="">-- Select Driver --</option>';
                 if (data && data.length > 0) {
-                    $.each(data, function(index, driver) {
+                    $.each(data, function (index, driver) {
                         // Assuming each driver has properties "driverId" and a nested "user" object with "fullName"
                         options += '<option value="' + driver.driverId + '">' + driver.user.fullName + '</option>';
                     });
@@ -545,38 +495,253 @@
                 }
                 $('#driver').html(options);
             },
-            error: function() {
+            error: function () {
                 $('#driver').html('<option value="">Error loading drivers</option>');
             }
         });
+    }
 
-        $("#bookingForm").submit(function(e){
-            e.preventDefault(); // Prevent the default form submission
-            // console.log($(this).serialize())
-            let url = '${pageContext.request.contextPath}/booking/insert';
-            if($("#bookingNumber").val().trim() != "") {
-                url = '${pageContext.request.contextPath}/booking/update';
+    function getCarTypes() {
+        $.ajax({
+            url: '${pageContext.request.contextPath}/getCarTypes',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var options = '<option value="">-- Select Car Type --</option>';
+                $.each(data, function (index, carType) {
+                    options += '<option value="' + carType.typeId + '">' + carType.typeName + '</option>';
+                });
+                $("#carType").html(options);
+            },
+            error: function () {
+                $("#carType").html('<option value="">Error loading car types</option>');
             }
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: $(this).serialize(), // Serialize form data
-                // dataType: 'json',
-                success: function(response) {
-                    if(response.status === "success") {
-                        alert("Booking saved successfully! Booking ID: " + response.bookingNumber);
-                        $("#bookingNumber").val(response.bookingNumber);
-                        // Optionally, clear the form or redirect the user:
-                        // $("#bookingForm")[0].reset();
-                    } else {
-                        alert("Error: " + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert("Ajax error: " + error);
-                }
-            });
         });
+    }
 
-    });
+    function getBookingNumbers(select = "") {
+        $.ajax({
+            url: "../booking/get-booking-numbers",
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                if (response.status == "success") {
+                    let options = '<option value="">--Select One--</option>';
+
+                    response.bookingNumbers.forEach((bookingNumber) => {
+                        options += "<option value='" + bookingNumber + "'>" + bookingNumber + "</option>";
+                    });
+                    $("#bookingNumber").html(options);
+                    $("#bookingNumber").val(select);
+                } else {
+                    console.error("Error fetching booking numbers:", response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Ajax error while fetching booking numbers:", error);
+            }
+        });
+    }
+
+    function getBookingDetails() {
+        const bookingNumber = $("#bookingNumber").val();
+        if (bookingNumber == "") {
+            toggleCustomerDetails(false);
+            resetForm()
+            return;
+        } else {
+            toggleCustomerDetails(true);
+            resetForm();
+        }
+
+        $.ajax({
+            url: '${pageContext.request.contextPath}/booking/get-details',
+            type: 'GET',
+            data: {bookingNumber: bookingNumber},
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === "success") {
+                    // Disable customer-related fields
+                    $("#customerRegNo,#openCustomerModal,#customerName, #customerNIC, #customerEmail, #phoneNo, #address").prop("disabled", true);
+
+                    // Populate customer details
+                    $("#customerRegNo").val(response.booking.customerRegNo);
+                    $("#customerName").val(response.booking.customerName);
+                    $("#customerNIC").val(response.booking.customerNIC);
+                    $("#address").val(response.booking.address);
+                    $("#customerEmail").val(response.booking.customerEmail);
+                    $("#phoneNo").val(response.booking.phoneNo);
+
+                    // Populate car details
+                    $("#carId").val(response.booking.carId);
+                    $("#carRegNo").val(response.booking.carRegNo);
+                    $("#carType").val(response.booking.carType);
+                    $("#carModel").val(response.booking.carModel);
+
+                    // Populate driver and status
+                    $("#driver").val(response.booking.driverId);
+                    $("#bookingStatus").val(response.booking.bookingStatus);
+
+                    // Populate time and fare details
+                    $("#priceForHr").val(response.booking.priceForHr);
+                    $("#pickupTime").val(response.booking.pickupTime);
+                    $("#dropOffTime").val(response.booking.dropOffTime);
+                    $("#timeHr").val(response.booking.timeHr);
+                    $("#totalFare").val(response.booking.totalFare);
+
+                    // Populate locations
+                    $("#pickupLocation").val(response.booking.pickupLocation);
+                    $("#destination").val(response.booking.destination);
+
+                    // Show print button for existing booking
+                    $("#printButton").show();
+                } else {
+                    alert("Error loading booking details: " + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error loading booking details: " + error);
+            }
+        });
+    }
+
+    function toggleCustomerDetails(disable) {
+        // Enable / Disable customer-related fields for existing booking
+        $("#customerRegNo,#customerName,#customerNIC,#customerEmail,#phoneNo,#address").prop("disabled", disable);
+        if ($('#bookingNumber').val() == "") $("#openCustomerModal").prop("disabled", false);
+        else $("#openCustomerModal").prop("disabled", true);
+    }
+
+    function resetForm() {
+        // Keep the booking number
+        // const bookingNumber = $("#bookingNumber").val();
+
+        // Reset customer details
+        // $("#customerRegNo").val("");
+        $("#customerName").val("");
+        $("#customerNIC").val("");
+        $("#customerEmail").val("");
+        $("#phoneNo").val("");
+        $("#address").val("");
+        $("#customerId").val("");
+
+        // Reset car details
+        $("#carId").val("");
+        $("#carRegNo").val("");
+        $("#carType").val("");
+        $("#carModel").val("");
+        $("#priceForHr").val("0");
+
+        // Reset driver
+        $("#driver").val("");
+
+        // Reset time and location details
+        $("#pickupTime").val("");
+        $("#dropOffTime").val("");
+        $("#timeHr").val("0");
+        $("#totalFare").val("0");
+        $("#pickupLocation").val("");
+        $("#destination").val("");
+
+        // Hide print button for new booking
+        $("#printButton").hide();
+
+        // Restore the booking number
+        // $("#bookingNumber").val(bookingNumber);
+    }
+
+    function loadPopupCustomers() {
+        let query = $('#searchInput').val().trim();
+        $.ajax({
+            url: '${pageContext.request.contextPath}/searchCustomer',
+            type: 'GET',
+            data: {q: query}, // The query parameter
+            dataType: 'json',
+            success: function (data) {
+                let rows = '';
+                if (data && data.length > 0) {
+                    data.forEach(function (customer) {
+                        rows += "<tr>"
+                            + "<td>" + customer.customerNumber + "</td>"
+                            + "<td>" + customer.user.fullName + "</td>"
+                            + "<td>" + customer.user.nic + "</td>"
+                            + "<td>" + customer.address + "</td>"
+                            + "<td>" + customer.user.email + "</td>"
+                            + "<td>" + customer.user.phone + "</td>"
+                            + "<td><button onclick='setUserData(this);' class='btn btn-success'><i class='bi bi-check-square'></i> Select</button></td>"
+                            + "</tr>";
+                    });
+                } else {
+                    rows = '<tr><td colspan="100%">No results found.</td></tr>';
+                }
+                $("#searchResults").html(rows);
+            },
+            error: function () {
+                $("#searchResults").html('<tr><td colspan="100%">Error loading data.</td></tr>');
+            }
+        });
+    }
+
+    function setUserData(obj) {
+        $('#customerId').val($(obj).closest('tr').find('td:eq(0)').text());
+        $('#customerName').val($(obj).closest('tr').find('td:eq(1)').text());
+        $('#customerNIC').val($(obj).closest('tr').find('td:eq(2)').text());
+        $('#address').val($(obj).closest('tr').find('td:eq(3)').text());
+        $('#customerEmail').val($(obj).closest('tr').find('td:eq(4)').text());
+        $('#phoneNo').val($(obj).closest('tr').find('td:eq(5)').text());
+        toggleCustomerDetails(true);
+        $('#searchCustomerModal').modal('hide');
+        $('#searchInput').val();
+        toastSuccess("Customer added successfully");
+    }
+
+    function loadPopupCars() {
+        var query = $("#carSearchInput").val().trim();
+
+        // AJAX call to search for cars
+        $.ajax({
+            url: '${pageContext.request.contextPath}/searchCar',  // Ensure this matches your servlet mapping
+            type: 'GET',
+            data: {q: query},
+            dataType: 'json',
+            success: function (data) {
+                var rows = "";
+                if (data && data.length > 0) {
+                    $.each(data, function (index, car) {
+                        var available = car.available == '0' ? 'Not Available' : 'Available';
+                        rows += "<tr>";
+                        rows += "<td>" + car.carId + "</td>";
+                        rows += "<td>" + car.type + "</td>";
+                        rows += "<td>" + car.model + "</td>";
+                        rows += "<td>" + car.regNumber + "</td>";
+                        rows += "<td>" + car.seatingCapacity + "</td>";
+                        rows += "<td>" + car.driverId + "</td>";
+                        rows += "<td>" + available + "</td>";
+                        rows += "<td><button onclick='setCarData(this);' class='btn btn-success'><i class='bi bi-check-square'></i> Select</button></td>"
+                        rows += "</tr>";
+                    });
+                } else {
+                    rows = "<tr><td colspan='100%'>No results found.</td></tr>";
+                }
+                $("#carSearchResults").html(rows);
+            },
+            error: function () {
+                $("#carSearchResults").html("<tr><td colspan='100%'>Error loading data.</td></tr>");
+            }
+        });
+    }
+
+    function setCarData(obj) {
+        $('#carId').val($(obj).closest('tr').find('td:eq(0)').text());
+        $('#carType').val($(obj).closest('tr').find('td:eq(1)').text());
+        $('#carModel').val($(obj).closest('tr').find('td:eq(2)').text());
+        $('#seatingCapacity').val($(obj).closest('tr').find('td:eq(4)').text());
+        $('#driver').val($(obj).closest('tr').find('td:eq(5)').text());
+
+        $('#searchCarModal').modal('hide');
+        $('#carSearchInput').val();
+        toastSuccess("Car added successfully");
+    }
+
+
 </script>

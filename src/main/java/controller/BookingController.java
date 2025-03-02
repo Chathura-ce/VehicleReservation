@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,6 @@ public class BookingController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getPathInfo();
-        System.out.println(action);
         try {
             switch (action) {
                 case "/new":
@@ -70,6 +70,12 @@ public class BookingController extends HttpServlet {
                     break;
                 case "/update":
                     updateBooking(request, response);
+                    break;
+                case "/get-booking-numbers":
+                    getBookingNumbers(request, response);
+                    break; 
+                case "/get-details":
+                    getBookingDetails(request, response);
                     break;
                 default:
                     listBooking(request, response);
@@ -112,94 +118,6 @@ public class BookingController extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    /*private void insertBooking_1(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException, ServletException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        Gson gson = new Gson();
-        Map<String, Object> jsonResponse = new HashMap<>();
-        try {
-            String username = request.getParameter("customerName");
-            String password = PasswordUtil.generateRandomPassword();
-            String fullName = request.getParameter("customerName");
-            String phoneNumber = request.getParameter("phoneNo");
-            String address = request.getParameter("address");
-            String nic = request.getParameter("customerNIC");
-            String email = request.getParameter("customerEmail");
-
-            String bookingNumber = request.getParameter("bookingNumber");
-            String customerIdStr = request.getParameter("customerId");
-            int customerId;
-            if (customerIdStr == null || customerIdStr.trim().isEmpty()) {
-                //  Register the user
-                User user = new User();
-                user.setUsername(username);
-                user.setPassword(password);
-                user.setFullName(fullName);
-                user.setEmail(email);
-                user.setNic(nic);
-                user.setRole("customer");
-                user.setUserId(0);
-
-                UserValidator validator = new UserValidator(new UserDAO());
-                validator.validateUser(user);
-
-                int userId = userService.insertUser(user);
-                user.setUserId(userId);
-
-                // Customer does not exist; create a new customer
-                Customer newCustomer = new Customer();
-                newCustomer.setUserId(userId);
-                newCustomer.setUsername(username);
-                newCustomer.setNic(nic);
-                newCustomer.setAddress(address);
-                newCustomer.setPhoneNumber(phoneNumber);
-                newCustomer.setEmail(email);
-
-                CustomerValidator customerValidator = new CustomerValidator(new CustomerDAO());
-                customerValidator.validateCustomer(newCustomer);
-
-                customerId = customerService.insertCustomer(newCustomer);
-            } else {
-                customerId = Integer.parseInt(customerIdStr);
-            }
-            String driverId = request.getParameter("driver"); // From dropdown
-            String carId = request.getParameter("carId");
-            String destination = request.getParameter("destination");
-            Timestamp pickupTime = Timestamp.valueOf(
-                    request.getParameter("pickupTime").replace("T", " ") + ":00"
-            );
-            double priceForHr = Double.parseDouble(request.getParameter("priceForHr"));
-            int timeHr = Integer.parseInt(request.getParameter("timeHr"));
-            double totalFare = Double.parseDouble(request.getParameter("totalFare"));
-
-            // Create booking object
-            Booking newBooking = new Booking();
-            newBooking.setBookingNumber(bookingNumber);
-            newBooking.setCustomerId(customerId);
-            newBooking.setDriverId(driverId);
-            newBooking.setCarId(carId);
-            newBooking.setDestination(destination);
-            newBooking.setPickupTime(pickupTime);
-            newBooking.setPriceForHr(priceForHr);
-            newBooking.setTimeHr(timeHr);
-            newBooking.setTotalFare(totalFare);
-
-            // Save the booking (validations occur in the service)
-            int bookingId = bookingService.createBooking(newBooking);
-
-            jsonResponse.put("status", "success");
-            jsonResponse.put("bookingId", bookingId);
-        } catch (IllegalArgumentException | ValidationException e) {
-            jsonResponse.put("status", "error");
-            jsonResponse.put("message", e.getMessage());
-        } catch (SQLException e) {
-            jsonResponse.put("status", "error");
-            jsonResponse.put("message", "Database error while creating booking.");
-        }
-        response.getWriter().write(gson.toJson(jsonResponse));
-    }*/
-
     private void insertBooking(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
         response.setContentType("application/json");
@@ -229,7 +147,8 @@ public class BookingController extends HttpServlet {
             );
             double priceForHr = Double.parseDouble(request.getParameter("priceForHr"));
             double timeHr = Double.parseDouble(request.getParameter("timeHr"));
-            double totalFare = Double.parseDouble(request.getParameter("totalFare"));
+//            double totalFare = Double.parseDouble(request.getParameter("totalFare"));
+            double totalFare = bookingService.calculateTotalFare(priceForHr, timeHr);
 
             // If customerIdStr is empty, we need to create a new user and customer
             if (customerIdStr == null || customerIdStr.trim().isEmpty()) {
@@ -267,12 +186,13 @@ public class BookingController extends HttpServlet {
                 newBooking.setTotalFare(totalFare);
 
                 // Use the transactional service method to insert user, customer, and booking together.
-                String bookingNumber= bookingService.createBookingTransaction(newBooking, user, customer);
+                String bookingNumber = bookingService.createBookingTransaction(newBooking, user, customer);
                 jsonResponse.put("status", "success");
                 jsonResponse.put("bookingNumber", bookingNumber);
             } else {
                 // If the customer already exists, only create the booking.
-                int customerId = Integer.parseInt(customerIdStr);
+//                int customerId = Integer.parseInt(customerIdStr);
+                int customerId = customerService.getCustomerIdByNumber(customerIdStr);
                 Booking newBooking = new Booking();
                 newBooking.setBookingNumber(bookingNum);
                 newBooking.setCustomerId(customerId);
@@ -300,32 +220,73 @@ public class BookingController extends HttpServlet {
         response.getWriter().write(gson.toJson(jsonResponse));
     }
 
-
-
     private void updateBooking(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        int customerId = Integer.parseInt(request.getParameter("customerId"));
-        String driverId = request.getParameter("driverId") ;
-        String carId = request.getParameter("carId");
-        String destination = request.getParameter("destination");
-        Timestamp pickupTime = Timestamp.valueOf(request.getParameter("pickupTime"));
-        Timestamp dropOffTime = Timestamp.valueOf(request.getParameter("dropOffTime"));
-        int statusId = Integer.parseInt(request.getParameter("statusId"));
-/*
-        Booking booking = new Booking(customerId, driverId, carId, destination, pickupTime,dropOffTime,  statusId);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> jsonResponse = new HashMap<>();
+
         try {
-            if (bookingService.updateBooking(booking)) {
-                response.sendRedirect("list");
-            } else {
-                request.setAttribute("error", "Failed to update booking");
-                showEditForm(request, response);
+            // Extract parameters from request
+            String bookingNum = request.getParameter("bookingNumber");
+            if (bookingNum == null || bookingNum.trim().isEmpty()) {
+                throw new IllegalArgumentException("Booking number is required for update.");
             }
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("error", e.getMessage());
-            showEditForm(request, response);
-        }*/
+
+            // Fetch existing booking
+            Booking existingBooking = bookingService.getBookingByNumber(bookingNum);
+            if (existingBooking == null) {
+                throw new IllegalArgumentException("Booking not found.");
+            }
+
+            // Extract and validate new values
+            String driverId = request.getParameter("driver"); // From dropdown
+            String carId = request.getParameter("carId");
+            String destination = request.getParameter("destination");
+
+            Timestamp pickupTime = Timestamp.valueOf(
+                    request.getParameter("pickupTime").replace("T", " ") + ":00"
+            );
+            Timestamp dropOffTime = Timestamp.valueOf(
+                    request.getParameter("dropOffTime").replace("T", " ") + ":00"
+            );
+
+            double priceForHr = Double.parseDouble(request.getParameter("priceForHr"));
+            double timeHr = Double.parseDouble(request.getParameter("timeHr"));
+            double totalFare = bookingService.calculateTotalFare(priceForHr, timeHr);
+
+            // Update booking object
+            existingBooking.setDriverId(driverId);
+            existingBooking.setCarId(carId);
+            existingBooking.setDestination(destination);
+            existingBooking.setPickupTime(pickupTime);
+            existingBooking.setDropOffTime(dropOffTime);
+            existingBooking.setPriceForHr(priceForHr);
+            existingBooking.setTimeHr(timeHr);
+            existingBooking.setTotalFare(totalFare);
+
+            // Perform update
+            bookingService.updateBooking(existingBooking);
+
+            // Return success response
+            jsonResponse.put("status", "success");
+            jsonResponse.put("message", "Booking updated successfully.");
+            jsonResponse.put("bookingNumber", bookingNum);
+
+        } catch (IllegalArgumentException | ValidationException e) {
+            e.printStackTrace();
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", "Database error while updating booking.");
+        }
+
+        response.getWriter().write(gson.toJson(jsonResponse));
     }
+
 
     private void deleteBooking(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
@@ -342,4 +303,70 @@ public class BookingController extends HttpServlet {
             listBooking(request, response);
         }
     }
+
+    private void getBookingNumbers(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> jsonResponse = new HashMap<>();
+
+        try {
+            List<String> bookingNumbers = bookingService.getBookingByNumbers(); // Fix: Use List<String>
+            jsonResponse.put("status", "success");
+            jsonResponse.put("bookingNumbers", bookingNumbers);
+        } catch (SQLException e) {
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", "Database error while fetching booking numbers.");
+            e.printStackTrace();
+        }
+
+        response.getWriter().write(gson.toJson(jsonResponse)); // Fix: Send response back
+    }
+
+
+    private void getBookingDetails(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> jsonResponse = new HashMap<>();
+
+        try {
+            String bookingNumber = request.getParameter("bookingNumber");
+
+            // Check if bookingNumber is present
+            if (bookingNumber == null || bookingNumber.isEmpty()) {
+                jsonResponse.put("status", "error");
+                jsonResponse.put("message", "Booking number is required.");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 Bad Request
+            } else {
+                Booking booking = bookingService.getBookingByNumber(bookingNumber);
+                if (booking != null) {
+                    jsonResponse.put("status", "success");
+                    jsonResponse.put("booking", booking);
+                    response.setStatus(HttpServletResponse.SC_OK); // 200 OK
+                } else {
+                    jsonResponse.put("status", "error");
+                    jsonResponse.put("message", "Booking not found.");
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND); // 404 Not Found
+                }
+            }
+        } catch (SQLException e) {
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", "Database error while fetching booking details.");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
+            e.printStackTrace();
+        } catch (ValidationException e) {
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 Bad Request
+        }
+
+        // Convert the map to a JSON string and send it in the response
+        String jsonResponseString = gson.toJson(jsonResponse);
+        response.getWriter().write(jsonResponseString);
+    }
+
+
 }

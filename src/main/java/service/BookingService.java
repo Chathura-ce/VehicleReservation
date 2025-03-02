@@ -21,6 +21,9 @@ import validator.UserValidator;
 public class BookingService {
     private BookingDAO bookingDAO;
 
+    private static final double DEFAULT_TAX_RATE = 0.10;       // 10% tax
+    private static final double DEFAULT_DISCOUNT_RATE = 0.05;    // 5% discount
+
     public BookingService() {
         this.bookingDAO = new BookingDAO();
     }
@@ -100,6 +103,14 @@ public class BookingService {
         return booking;
     }
 
+    public Booking getBookingByNumber(String no) throws ValidationException, SQLException {
+        Booking booking = bookingDAO.getBookingByNumber(no);
+        if (booking == null) {
+            throw new IllegalArgumentException("Booking not found with no: " + no);
+        }
+        return booking;
+    }
+
     public boolean deleteBooking(int id) throws SQLException {
         Booking existingBooking = getBookingById(id);
         if (existingBooking.getStatusId() != 1) { // Assuming 1 is 'Pending'
@@ -118,8 +129,22 @@ public class BookingService {
         return bookingDAO.updateBooking(booking);
     }
 
+    public double calculateTotalFare(double priceForHr, double timeHr, double taxRate, double discountRate) {
+        double subtotal = priceForHr * timeHr;
+        double taxAmount = subtotal * taxRate;
+        double discountAmount = subtotal * discountRate;
+        return subtotal + taxAmount - discountAmount;
+    }
+
+    // Overloaded version using default tax and discount rates
+    public double calculateTotalFare(double priceForHr, double timeHr) {
+        return calculateTotalFare(priceForHr, timeHr, DEFAULT_TAX_RATE, DEFAULT_DISCOUNT_RATE);
+    }
 
 
+    public List<String> getBookingByNumbers() throws SQLException {
+        return bookingDAO.fetchAllBookingNumbers();
+    }
 
 
 }

@@ -22,11 +22,52 @@
         integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script>
 <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
 <script src="${pageContext.request.contextPath}/js/adminlte.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body><!--end::Body-->
 
 </html>
-
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    function success(message) {
+        Swal.fire({
+            title: "Success!",
+            text: message,
+            icon: "success",
+            confirmButtonText: "OK"
+        });
+    }
+    function error(message) {
+        Swal.fire({
+            title: "Success!",
+            text: message,
+            icon: "success",
+            confirmButtonText: "OK"
+        });
+    }
+    function toastSuccess(title) {
+        Toast.fire({
+            icon: "success",
+            title: title
+        });
+    }
+    function toastError(title) {
+        Toast.fire({
+            icon: "error",
+            title: title
+        });
+    }
+</script>
 <%
     // Remove the attribute so it doesn't persist
     session.removeAttribute("errorMessage");

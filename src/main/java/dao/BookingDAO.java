@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static util.DatabaseUtil.getConnection;
+
 public class BookingDAO {
     public String insertBooking(Booking booking,Connection connection) throws SQLException {
         String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, pickup_time,dropoff_time, status_id, price_for_hr, time_hr, total_fare, created_at) " +
@@ -39,10 +41,24 @@ public class BookingDAO {
 
     public Booking selectBooking(String id) throws SQLException {
         String sql = "SELECT * FROM bookings WHERE booking_id = ?";
-        try (Connection connection = DatabaseUtil.getConnection();
+        try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setInt(1, Integer.parseInt(id));
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return extractBookingFromResultSet(rs);
+            }
+        }
+        return null;
+    }
+    public Booking getBookingByNumber(String no) throws SQLException {
+        String sql = "SELECT * FROM bookings WHERE booking_number = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, no);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -56,7 +72,7 @@ public class BookingDAO {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM bookings ORDER BY pickup_time DESC";
 
-        try (Connection connection = DatabaseUtil.getConnection();
+        try (Connection connection = getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -68,10 +84,10 @@ public class BookingDAO {
     }
 
     public boolean updateBooking(Booking booking) throws SQLException {
-        String sql = "UPDATE bookings SET booking_number = ?, customer_id = ?, driver_id = ?, car_id = ?, destination = ?, pickup_time = ?,  status_id = ?, price_for_hr = ?, time_hr = ?, total_fare = ? " +
+        String sql = "UPDATE bookings SET booking_number = ?, customer_id = ?, driver_id = ?, car_id = ?, destination = ?, pickup_time = ?,  status_id = ?, price_for_hr = ?, time_hr = ?, total_fare = ?,dropoff_time=? " +
                 "WHERE booking_id = ?";
 
-        try (Connection connection = DatabaseUtil.getConnection();
+        try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, booking.getBookingNumber());
@@ -85,6 +101,7 @@ public class BookingDAO {
             stmt.setDouble(9, booking.getTimeHr());
             stmt.setDouble(10, booking.getTotalFare());
             stmt.setInt(11, booking.getBookingId());
+            stmt.setTimestamp(12, booking.getDropOffTime());
 
             return stmt.executeUpdate() > 0;
         }
@@ -93,7 +110,7 @@ public class BookingDAO {
     public boolean deleteBooking(String id) throws SQLException {
         String sql = "DELETE FROM bookings WHERE booking_id = ?";
 
-        try (Connection connection = DatabaseUtil.getConnection();
+        try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setInt(1, Integer.parseInt(id));
@@ -133,4 +150,20 @@ public class BookingDAO {
             return 0;
         }
     }
+
+    public List<String> fetchAllBookingNumbers() throws SQLException {
+        List<String> bookingNumbers = new ArrayList<>();
+        String sql = "SELECT booking_number FROM bookings";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                bookingNumbers.add(rs.getString("booking_number"));
+            }
+        }
+        return bookingNumbers;
+    }
+
 }

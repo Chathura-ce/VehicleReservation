@@ -15,6 +15,7 @@ public class CustomerDAO {
         Connection connection = DatabaseUtil.getConnection();
         return   addCustomer(customer,connection);
     }
+
     public int addCustomer(Customer customer,Connection connection) throws SQLException {
         String sql = "INSERT INTO customers (customer_number,user_id, address) VALUES (?, ?, ?)";
         try (
@@ -96,6 +97,20 @@ public class CustomerDAO {
         return null;
     }
 
+    public int getCustomerIdByNumber(String number) throws SQLException {
+        String sql = "SELECT c.customer_id FROM customers c WHERE c.customer_number = ?";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, number);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("customer_id");
+                }
+                return 0;
+            }
+        }
+    }
+
     public boolean updateCustomer(Customer customer) throws SQLException {
         Connection connection = null;
         try {
@@ -147,24 +162,40 @@ public class CustomerDAO {
 
     public List<Customer> searchCustomers(String query) throws SQLException {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT c.*, u.user_id, u.username, u.email, u.full_name " +
+        String sql = "SELECT c.*, u.* " +
                 "FROM customers c JOIN users u ON c.user_id = u.user_id " +
-                "WHERE c.nic LIKE ? OR u.username LIKE ?";
+                "WHERE u.nic LIKE ? OR u.username LIKE ? OR c.customer_number LIKE ? OR u.email LIKE ? OR u.phone LIKE ? ";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             String searchTerm = "%" + query + "%";
             stmt.setString(1, searchTerm);
             stmt.setString(2, searchTerm);
+            stmt.setString(3, searchTerm);
+            stmt.setString(4, searchTerm);
+            stmt.setString(5, searchTerm);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Customer customer = new Customer();
                     customer.setCustomerId(rs.getInt("customer_id"));
+                    customer.setCustomerNumber(rs.getString("customer_number"));
                     customer.setUserId(rs.getInt("user_id"));
-                    customer.setUsername(rs.getString("username"));
-                    customer.setEmail(rs.getString("email"));
                     customer.setAddress(rs.getString("address"));
-                    customer.setNic(rs.getString("nic"));
-                    customer.setPhoneNumber(rs.getString("phone_number"));
+//                    customer.setUsername(rs.getString("username"));
+//                    customer.setEmail(rs.getString("email"));
+//                    customer.setNic(rs.getString("nic"));
+//                    customer.setPhoneNumber(rs.getString("phone"));
+
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setNic(rs.getString("nic"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setStatus(rs.getInt("status"));
+
+                    customer.setUser(user);
+
                     customers.add(customer);
                 }
             }

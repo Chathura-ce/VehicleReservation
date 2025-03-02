@@ -126,12 +126,14 @@ public class CarDAO {
 
     public List<Car> searchCars(String query) throws SQLException {
         List<Car> cars = new ArrayList<>();
-        String sql = "SELECT * FROM cars WHERE reg_number LIKE ? OR model LIKE ?";
+        String sql = "SELECT * FROM cars WHERE reg_number LIKE ? OR model LIKE ? OR car_id LIKE ? OR type LIKE ? ";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             String searchTerm = "%" + query + "%";
             stmt.setString(1, searchTerm);
             stmt.setString(2, searchTerm);
+            stmt.setString(3, searchTerm);
+            stmt.setString(4, searchTerm);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Car car = new Car();

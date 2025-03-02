@@ -26,6 +26,10 @@ public class CustomerService {
         return customerDAO.selectCustomer(id);
     }
 
+    public int getCustomerIdByNumber(String number) throws SQLException {
+        return customerDAO.getCustomerIdByNumber(number);
+    }
+
     public boolean deleteCustomer(int id) throws SQLException {
         return customerDAO.deleteCustomer(id);
     }
