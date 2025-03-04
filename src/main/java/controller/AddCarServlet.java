@@ -10,9 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
-import model.Car;
-import model.CarImage;
-import model.Driver;
+import model.*;
 import util.CarUtil;
 import util.FlashMessageUtil;
 
@@ -55,8 +53,13 @@ public class AddCarServlet extends HttpServlet {
         String available = request.getParameter("available");
         int seatingCapacity = Integer.parseInt(seatingCapacityStr);
 
-        // Save car data first
-        Car car = new Car(carId, model, type, regNumber, seatingCapacity, available);
+        CarType carType = new CarType();
+        carType.setTypeId(Integer.parseInt(type));
+
+        CarModel carModel = new CarModel();
+        carModel.setModelId(Integer.parseInt(model));
+
+        Car car = new Car(carId, carModel, carType, regNumber, seatingCapacity, available);
         CarDAO carDAO = new CarDAO();
 
         try {

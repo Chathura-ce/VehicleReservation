@@ -18,7 +18,7 @@ public class CustomerService {
         return customerDAO.selectAllCustomers();
     }
 
-    public int insertCustomer(Customer customer, Connection conn) throws SQLException {
+    public String insertCustomer(Customer customer, Connection conn) throws SQLException {
        return customerDAO.addCustomer(customer,conn);
     }
 

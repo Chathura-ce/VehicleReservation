@@ -11,6 +11,7 @@ public class Driver {
 //    private String phone;
 //    private String status;
     private User user;
+    private String driverName;
 
     public Driver(int userId, String driverId, String licenseNumber) {
         this.licenseNumber = licenseNumber;
@@ -22,30 +23,6 @@ public class Driver {
 
     }
 
-    /*public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }*/
-
 
     public String getDriverId() {
         return driverId;
@@ -54,6 +31,11 @@ public class Driver {
     public void setDriverId(String driverId) {
         this.driverId = driverId;
     }
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverName() {return driverName;}
 
     public String getLicenseNumber() {
         return licenseNumber;

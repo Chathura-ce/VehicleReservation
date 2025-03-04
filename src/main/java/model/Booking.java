@@ -5,23 +5,27 @@ import java.sql.Timestamp;
 public class Booking {
     private int bookingId;
     private String bookingNumber;
-    private int customerId;
+    private String customerId;
     private String driverId;
     private String carId;
+    private String pickupLocation;
     private String destination;
-    private Timestamp pickupTime;
-    private Timestamp dropOffTime;
+    private String pickupTime;
+    private String dropOffTime;
     private int statusId;
     private Timestamp createdAt;
     private double priceForHr;
     private double timeHr;
     private double totalFare;
+    private User user;
+    private Customer customer;
+    private Car car;
 
     public Booking() {
     }
 
-    public Booking(int customerId, String driverId, String carId, String destination,
-                   Timestamp pickupTime, Timestamp dropOffTime,   int statusId,
+    public Booking(String customerId, String driverId, String carId, String destination,
+                   String pickupTime, String dropOffTime,   int statusId,
                    double priceForHr, double timeHr, double totalFare) {
         this.customerId = customerId;
         this.driverId = driverId;
@@ -51,10 +55,10 @@ public class Booking {
         this.bookingNumber = bookingNumber;
     }
 
-    public int getCustomerId() {
+    public String getCustomerId() {
         return customerId;
     }
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
 
@@ -78,18 +82,24 @@ public class Booking {
     public void setDestination(String destination) {
         this.destination = destination;
     }
+    public String getPickupLocation() {
+        return pickupLocation;
+    }
+    public void setPickupLocation(String pickupLocation) {
+        this.destination = pickupLocation;
+    }
 
-    public Timestamp getPickupTime() {
+    public String getPickupTime() {
         return pickupTime;
     }
-    public void setPickupTime(Timestamp pickupTime) {
+    public void setPickupTime(String pickupTime) {
         this.pickupTime = pickupTime;
     }
 
-    public Timestamp getDropOffTime() {
+    public String getDropOffTime() {
         return dropOffTime;
     }
-    public void setDropOffTime(Timestamp dropOffTime) {
+    public void setDropOffTime(String dropOffTime) {
         this.dropOffTime = dropOffTime;
     }
 
@@ -127,5 +137,15 @@ public class Booking {
     }
     public void setTotalFare(double totalFare) {
         this.totalFare = totalFare;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+    public void setCar(Car car) {
+        this.car = car;
     }
 }

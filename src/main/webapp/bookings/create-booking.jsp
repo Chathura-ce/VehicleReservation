@@ -24,7 +24,7 @@
             <h4 class="mb-0">Booking Form</h4>
         </div>
         <div class="card-body">
-            <form id="bookingForm">
+            <form onsubmit="event.preventDefault();" id="bookingForm">
                 <!-- Row 1: Booking Number -->
                 <div class="mb-3">
                     <label for="bookingNumber" class="form-label">Booking Number</label>
@@ -255,7 +255,7 @@
                     <div class="col-md-6">
                         <label class="form-label">&nbsp;</label>
                         <div class="">
-                            <button type="submit" class="btn btn-primary me-2">Create</button>
+                            <button onclick="saveData();" type="button" class="btn btn-primary me-2">Create</button>
                             <button type="button" class="btn btn-success me-2">Print</button>
                             <button onclick="window.location.reload();" type="reset" class="btn btn-secondary">New
                             </button>
@@ -376,7 +376,7 @@
 
             if (!isNaN(pickupTime) && !isNaN(dropOffTime)) {
                 if (dropOffTime < pickupTime) {
-                    alert("Drop-off time cannot be earlier than Pickup time!");
+                    errorMsg("Drop-off time cannot be earlier than Pickup time!");
                     dropOffTimeInput.value = ""; // Reset drop-off time
                     timeHrInput.value = "0";
                     totalFareInput.value = "0";
@@ -445,38 +445,43 @@
             });
         });
 
-        $("#bookingForm").submit(function (e) {
-            e.preventDefault(); // Prevent the default form submission
-            // console.log($(this).serialize())
-            let url = '${pageContext.request.contextPath}/booking/insert';
-            if ($("#bookingNumber").val().trim() != "") {
-                url = '${pageContext.request.contextPath}/booking/update';
-            }
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: $(this).serialize(), // Serialize form data
-                // dataType: 'json',
-                success: function (response) {
-                    if (response.status === "success") {
-                        alert("Booking saved successfully! Booking ID: " + response.bookingNumber);
-                        $("#bookingNumber").val(response.bookingNumber);
-
-                        // Show print button
-                        $("#printButton").show();
-                        // $("#bookingForm")[0].reset();
-                    } else {
-                        alert("Error: " + response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert("Ajax error: " + error);
-                }
-            });
-        });
 
         loadDrivers();
     });
+    function saveData(){
+        // e.preventDefault(); // Prevent the default form submission
+        if(!validateBookingForm()){
+            return;
+        }
+        // console.log($(this).serialize())
+        let url = '${pageContext.request.contextPath}/booking/insert';
+        if ($("#bookingNumber").val().trim() != "") {
+            url = '${pageContext.request.contextPath}/booking/update';
+        }
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: $('#bookingForm').serialize(), // Serialize form data
+            // dataType: 'json',
+            success: function (response) {
+                if (response.status === "success") {
+                    success("Booking saved successfully! Booking ID: " + response.bookingNumber);
+                    $("#bookingNumber").val(response.bookingNumber);
+
+                    // Show print button
+                    $("#printButton").show();
+                    // $("#bookingForm")[0].reset();
+                    getBookingNumbers(response.bookingNumber);
+
+                } else {
+                    errorMsg("Error: " + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                errorMsg("Internal server error.Please Try again");
+            }
+        });
+    }
 
     function loadDrivers() {
         $.ajax({
@@ -565,6 +570,8 @@
                     $("#customerRegNo,#openCustomerModal,#customerName, #customerNIC, #customerEmail, #phoneNo, #address").prop("disabled", true);
 
                     // Populate customer details
+                    $("#customerId").val(response.booking.customerId);
+                    $("#customerName").val(response.booking.customerRegNo);
                     $("#customerRegNo").val(response.booking.customerRegNo);
                     $("#customerName").val(response.booking.customerName);
                     $("#customerNIC").val(response.booking.customerNIC);
@@ -596,11 +603,11 @@
                     // Show print button for existing booking
                     $("#printButton").show();
                 } else {
-                    alert("Error loading booking details: " + response.message);
+                    errorMsg("Error loading booking details: " + response.message);
                 }
             },
             error: function (xhr, status, error) {
-                alert("Error loading booking details: " + error);
+                errorMsg("Error loading booking details: " + error);
             }
         });
     }
@@ -711,11 +718,11 @@
                         var available = car.available == '0' ? 'Not Available' : 'Available';
                         rows += "<tr>";
                         rows += "<td>" + car.carId + "</td>";
-                        rows += "<td>" + car.type + "</td>";
-                        rows += "<td>" + car.model + "</td>";
+                        rows += "<td>" + car.type.typeName + "</td>";
+                        rows += "<td>" + car.model.modelName + "</td>";
                         rows += "<td>" + car.regNumber + "</td>";
                         rows += "<td>" + car.seatingCapacity + "</td>";
-                        rows += "<td>" + car.driverId + "</td>";
+                        rows += "<td data-driver_id='"+car.driver.driverId+"'>" + car.driver.driverName + "</td>";
                         rows += "<td>" + available + "</td>";
                         rows += "<td><button onclick='setCarData(this);' class='btn btn-success'><i class='bi bi-check-square'></i> Select</button></td>"
                         rows += "</tr>";
@@ -736,12 +743,201 @@
         $('#carType').val($(obj).closest('tr').find('td:eq(1)').text());
         $('#carModel').val($(obj).closest('tr').find('td:eq(2)').text());
         $('#seatingCapacity').val($(obj).closest('tr').find('td:eq(4)').text());
-        $('#driver').val($(obj).closest('tr').find('td:eq(5)').text());
+        $('#driver').val($(obj).closest('tr').find('td:eq(5)').attr('data-driver_id'));
 
         $('#searchCarModal').modal('hide');
         $('#carSearchInput').val();
         toastSuccess("Car added successfully");
     }
 
+
+    function validateBookingForm() {
+        // Booking Number validation
+        // const bookingNumber = $("#bookingNumber").val();
+        /*if (bookingNumber === "") {
+            errorMsg("Please select a Booking Number");
+            return false;
+        }*/
+
+        // Customer validation
+       /* const customerId = $("#customerId").val();
+        if (customerId === "") {
+            errorMsg("Please select a Customer ID");
+            return false;
+        }*/
+
+        // Customer Name validation
+        const customerName = $("#customerName").val().trim();
+        if (customerName === "") {
+            errorMsg("Customer Name is required");
+            $("#customerName").focus()
+            return false;
+        }
+
+        // NIC validation
+        const customerNIC = $("#customerNIC").val().trim();
+        if (customerNIC === "") {
+            errorMsg("NIC is required");
+            $("#customerNIC").focus()
+            return false;
+        }
+        const nicRegex = /^(?:\d{9}[Vv]?|\d{12})$/;
+        if (!nicRegex.test(customerNIC)) {
+            errorMsg("Invalid NIC format (Use 123456789V or 12-digit format).");
+            return;
+        }
+
+        // Address validation
+        const address = $("#address").val().trim();
+        if (address === "") {
+            errorMsg("Address is required");
+            $("#address").focus()
+            return false;
+        }
+
+        // Email validation
+        const email = $("#customerEmail").val().trim();
+        if (email === "") {
+            errorMsg("Email is required");
+            $("#customerEmail").focus()
+            return false;
+        } else if (!isValidEmail(email)) {
+            errorMsg("Please enter a valid email address");
+            $("#customerEmail").focus()
+            return false;
+        }
+
+        // Phone validation
+        const phone = $("#phoneNo").val().trim();
+        if (phone === "") {
+            errorMsg("Phone Number is required");
+            $("#phoneNo").focus()
+            return false;
+        }
+        const phoneRegex = /^(?:\+94|0)\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+            errorMsg("Invalid phone number (Use 0XXXXXXXXX or +94XXXXXXXXX format).");
+            return;
+        }
+
+
+        // Car ID validation
+        const carId = $("#carId").val();
+        if (carId === "") {
+            errorMsg("Please select a Car");
+            $("#carId").focus()
+            return false;
+        }
+
+        // Driver validation
+        const driver = $("#driver").val();
+        if (driver === "") {
+            errorMsg("Please select a Driver");
+            $("#driver").focus()
+            return false;
+        }
+
+        // Booking Status validation
+        const bookingStatus = $("#bookingStatus").val();
+        if (bookingStatus === "") {
+            errorMsg("Please select a Booking Status");
+            $("#bookingStatus").focus()
+            return false;
+        }
+
+        // Price for Hour validation
+        const priceForHr = $("#priceForHr").val().trim();
+        if (priceForHr === "") {
+            errorMsg("Price for Hour is required");
+            $("#priceForHr").focus()
+            return false;
+        } else if (isNaN(priceForHr) || parseFloat(priceForHr) <= 0) {
+            errorMsg("Please enter a valid Price for Hour (must be a positive number)");
+            $("#priceForHr").focus()
+            return false;
+        }
+
+        // Pickup Time validation
+        const pickupTime = $("#pickupTime").val();
+        if (pickupTime === "") {
+            errorMsg("Pickup Time is required");
+            $("#pickupTime").focus()
+            return false;
+        }
+
+        // Drop-off Time validation
+        const dropOffTime = $("#dropOffTime").val();
+        if (dropOffTime === "") {
+            errorMsg("Drop-off Time is required");
+            $("#dropOffTime").focus()
+            return false;
+        }
+
+        // Compare pickup and drop-off times
+        const pickupDateTime = new Date(pickupTime);
+        const dropOffDateTime = new Date(dropOffTime);
+
+        if (dropOffDateTime <= pickupDateTime) {
+            errorMsg("Drop-off time must be after pickup time");
+            $("#pickupTime").focus()
+            return false;
+        }
+
+        // Pickup Location validation
+        const pickupLocation = $("#pickupLocation").val().trim();
+        if (pickupLocation === "") {
+            errorMsg("Pickup Location is required");
+            $("#pickupLocation").focus()
+            return false;
+        }
+
+        // Destination validation
+        const destination = $("#destination").val().trim();
+        if (destination === "") {
+            errorMsg("Destination is required");
+            $("#destination").focus()
+            return false;
+        }
+
+        // All validations passed
+        return true;
+    }
+
+    // Helper function to validate email format
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+
+
+    function calculateTimeDifference() {
+        const pickupTime = $("#pickupTime").val();
+        const dropOffTime = $("#dropOffTime").val();
+
+        if (pickupTime && dropOffTime) {
+            const pickupDateTime = new Date(pickupTime);
+            const dropOffDateTime = new Date(dropOffTime);
+
+            if (dropOffDateTime > pickupDateTime) {
+                // Calculate time difference in hours
+                const diffMs = dropOffDateTime - pickupDateTime;
+                const diffHrs = diffMs / (1000 * 60 * 60);
+
+                // Update the time hours field
+                $("#timeHr").val(diffHrs.toFixed(2));
+
+                // Calculate total fare if price per hour is available
+                const pricePerHour = parseFloat($("#priceForHr").val());
+                if (!isNaN(pricePerHour)) {
+                    const totalFare = pricePerHour * diffHrs;
+                    $("#totalFare").val(totalFare.toFixed(2));
+                }
+            } else {
+                $("#timeHr").val("0");
+                $("#totalFare").val("0");
+            }
+        }
+    }
 
 </script>

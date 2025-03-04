@@ -5,14 +5,16 @@ import java.util.Objects;
 public class Car {
 
 
-    private String type;
+    private CarType type;
     private String carId;
-    private String model;
+    private CarModel model;
     private String regNumber;
     private int seatingCapacity;
     private String available; // Values: "Available", "Booked", "Under Maintenance"
     private String driverId;
-
+    private Driver driver;
+    public Car() {
+    }
     public String getImagePath() {
         return imagePath;
     }
@@ -21,20 +23,24 @@ public class Car {
         this.imagePath = imagePath;
     }
 
-    public String getModel() {
+    public CarModel getModel() {
         return model;
     }
 
-    public void setModel(String model) {
+    public void setModel(CarModel model) {
         this.model = model;
     }
 
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+    public Driver getDriver() {return driver;}
+
     private String imagePath;
 
-    public Car() {
-    }
 
-    public Car(String carId, String model, String type, String regNumber, int seatingCapacity, String available) {
+
+    public Car(String carId, CarModel model, CarType type, String regNumber, int seatingCapacity, String available) {
         this.carId = carId;
         this.model = model;
         this.type = type;
@@ -43,11 +49,11 @@ public class Car {
         this.available = available;
     }
 
-    public String getType() {
+    public CarType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(CarType type) {
         this.type = type;
     }
 
@@ -59,11 +65,11 @@ public class Car {
         this.carId = carId;
     }
 
-    public String getCarModel() {
+    public CarModel getCarModel() {
         return model;
     }
 
-    public void setCarModel(String model) {
+    public void setCarModel(CarModel model) {
         this.model = model;
     }
 

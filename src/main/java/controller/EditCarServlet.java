@@ -3,6 +3,8 @@ package controller;
 import dao.CarDAO;
 import dao.DriverDAO;
 import model.Car;
+import model.CarModel;
+import model.CarType;
 import model.Driver;
 import util.FlashMessageUtil;
 
@@ -50,7 +52,13 @@ public class EditCarServlet extends HttpServlet {
         int seatingCapacity = Integer.parseInt(seatingCapacityStr);
         
         try {
-            Car car = new Car(carId, model, type, regNumber, seatingCapacity, available);
+            CarType carType = new CarType();
+            carType.setTypeId(Integer.parseInt(type));
+
+            CarModel carModel = new CarModel();
+            carModel.setModelId(Integer.parseInt(model));
+
+            Car car = new Car(carId, carModel, carType, regNumber, seatingCapacity, available);
             CarDAO carDAO = new CarDAO();
 
             // Save changes to database

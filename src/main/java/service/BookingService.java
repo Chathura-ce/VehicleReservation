@@ -70,7 +70,7 @@ public class BookingService {
             // Insert the customer using the connection-aware DAO method
             customer.setUserId(userId);
             CustomerService customerService = new CustomerService();
-            int customerId = customerService.insertCustomer(customer, connection);  // Overloaded to accept Connection
+            String customerId = customerService.insertCustomer(customer, connection);  // Overloaded to accept Connection
             booking.setCustomerId(customerId);
 
             BookingValidator bookingValidator = new BookingValidator();

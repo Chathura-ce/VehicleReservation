@@ -27,6 +27,7 @@ import service.BookingService;
 import service.CustomerService;
 import service.CarService;
 import service.UserService;
+import util.DateTimeUtil;
 import util.PasswordUtil;
 import validator.CustomerValidator;
 import validator.UserValidator;
@@ -136,17 +137,13 @@ public class BookingController extends HttpServlet {
             String email = request.getParameter("customerEmail");
             String bookingNum = request.getParameter("bookingNumber");
             String customerIdStr = request.getParameter("customerId");
-            String driverId = request.getParameter("driver"); // From dropdown
+            String driverId = request.getParameter("driver");
             String carId = request.getParameter("carId");
             String destination = request.getParameter("destination");
-            Timestamp pickupTime = Timestamp.valueOf(
-                    request.getParameter("pickupTime").replace("T", " ") + ":00"
-            );
-            Timestamp dropOffTime = Timestamp.valueOf(
-                    request.getParameter("dropOffTime").replace("T", " ") + ":00"
-            );
-            double priceForHr = Double.parseDouble(request.getParameter("priceForHr"));
-            double timeHr = Double.parseDouble(request.getParameter("timeHr"));
+            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
+            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
+            double priceForHr = !request.getParameter("priceForHr").isEmpty() ? Double.parseDouble(request.getParameter("priceForHr")) : 0;
+            double timeHr = !request.getParameter("timeHr").isEmpty() ? Double.parseDouble(request.getParameter("timeHr")) : 0;
 //            double totalFare = Double.parseDouble(request.getParameter("totalFare"));
             double totalFare = bookingService.calculateTotalFare(priceForHr, timeHr);
 
@@ -192,14 +189,15 @@ public class BookingController extends HttpServlet {
             } else {
                 // If the customer already exists, only create the booking.
 //                int customerId = Integer.parseInt(customerIdStr);
-                int customerId = customerService.getCustomerIdByNumber(customerIdStr);
+//                int customerId = customerService.getCustomerIdByNumber(customerIdStr);
                 Booking newBooking = new Booking();
                 newBooking.setBookingNumber(bookingNum);
-                newBooking.setCustomerId(customerId);
+                newBooking.setCustomerId(customerIdStr);
                 newBooking.setDriverId(driverId);
                 newBooking.setCarId(carId);
                 newBooking.setDestination(destination);
                 newBooking.setPickupTime(pickupTime);
+                newBooking.setDropOffTime(dropOffTime);
                 newBooking.setPriceForHr(priceForHr);
                 newBooking.setTimeHr(timeHr);
                 newBooking.setTotalFare(totalFare);
@@ -208,7 +206,7 @@ public class BookingController extends HttpServlet {
                 jsonResponse.put("status", "success");
                 jsonResponse.put("bookingNumber", bookingNumber);
             }
-        } catch (IllegalArgumentException | ValidationException e) {
+        } catch (ValidationException e) {
             e.printStackTrace();
             jsonResponse.put("status", "error");
             jsonResponse.put("message", e.getMessage());
@@ -245,12 +243,8 @@ public class BookingController extends HttpServlet {
             String carId = request.getParameter("carId");
             String destination = request.getParameter("destination");
 
-            Timestamp pickupTime = Timestamp.valueOf(
-                    request.getParameter("pickupTime").replace("T", " ") + ":00"
-            );
-            Timestamp dropOffTime = Timestamp.valueOf(
-                    request.getParameter("dropOffTime").replace("T", " ") + ":00"
-            );
+            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
+            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
 
             double priceForHr = Double.parseDouble(request.getParameter("priceForHr"));
             double timeHr = Double.parseDouble(request.getParameter("timeHr"));

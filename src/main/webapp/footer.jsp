@@ -47,11 +47,11 @@
             confirmButtonText: "OK"
         });
     }
-    function error(message) {
+    function errorMsg(message) {
         Swal.fire({
-            title: "Success!",
+            title: "Error!",
             text: message,
-            icon: "success",
+            icon: "error",
             confirmButtonText: "OK"
         });
     }
