@@ -49,11 +49,11 @@
             </c:if>
 
             <form action="login" method="post">
-                <div class="input-group mb-3"><input value="${not empty username ? username : ''}" type="text"
+                <div class="input-group mb-3"><input value="${not empty username ? username : 'admin'}" type="text"
                                                      class="form-control" name="username" placeholder="User Name">
                     <div class="input-group-text"><span class="bi bi-person-fill"></span></div>
                 </div>
-                <div class="input-group mb-3"><input value="${not empty password ? password : ''}" type="password"
+                <div class="input-group mb-3"><input value="${not empty password ? password : '123'}" type="password"
                                                      class="form-control" name="password" placeholder="Password">
                     <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
                 </div> <!--begin::Row-->

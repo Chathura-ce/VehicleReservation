@@ -14,8 +14,8 @@ public class Booking {
     private String dropOffTime;
     private int statusId;
     private Timestamp createdAt;
-    private double priceForHr;
-    private double timeHr;
+    private double priceForKm;
+    private double distance;
     private double totalFare;
     private User user;
     private Customer customer;
@@ -26,7 +26,7 @@ public class Booking {
 
     public Booking(String customerId, String driverId, String carId, String destination,
                    String pickupTime, String dropOffTime,   int statusId,
-                   double priceForHr, double timeHr, double totalFare) {
+                   double priceForKm, double distance, double totalFare) {
         this.customerId = customerId;
         this.driverId = driverId;
         this.carId = carId;
@@ -34,8 +34,8 @@ public class Booking {
         this.pickupTime = pickupTime;
         this.dropOffTime = dropOffTime;
         this.statusId = statusId;
-        this.priceForHr = priceForHr;
-        this.timeHr = timeHr;
+        this.priceForKm = priceForKm;
+        this.distance = distance;
         this.totalFare = totalFare;
     }
 
@@ -86,7 +86,7 @@ public class Booking {
         return pickupLocation;
     }
     public void setPickupLocation(String pickupLocation) {
-        this.destination = pickupLocation;
+        this.pickupLocation = pickupLocation;
     }
 
     public String getPickupTime() {
@@ -118,18 +118,18 @@ public class Booking {
         this.createdAt = createdAt;
     }
 
-    public double getPriceForHr() {
-        return priceForHr;
+    public double getPriceForKm() {
+        return priceForKm;
     }
-    public void setPriceForHr(double priceForHr) {
-        this.priceForHr = priceForHr;
+    public void setPriceForKm(double priceForKm) {
+        this.priceForKm = priceForKm;
     }
 
-    public double getTimeHr() {
-        return timeHr;
+    public double getDistance() {
+        return distance;
     }
-    public void setTimeHr(double timeHr) {
-        this.timeHr = timeHr;
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
     public double getTotalFare() {

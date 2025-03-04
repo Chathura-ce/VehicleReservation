@@ -11,8 +11,8 @@ import static util.DatabaseUtil.getConnection;
 
 public class BookingDAO {
     public String insertBooking(Booking booking,Connection connection) throws SQLException {
-        String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, pickup_time,dropoff_time, status_id, price_for_hr, time_hr, total_fare, created_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, CURRENT_TIMESTAMP)";
+        String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, status_id, price_for_km, distance, total_fare, created_at,pickup_location) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  CURRENT_TIMESTAMP,?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -22,12 +22,13 @@ public class BookingDAO {
             stmt.setObject(3, booking.getDriverId());
             stmt.setString(4, booking.getCarId());
             stmt.setString(5, booking.getDestination());
-            stmt.setString(6, booking.getPickupTime());
-            stmt.setString(7, booking.getDropOffTime());
-            stmt.setInt(8, booking.getStatusId());
-            stmt.setDouble(9, booking.getPriceForHr());
-            stmt.setDouble(10, booking.getTimeHr());
-            stmt.setDouble(11, booking.getTotalFare());
+//            stmt.setString(6, booking.getPickupTime());
+//            stmt.setString(7, booking.getDropOffTime());
+            stmt.setInt(6, booking.getStatusId());
+            stmt.setDouble(7, booking.getPriceForKm());
+            stmt.setDouble(8, booking.getDistance());
+            stmt.setDouble(9, booking.getTotalFare());
+            stmt.setString(10, booking.getPickupLocation());
 
             stmt.executeUpdate();
 
@@ -40,7 +41,14 @@ public class BookingDAO {
     }
 
     public Booking selectBooking(String id) throws SQLException {
-        String sql = "SELECT * FROM bookings WHERE booking_id = ?";
+//        String sql = "SELECT * FROM bookings WHERE booking_id = ?";
+        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+                "  pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
+                " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_name," +
+                " cars.capacity, cars.driver_id FROM bookings LEFT JOIN customers ON bookings.customer_id = customers.customer_number " +
+                " LEFT JOIN users ON customers.user_id = users.user_id LEFT JOIN cars ON bookings.car_id = cars.car_id " +
+                "LEFT JOIN car_models ON cars.model = car_models.model_id left JOIN car_types ON car_types.type_id = cars.type" +
+                " WHERE booking_number = ? ";
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -53,12 +61,19 @@ public class BookingDAO {
         }
         return null;
     }
+
     public Booking getBookingByNumber(String no) throws SQLException {
-        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id, '' as pickup_location, bookings.destination, bookings.pickup_time, bookings.dropoff_time, bookings.status_id, bookings.price_for_hr, bookings.time_hr, bookings.total_fare, bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone, car_types.type_name, car_models.model_name, cars.capacity, cars.driver_id FROM bookings INNER JOIN customers ON bookings.customer_id = customers.customer_number INNER JOIN users ON customers.user_id = users.user_id INNER JOIN cars ON bookings.car_id = cars.car_id INNER JOIN car_models ON cars.model = car_models.model_id left JOIN car_types ON car_types.type_id = cars.type" +
+        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+                " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
+                " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
+                " cars.capacity, cars.driver_id FROM bookings LEFT JOIN customers ON bookings.customer_id = customers.customer_number " +
+                " LEFT JOIN users ON customers.user_id = users.user_id LEFT JOIN cars ON bookings.car_id = cars.car_id " +
+                " LEFT JOIN car_models ON cars.model = car_models.model_id left JOIN car_types ON car_types.type_id = cars.type" +
                 " WHERE booking_number = ? ";
+//        System.out.println(sql);
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
-
+//            System.out.println(sql);
             stmt.setString(1, no);
             ResultSet rs = stmt.executeQuery();
 
@@ -71,7 +86,7 @@ public class BookingDAO {
 
     public List<Booking> selectAllBookings() throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM bookings ORDER BY pickup_time DESC";
+        String sql = "SELECT * FROM bookings ORDER BY booking_number DESC";
 
         try (Connection connection = getConnection();
              Statement stmt = connection.createStatement();
@@ -85,7 +100,7 @@ public class BookingDAO {
     }
 
     public boolean updateBooking(Booking booking) throws SQLException {
-        String sql = "UPDATE bookings SET customer_id = ?, driver_id = ?, car_id = ?, destination = ?, pickup_time = ?,  status_id = ?, price_for_hr = ?, time_hr = ?, total_fare = ?,dropoff_time=? " +
+        String sql = "UPDATE bookings SET customer_id = ?, driver_id = ?, car_id = ?, destination = ?,  status_id = ?, price_for_km = ?, distance = ?, total_fare = ? , pickup_location = ?" +
                 "WHERE booking_number = ?";
 
         try (Connection connection = getConnection();
@@ -95,13 +110,13 @@ public class BookingDAO {
             stmt.setObject(2, booking.getDriverId());
             stmt.setString(3, booking.getCarId());
             stmt.setString(4, booking.getDestination());
-            stmt.setString(5, booking.getPickupTime());
-            stmt.setInt(6, booking.getStatusId());
-            stmt.setDouble(7, booking.getPriceForHr());
-            stmt.setDouble(8, booking.getTimeHr());
-            stmt.setDouble(9, booking.getTotalFare());
-            stmt.setString(10, booking.getDropOffTime());
-            stmt.setString(11, booking.getBookingNumber());
+            stmt.setInt(5, booking.getStatusId());
+            stmt.setDouble(6, booking.getPriceForKm());
+            stmt.setDouble(7, booking.getDistance());
+            stmt.setDouble(8, booking.getTotalFare());
+            stmt.setString(9, booking.getPickupLocation());
+            stmt.setString(10, booking.getBookingNumber());
+//            stmt.setString(5, booking.getPickupTime());
 
             return stmt.executeUpdate() > 0;
         }
@@ -127,11 +142,11 @@ public class BookingDAO {
         booking.setCarId(rs.getString("car_id"));
         booking.setPickupLocation(rs.getString("pickup_location"));
         booking.setDestination(rs.getString("destination"));
-        booking.setPickupTime(rs.getString("pickup_time"));
-        booking.setDropOffTime(rs.getString("dropoff_time"));
+//        booking.setPickupTime(rs.getString("pickup_time"));
+//        booking.setDropOffTime(rs.getString("dropoff_time"));
         booking.setStatusId(rs.getInt("status_id"));
-        booking.setPriceForHr(rs.getDouble("price_for_hr"));
-        booking.setTimeHr(rs.getInt("time_hr"));
+        booking.setPriceForKm(rs.getDouble("price_for_km"));
+        booking.setDistance(rs.getInt("distance"));
         booking.setTotalFare(rs.getDouble("total_fare"));
         booking.setCreatedAt(rs.getTimestamp("created_at"));
 

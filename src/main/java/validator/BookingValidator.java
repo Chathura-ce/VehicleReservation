@@ -28,7 +28,10 @@ public class BookingValidator {
         if (booking.getDestination() == null || booking.getDestination().trim().isEmpty()) {
             throw new ValidationException("Destination is required.");
         }
-        if (booking.getPickupTime() == null || booking.getPickupTime().trim().isEmpty()) {
+        if (booking.getDistance() == 0 || booking.getDestination().trim().isEmpty()) {
+            throw new ValidationException("Distance is required.");
+        }
+        /*if (booking.getPickupTime() == null || booking.getPickupTime().trim().isEmpty()) {
             throw new ValidationException("Pickup Time cannot be empty.");
         }
         LocalDateTime pickupTime = LocalDateTime.parse(booking.getPickupTime(), DATE_TIME_FORMATTER);
@@ -41,7 +44,7 @@ public class BookingValidator {
         LocalDateTime dropOffTime = LocalDateTime.parse(booking.getDropOffTime(), DATE_TIME_FORMATTER);
         if (dropOffTime.isBefore(LocalDateTime.now())) {
             throw new ValidationException("Drop off Time cannot be in the past.");
-        }
+        }*/
     }
 
     // Helper method to validate the format of the date time string

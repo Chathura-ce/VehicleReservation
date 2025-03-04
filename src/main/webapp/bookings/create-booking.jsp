@@ -171,9 +171,9 @@
                     <div class="col-md-4">
                         <label for="bookingStatus" class="form-label">Booking Status</label>
                         <select class="form-select" id="bookingStatus" name="bookingStatus">
-                            <option value="1">Pending</option>
+<%--                            <option value="1">Pending</option>--%>
                             <option value="2">Confirmed</option>
-                            <option value="3">Completed</option>
+<%--                            <option value="3">Completed</option>--%>
                             <option value="4">Cancelled</option>
                         </select>
                     </div>
@@ -182,46 +182,14 @@
                 <!-- Row 6: Time (Hr), Total Fare, Buttons -->
                 <div class="row mb-3">
                     <div class="col-md-3">
-                        <label for="totalFare" class="form-label">Price for Hr</label>
+                        <label for="priceForKm" class="form-label">Price for KM</label>
                         <input
                                 type="text"
                                 class="form-control"
-                                id="priceForHr"
-                                name="priceForHr"
+                                id="priceForKm"
+                                name="priceForKm"
                         />
                     </div>
-                    <div class="col-md-3">
-                        <label for="pickupTime" class="form-label">Pickup Time</label>
-                        <input
-                                type="datetime-local"
-                                class="form-control"
-                                id="pickupTime"
-                                name="pickupTime"
-                        />
-                    </div>
-                    <div class="col-md-3">
-                        <label for="dropOffTime" class="form-label">Drop-off Time</label>
-                        <input
-                                type="datetime-local"
-                                class="form-control"
-                                id="dropOffTime"
-                                name="dropOffTime"
-                        />
-                    </div>
-                    <div class="col-md-3">
-                        <label for="timeHr" class="form-label">Time(Hr)</label>
-                        <input readonly
-                               value="0"
-                               type="text"
-                               class="form-control"
-                               id="timeHr"
-                               name="timeHr"
-                        />
-                    </div>
-                </div>
-
-                <!-- Row 7: Buttons -->
-                <div class="row mb-3">
                     <div class="col-md-3">
                         <label for="pickupLocation" class="form-label">Pickup Location</label>
                         <input
@@ -242,6 +210,39 @@
                                 name="destination"
                         />
                     </div>
+
+                    <div class="col-md-3">
+                        <label for="distance" class="form-label">Distance (Km)</label>
+                        <input
+                               value=""
+                               type="text"
+                               class="form-control"
+                               id="distance"
+                               name="distance"
+                        />
+                    </div>
+                </div>
+
+                <!-- Row 7: Buttons -->
+                <div class="row mb-3">
+                   <%-- <div class="col-md-3">
+                        <label for="pickupTime" class="form-label">Pickup Time</label>
+                        <input
+                                type="datetime-local"
+                                class="form-control"
+                                id="pickupTime"
+                                name="pickupTime"
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dropOffTime" class="form-label">Drop-off Time</label>
+                        <input
+                                type="datetime-local"
+                                class="form-control"
+                                id="dropOffTime"
+                                name="dropOffTime"
+                        />
+                    </div>--%>
                     <div style="display:none" class="col-md-3">
                         <label for="totalFare" class="form-label">Total Fare</label>
                         <input readonly
@@ -357,19 +358,19 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const pickupTimeInput = document.getElementById("pickupTime");
-        const dropOffTimeInput = document.getElementById("dropOffTime");
-        const timeHrInput = document.getElementById("timeHr");
-        const priceForHrInput = document.getElementById("priceForHr");
-        const totalFareInput = document.getElementById("totalFare");
+        // const pickupTimeInput = document.getElementById("pickupTime");
+        // const dropOffTimeInput = document.getElementById("dropOffTime");
+        // const priceForKmInput = document.getElementById("priceForKm");
+        // const distanceInput = document.getElementById("distance");
+        // const totalFareInput = document.getElementById("totalFare");
 
-        pickupTimeInput.addEventListener("change", calculateTimeAndFare);
-        dropOffTimeInput.addEventListener("change", calculateTimeAndFare);
-        priceForHrInput.addEventListener("input", calculateTimeAndFare);
+        // pickupTimeInput.addEventListener("change", calculateTimeAndFare);
+        // dropOffTimeInput.addEventListener("change", calculateTimeAndFare);
+        // priceForKmInput.addEventListener("input", calculateTimeAndFare);
 
         getBookingNumbers();
 
-        function calculateTimeAndFare() {
+        /*function calculateTimeAndFare() {
             const pickupTime = new Date(pickupTimeInput.value);
             const dropOffTime = new Date(dropOffTimeInput.value);
             const pricePerHour = parseFloat(priceForHrInput.value) || 0;
@@ -378,7 +379,7 @@
                 if (dropOffTime < pickupTime) {
                     errorMsg("Drop-off time cannot be earlier than Pickup time!");
                     dropOffTimeInput.value = ""; // Reset drop-off time
-                    timeHrInput.value = "0";
+                    distanceInput.value = "0";
                     totalFareInput.value = "0";
                     return;
                 }
@@ -388,16 +389,16 @@
                 const hoursDifference = timeDifference / (1000 * 60 * 60); // Convert ms to hours
 
                 // Update the hours field
-                timeHrInput.value = hoursDifference.toFixed(2);
+                distanceInput.value = hoursDifference.toFixed(2);
 
                 // Calculate total fare
                 const totalFare = hoursDifference * pricePerHour;
                 totalFareInput.value = totalFare.toFixed(2); // Round to 2 decimal places
             } else {
-                timeHrInput.value = "0";
+                distanceInput.value = "0";
                 totalFareInput.value = "0";
             }
-        }
+        }*/
 
 
         $("#searchCustomerModal").on("shown.bs.modal", function () {
@@ -571,29 +572,28 @@
 
                     // Populate customer details
                     $("#customerId").val(response.booking.customerId);
-                    $("#customerName").val(response.booking.customerRegNo);
-                    $("#customerRegNo").val(response.booking.customerRegNo);
-                    $("#customerName").val(response.booking.customerName);
-                    $("#customerNIC").val(response.booking.customerNIC);
-                    $("#address").val(response.booking.address);
-                    $("#customerEmail").val(response.booking.customerEmail);
-                    $("#phoneNo").val(response.booking.phoneNo);
+                    $("#customerName").val(response.booking.user.fullName);
+                    $("#customerNIC").val(response.booking.user.nic);
+                    $("#address").val(response.booking.customer.address);
+                    $("#customerEmail").val(response.booking.user.email);
+                    $("#phoneNo").val(response.booking.user.phone);
 
                     // Populate car details
                     $("#carId").val(response.booking.carId);
-                    $("#carRegNo").val(response.booking.carRegNo);
-                    $("#carType").val(response.booking.carType);
-                    $("#carModel").val(response.booking.carModel);
+                    // $("#carRegNo").val(response.booking.carRegNo);
+                    $("#carType").val(response.booking.car.type.typeName);
+                    $("#carModel").val(response.booking.car.model.modelName);
+                    $("#seatingCapacity").val(response.booking.car.seatingCapacity);
 
                     // Populate driver and status
                     $("#driver").val(response.booking.driverId);
-                    $("#bookingStatus").val(response.booking.bookingStatus);
+                    $("#bookingStatus").val(response.booking.statusId);
 
                     // Populate time and fare details
-                    $("#priceForHr").val(response.booking.priceForHr);
-                    $("#pickupTime").val(response.booking.pickupTime);
-                    $("#dropOffTime").val(response.booking.dropOffTime);
-                    $("#timeHr").val(response.booking.timeHr);
+                    $("#priceForKm").val(response.booking.priceForKm);
+                    // $("#pickupTime").val(response.booking.pickupTime);
+                    // $("#dropOffTime").val(response.booking.dropOffTime);
+                    $("#distance").val(response.booking.distance);
                     $("#totalFare").val(response.booking.totalFare);
 
                     // Populate locations
@@ -637,7 +637,7 @@
         $("#carRegNo").val("");
         $("#carType").val("");
         $("#carModel").val("");
-        $("#priceForHr").val("0");
+        $("#priceForKm").val("0");
 
         // Reset driver
         $("#driver").val("");
@@ -645,7 +645,7 @@
         // Reset time and location details
         $("#pickupTime").val("");
         $("#dropOffTime").val("");
-        $("#timeHr").val("0");
+        $("#distance").val("0");
         $("#totalFare").val("0");
         $("#pickupLocation").val("");
         $("#destination").val("");
@@ -846,19 +846,19 @@
         }
 
         // Price for Hour validation
-        const priceForHr = $("#priceForHr").val().trim();
-        if (priceForHr === "") {
-            errorMsg("Price for Hour is required");
-            $("#priceForHr").focus()
+        const priceForKm = $("#priceForKm").val().trim();
+        if (priceForKm === "") {
+            errorMsg("Price for KM is required");
+            $("#priceForKm").focus()
             return false;
-        } else if (isNaN(priceForHr) || parseFloat(priceForHr) <= 0) {
-            errorMsg("Please enter a valid Price for Hour (must be a positive number)");
-            $("#priceForHr").focus()
+        } else if (isNaN(priceForKm) || parseFloat(priceForKm) <= 0) {
+            errorMsg("Please enter a valid Price for KM (must be a positive number)");
+            $("#priceForKm").focus()
             return false;
         }
 
         // Pickup Time validation
-        const pickupTime = $("#pickupTime").val();
+        /*const pickupTime = $("#pickupTime").val();
         if (pickupTime === "") {
             errorMsg("Pickup Time is required");
             $("#pickupTime").focus()
@@ -871,17 +871,17 @@
             errorMsg("Drop-off Time is required");
             $("#dropOffTime").focus()
             return false;
-        }
+        }*/
 
         // Compare pickup and drop-off times
-        const pickupDateTime = new Date(pickupTime);
+       /* const pickupDateTime = new Date(pickupTime);
         const dropOffDateTime = new Date(dropOffTime);
 
         if (dropOffDateTime <= pickupDateTime) {
             errorMsg("Drop-off time must be after pickup time");
             $("#pickupTime").focus()
             return false;
-        }
+        }*/
 
         // Pickup Location validation
         const pickupLocation = $("#pickupLocation").val().trim();
@@ -896,6 +896,13 @@
         if (destination === "") {
             errorMsg("Destination is required");
             $("#destination").focus()
+            return false;
+        }
+        // Distance validation
+        const distance = $("#distance").val().trim();
+        if (distance === "") {
+            errorMsg("Distance is required");
+            $("#distance").focus()
             return false;
         }
 
@@ -925,16 +932,16 @@
                 const diffHrs = diffMs / (1000 * 60 * 60);
 
                 // Update the time hours field
-                $("#timeHr").val(diffHrs.toFixed(2));
+                $("#distance").val(diffHrs.toFixed(2));
 
                 // Calculate total fare if price per hour is available
-                const pricePerHour = parseFloat($("#priceForHr").val());
+                const pricePerHour = parseFloat($("#priceForKm").val());
                 if (!isNaN(pricePerHour)) {
                     const totalFare = pricePerHour * diffHrs;
                     $("#totalFare").val(totalFare.toFixed(2));
                 }
             } else {
-                $("#timeHr").val("0");
+                $("#distance").val("0");
                 $("#totalFare").val("0");
             }
         }

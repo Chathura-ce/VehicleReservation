@@ -40,7 +40,7 @@ public class BookingService {
     }
 
     public String createBooking(Booking booking,Connection connection) throws SQLException {
-        double totalFare = booking.getPriceForHr() * booking.getTimeHr();
+        double totalFare = booking.getPriceForKm() * booking.getDistance();
         booking.setTotalFare(totalFare);
 
         booking.setStatusId(1);
@@ -121,24 +121,24 @@ public class BookingService {
 
     public boolean updateBooking(Booking booking) throws SQLException {
 
-        Booking existingBooking = getBookingById(booking.getBookingId());
-        if (existingBooking.getStatusId() != 1) { // Assuming 1 is 'Pending'
-            throw new IllegalStateException("Cannot update booking that is not in Pending status");
-        }
-
+//        Booking existingBooking = getBookingById(booking.getBookingId());
+//        if (existingBooking.getStatusId() != 1) { // Assuming 1 is 'Pending'
+//            throw new IllegalStateException("Cannot update booking that is not in Pending status");
+//        }
+//
         return bookingDAO.updateBooking(booking);
     }
 
-    public double calculateTotalFare(double priceForHr, double timeHr, double taxRate, double discountRate) {
-        double subtotal = priceForHr * timeHr;
+    public double calculateTotalFare(double priceForKm, double distance, double taxRate, double discountRate) {
+        double subtotal = priceForKm * distance;
         double taxAmount = subtotal * taxRate;
         double discountAmount = subtotal * discountRate;
         return subtotal + taxAmount - discountAmount;
     }
 
     // Overloaded version using default tax and discount rates
-    public double calculateTotalFare(double priceForHr, double timeHr) {
-        return calculateTotalFare(priceForHr, timeHr, DEFAULT_TAX_RATE, DEFAULT_DISCOUNT_RATE);
+    public double calculateTotalFare(double priceForKm, double distance) {
+        return calculateTotalFare(priceForKm, distance, DEFAULT_TAX_RATE, DEFAULT_DISCOUNT_RATE);
     }
 
 

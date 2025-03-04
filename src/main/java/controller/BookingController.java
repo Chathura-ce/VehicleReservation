@@ -140,12 +140,13 @@ public class BookingController extends HttpServlet {
             String driverId = request.getParameter("driver");
             String carId = request.getParameter("carId");
             String destination = request.getParameter("destination");
-            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
-            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
-            double priceForHr = !request.getParameter("priceForHr").isEmpty() ? Double.parseDouble(request.getParameter("priceForHr")) : 0;
-            double timeHr = !request.getParameter("timeHr").isEmpty() ? Double.parseDouble(request.getParameter("timeHr")) : 0;
+            String pickupLocation = request.getParameter("pickupLocation");
+//            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
+//            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
+            double priceForKm = !request.getParameter("priceForKm").isEmpty() ? Double.parseDouble(request.getParameter("priceForKm")) : 0;
+            double distance = !request.getParameter("distance").isEmpty() ? Double.parseDouble(request.getParameter("distance")) : 0;
 //            double totalFare = Double.parseDouble(request.getParameter("totalFare"));
-            double totalFare = bookingService.calculateTotalFare(priceForHr, timeHr);
+            double totalFare = bookingService.calculateTotalFare(priceForKm, distance);
 
             // If customerIdStr is empty, we need to create a new user and customer
             if (customerIdStr == null || customerIdStr.trim().isEmpty()) {
@@ -176,10 +177,11 @@ public class BookingController extends HttpServlet {
                 newBooking.setDriverId(driverId);
                 newBooking.setCarId(carId);
                 newBooking.setDestination(destination);
-                newBooking.setPickupTime(pickupTime);
-                newBooking.setDropOffTime(dropOffTime);
-                newBooking.setPriceForHr(priceForHr);
-                newBooking.setTimeHr(timeHr);
+                newBooking.setPickupLocation(pickupLocation);
+//                newBooking.setPickupTime(pickupTime);
+//                newBooking.setDropOffTime(dropOffTime);
+                newBooking.setPriceForKm(priceForKm);
+                newBooking.setDistance(distance);
                 newBooking.setTotalFare(totalFare);
 
                 // Use the transactional service method to insert user, customer, and booking together.
@@ -196,10 +198,11 @@ public class BookingController extends HttpServlet {
                 newBooking.setDriverId(driverId);
                 newBooking.setCarId(carId);
                 newBooking.setDestination(destination);
-                newBooking.setPickupTime(pickupTime);
-                newBooking.setDropOffTime(dropOffTime);
-                newBooking.setPriceForHr(priceForHr);
-                newBooking.setTimeHr(timeHr);
+                newBooking.setPickupLocation(pickupLocation);
+//                newBooking.setPickupTime(pickupTime);
+//                newBooking.setDropOffTime(dropOffTime);
+                newBooking.setPriceForKm(priceForKm);
+                newBooking.setDistance(distance);
                 newBooking.setTotalFare(totalFare);
 
                 String bookingNumber = bookingService.createBooking(newBooking);
@@ -242,22 +245,24 @@ public class BookingController extends HttpServlet {
             String driverId = request.getParameter("driver"); // From dropdown
             String carId = request.getParameter("carId");
             String destination = request.getParameter("destination");
+            String pickupLocation = request.getParameter("pickupLocation");
 
-            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
-            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
+//            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
+//            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
 
-            double priceForHr = Double.parseDouble(request.getParameter("priceForHr"));
-            double timeHr = Double.parseDouble(request.getParameter("timeHr"));
-            double totalFare = bookingService.calculateTotalFare(priceForHr, timeHr);
+            double priceForKm = Double.parseDouble(request.getParameter("priceForKm"));
+            double distance = Double.parseDouble(request.getParameter("distance"));
+            double totalFare = bookingService.calculateTotalFare(priceForKm, distance);
 
             // Update booking object
             existingBooking.setDriverId(driverId);
             existingBooking.setCarId(carId);
+            existingBooking.setPickupLocation(pickupLocation);
             existingBooking.setDestination(destination);
-            existingBooking.setPickupTime(pickupTime);
-            existingBooking.setDropOffTime(dropOffTime);
-            existingBooking.setPriceForHr(priceForHr);
-            existingBooking.setTimeHr(timeHr);
+//            existingBooking.setPickupTime(pickupTime);
+//            existingBooking.setDropOffTime(dropOffTime);
+            existingBooking.setPriceForKm(priceForKm);
+            existingBooking.setDistance(distance);
             existingBooking.setTotalFare(totalFare);
 
             // Perform update
