@@ -64,29 +64,42 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Car Type -->
+                        <div class="col-md-6">
+                            <label for="type">Car Type</label>
+                            <div class="input-group mb-3">
+                                <select onchange="getCarModels()" class="form-control" id="type" name="type">
+                                    <option value="">Select a Type</option>
+                                    <c:forEach var="type" items="${carTypes}">
+                                        <option ${type.typeId == car.type.getTypeId() ? "selected" : ""} value="${type.typeId}">
+                                                ${type.typeName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                                <div class="input-group-text">
+                                    <span class="bi bi-car"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
 
                         <!-- Car Model -->
                         <div class="col-md-6">
                             <label for="model">Car Model</label>
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="model" name="model"
-                                       value="${car.model}" required>
+                                <select class="form-control" id="model" name="model">
+                                    <option value="">Select a Model</option>
+                                    <c:forEach var="model" items="${models}">
+                                        <option ${model.modelId == car.model.getModelId() ? "selected" : ""} value="${model.modelId}">
+                                                ${model.modelName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
                                 <div class="input-group-text">
                                     <span class="bi bi-car-front-fill"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Car Type -->
-                        <div class="col-md-6">
-                            <label for="type">Car Type</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="type" name="type"
-                                       value="${car.type}" required>
-                                <div class="input-group-text">
-                                    <span class="bi bi-car"></span>
                                 </div>
                             </div>
                         </div>
@@ -123,8 +136,8 @@
                             <div class="input-group mb-3">
                                 <select class="form-control" id="available" name="available" required>
                                     <option value="">Select Availability</option>
-                                    <option value="1" ${car.available == 'Available' ? 'selected' : ''}>Yes</option>
-                                    <option value="0" ${car.available == 'Booked' ? 'selected' : ''}>No</option>
+                                    <option value="1" ${car.available == '1' ? 'selected' : ''}>Yes</option>
+                                    <option value="0" ${car.available == '0' ? 'selected' : ''}>No</option>
                                 </select>
                                 <div class="input-group-text">
                                     <span class="bi bi-check-circle"></span>

@@ -1,6 +1,10 @@
 package model;
 
+import util.PricingConfig;
+
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class Booking {
     private int bookingId;
@@ -19,8 +23,9 @@ public class Booking {
     private double totalFare;
     private User user;
     private Customer customer;
+    private Driver driver;
+    private String formattedDate;
     private Car car;
-
     public Booking() {
     }
 
@@ -148,4 +153,52 @@ public class Booking {
     public void setCar(Car car) {
         this.car = car;
     }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public void setFormattedDate(Timestamp timestamp) {
+        if (timestamp != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy | hh:mm a");
+            this.formattedDate = sdf.format(timestamp);
+        }else {
+            this.formattedDate = "";
+        }
+
+    }
+
+    public String getFormattedDate() {
+        return formattedDate;
+    }
+
+    public double calculateTax() {
+        double tax = (PricingConfig.TAX_PERCENTAGE / 100) * (distance * priceForKm);  // tax based on subtotal
+        return Math.round(tax * 10.0) / 10.0;  // Rounds to one decimal place
+    }
+
+    public double calculateTotalAmount() {
+        return (distance*priceForKm) + calculateTax();  // total includes subtotal + tax
+    }
+
+    public double getTotalAmount() {
+        return calculateTotalAmount();  // get total amount when needed
+    }
+
 }

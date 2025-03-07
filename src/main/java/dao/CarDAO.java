@@ -19,9 +19,9 @@ public class CarDAO {
             stmt.setString(1, car.getCarId());
             stmt.setInt(2, car.getCarModel().getModelId());
             stmt.setInt(3, car.getSeatingCapacity());
-            stmt.setString(4, car.getType().getTypeName());
+            stmt.setInt(4, car.getType().getTypeId());
             stmt.setString(5, car.getRegNumber());
-            stmt.setString(6, car.getAvailable());
+            stmt.setInt(6, car.getAvailable());
             stmt.setString(7, car.getDriverId());
             stmt.executeUpdate();
         }
@@ -62,7 +62,7 @@ public class CarDAO {
 
                 car.setRegNumber(rs.getString("reg_number"));
                 car.setSeatingCapacity(rs.getInt("capacity"));
-                car.setAvailable(rs.getString("available"));
+                car.setAvailable(rs.getInt("available"));
                 carList.add(car);
             }
         }
@@ -95,6 +95,7 @@ public class CarDAO {
             if (rs.next()) {
                 Car car = new Car();
                 car.setCarId(rs.getString("car_id"));
+                car.setDriverId(rs.getString("driver_id"));
 
                 CarType carType = new CarType(rs.getInt("type"),rs.getString("type_name"));
                 car.setType(carType);
@@ -104,7 +105,7 @@ public class CarDAO {
 
                 car.setRegNumber(rs.getString("reg_number"));
                 car.setSeatingCapacity(rs.getInt("capacity"));
-                car.setAvailable(rs.getString("available"));
+                car.setAvailable(rs.getInt("available"));
                 return car;
             }
         }
@@ -112,15 +113,16 @@ public class CarDAO {
     }
 
     public void updateCar(Car car) throws SQLException {
-        String sql = "UPDATE cars SET model = ?, type = ?, reg_number = ?,capacity= ? , available = ? WHERE car_id = ?";
+        String sql = "UPDATE cars SET model = ?, type = ?, reg_number = ?,capacity= ? , available = ?, driver_id = ? WHERE car_id = ?";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, car.getModel().getModelId());
             stmt.setInt(2, car.getType().getTypeId());
             stmt.setString(3, car.getRegNumber());
             stmt.setInt(4, car.getSeatingCapacity());
-            stmt.setString(5, car.getAvailableId());
-            stmt.setString(6, car.getCarId());
+            stmt.setInt(5, car.getAvailable());
+            stmt.setString(6, car.getDriverId());
+            stmt.setString(7, car.getCarId());
             stmt.executeUpdate();
         }
     }
@@ -222,7 +224,7 @@ public class CarDAO {
 
                     car.setRegNumber(rs.getString("reg_number"));
                     car.setSeatingCapacity(rs.getInt("capacity"));
-                    car.setAvailable(rs.getString("available"));
+                    car.setAvailable(rs.getInt("available"));
                     cars.add(car);
                 }
             }

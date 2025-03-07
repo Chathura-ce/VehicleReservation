@@ -62,6 +62,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Type</th>
                                 <th>Car Model</th>
                                 <th>Reg Number</th>
                                 <th>Seating Capacity</th>
@@ -73,16 +74,17 @@
                             <c:forEach var="car" items="${carList}">
                                 <tr>
                                     <td>${car.carId}</td>
-                                    <td>${car.model}</td>
+                                    <td>${car.type.typeName}</td>
+                                    <td>${car.model.modelName}</td>
                                     <td>${car.regNumber}</td>
                                     <td>${car.seatingCapacity}</td>
                                     <td>
-                                        <span class="badge ${car.available == 'Available' ? 'bg-success' : car.available == 'Booked' ? 'bg-warning' : 'bg-danger'}">
-                                            ${car.available}
+                                        <span class="badge ${car.available == '1' ? 'bg-success' : car.available == '0' ? 'bg-warning' : 'bg-danger'}">
+                                            ${car.getAvailableStr()}
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="${pageContext.request.contextPath}/edit-car?carId=${car.carId}" class="btn btn-info btn-sm">
+                                        <a href="${pageContext.request.contextPath}/edit-car?carId=${car.carId}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
                                         <a href="${pageContext.request.contextPath}/delete-car?carId=${car.carId}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this car?');">

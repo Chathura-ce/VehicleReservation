@@ -1,6 +1,7 @@
 package dao;
 
 import model.*;
+import model.Driver;
 import util.BookingUtil;
 import util.DatabaseUtil;
 import java.sql.*;
@@ -66,9 +67,12 @@ public class BookingDAO {
         String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
                 " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
                 " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
-                " cars.capacity, cars.driver_id FROM bookings LEFT JOIN customers ON bookings.customer_id = customers.customer_number " +
+                " cars.capacity, cars.driver_id,du.full_name as driver_name " +
+                "FROM bookings LEFT JOIN customers ON bookings.customer_id = customers.customer_number " +
                 " LEFT JOIN users ON customers.user_id = users.user_id LEFT JOIN cars ON bookings.car_id = cars.car_id " +
                 " LEFT JOIN car_models ON cars.model = car_models.model_id left JOIN car_types ON car_types.type_id = cars.type" +
+                " LEFT JOIN drivers AS d ON bookings.driver_id = d.driver_id " +
+                " LEFT JOIN users AS du ON d.user_id = du.user_id "+
                 " WHERE booking_number = ? ";
 //        System.out.println(sql);
         try (Connection connection = getConnection();
@@ -149,6 +153,7 @@ public class BookingDAO {
         booking.setDistance(rs.getInt("distance"));
         booking.setTotalFare(rs.getDouble("total_fare"));
         booking.setCreatedAt(rs.getTimestamp("created_at"));
+        booking.setFormattedDate(rs.getTimestamp("created_at"));
 
         User user = new User();
         user.setFullName(rs.getString("full_name"));
@@ -166,11 +171,15 @@ public class BookingDAO {
         CarModel carModel = new CarModel(rs.getInt("model_id"),rs.getString("model_name"),rs.getInt("type_id"));
         car.setModel(carModel);
 
+        Driver driver = new Driver();
+        driver.setDriverName(rs.getString("driver_name"));
+
         car.setSeatingCapacity(rs.getInt("capacity"));
 
         booking.setUser(user);
         booking.setCustomer(customer);
         booking.setCar(car);
+        booking.setDriver(driver);
 
         return booking;
     }

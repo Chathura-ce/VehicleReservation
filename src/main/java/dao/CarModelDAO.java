@@ -12,10 +12,15 @@ public class CarModelDAO {
     // Fetch car models by car type (using type_id)
     public List<CarModel> getCarModelsByTypeId(int typeId) throws SQLException {
         List<CarModel> models = new ArrayList<>();
-        String sql = "SELECT model_id, model_name, type_id FROM car_models WHERE type_id = ?";
+        String sql = "SELECT model_id, model_name, type_id FROM car_models ";
+        if (typeId != 0) {
+            sql += " WHERE type_id = ?";
+        }
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, typeId);
+            if (typeId != 0) {
+                stmt.setInt(1, typeId);
+            }
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     CarModel model = new CarModel();

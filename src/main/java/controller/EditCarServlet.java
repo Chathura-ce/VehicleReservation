@@ -1,6 +1,8 @@
 package controller;
 
 import dao.CarDAO;
+import dao.CarModelDAO;
+import dao.CarTypeDAO;
 import dao.DriverDAO;
 import model.Car;
 import model.CarModel;
@@ -13,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/edit-car")
@@ -25,7 +28,23 @@ public class EditCarServlet extends HttpServlet {
             try {
                 CarDAO carDAO = new CarDAO();
                 Car car = carDAO.getCarById(carId);
-                
+
+                CarTypeDAO carType = new CarTypeDAO();
+                List<CarType> carTypes = new ArrayList<>();
+                try {
+                    carTypes = carType.getAllCarTypes();
+                } catch (SQLException e) {
+                }
+                request.setAttribute("carTypes", carTypes);
+
+                CarModelDAO carModelDAO = new CarModelDAO();
+                List<CarModel> models = new ArrayList<>();
+                try {
+                    models = carModelDAO.getCarModelsByTypeId(car.getType().getTypeId());
+                } catch (SQLException e) {
+                }
+                request.setAttribute("models", models);
+
                 if (car != null) {
                     DriverDAO driverDAO = new DriverDAO();
                     List<Driver> availableDrivers  = driverDAO.getAvailableDrivers();
@@ -48,9 +67,10 @@ public class EditCarServlet extends HttpServlet {
         String type = request.getParameter("type");
         String regNumber = request.getParameter("regNumber");
         String seatingCapacityStr = request.getParameter("seatingCapacity");
-        String available = request.getParameter("available");
+        int available = Integer.parseInt(request.getParameter("available"));
         int seatingCapacity = Integer.parseInt(seatingCapacityStr);
-        
+        String driverId = request.getParameter("driverId");
+
         try {
             CarType carType = new CarType();
             carType.setTypeId(Integer.parseInt(type));
@@ -59,6 +79,7 @@ public class EditCarServlet extends HttpServlet {
             carModel.setModelId(Integer.parseInt(model));
 
             Car car = new Car(carId, carModel, carType, regNumber, seatingCapacity, available);
+            car.setDriverId(driverId);
             CarDAO carDAO = new CarDAO();
 
             // Save changes to database

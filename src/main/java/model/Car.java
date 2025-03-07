@@ -10,7 +10,7 @@ public class Car {
     private CarModel model;
     private String regNumber;
     private int seatingCapacity;
-    private String available; // Values: "Available", "Booked", "Under Maintenance"
+    private int available;
     private String driverId;
     private Driver driver;
     public Car() {
@@ -40,7 +40,7 @@ public class Car {
 
 
 
-    public Car(String carId, CarModel model, CarType type, String regNumber, int seatingCapacity, String available) {
+    public Car(String carId, CarModel model, CarType type, String regNumber, int seatingCapacity, int available) {
         this.carId = carId;
         this.model = model;
         this.type = type;
@@ -89,17 +89,19 @@ public class Car {
         this.seatingCapacity = seatingCapacity;
     }
 
-    public String getAvailable() {
+    public int getAvailable() {
+        return available;
+    }
+    public String getAvailableStr() {
         if(Objects.equals(available, "1")){return "Available";}
         return "Booked";
-
     }
-    public String getAvailableId() {
+    public int getAvailableId() {
         return available;
 
     }
 
-    public void setAvailable(String available) {
+    public void setAvailable(int available) {
         this.available = available;
     }
 

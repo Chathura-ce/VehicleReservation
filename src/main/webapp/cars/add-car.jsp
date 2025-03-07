@@ -5,11 +5,12 @@
 <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
 <div class="row">
     <div class="col-sm-6">
-        <h3 class="mb-0">Dashboard</h3>
+        <h3 class="mb-0">Car</h3>
     </div>
     <div class="col-sm-6">
         <ol class="breadcrumb float-sm-end">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item">Car</li>
             <li class="breadcrumb-item active" aria-current="page">Add Car</li>
         </ol>
     </div>
@@ -17,7 +18,7 @@
 
 <div class="row d-flex justify-content-center mt-5">
     <div class="col-sm-8">
-        <div class="card card-primary">
+        <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Add New Car</h3>
             </div>
@@ -58,35 +59,44 @@
                             <label for="carId">Car ID</label>
                             <div class="input-group mb-3">
                                 <input readonly type="text" class="form-control" id="carId" name="carId"
-                                       value="${carId != null ? carId : ''}" >
+                                       value="${carId != null ? carId : ''}">
                                 <div class="input-group-text">
                                     <span class="bi bi-car-front"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Car Model -->
-                        <div class="col-md-6">
-                            <label for="model">Car Model</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="model" name="model"
-                                       value="${model != null ? model : ''}" required>
-                                <div class="input-group-text">
-                                    <span class="bi bi-car-front-fill"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
                         <!-- Car Type -->
                         <div class="col-md-6">
                             <label for="type">Car Type</label>
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="type" name="type"
-                                       value="${type != null ? type : ''}" required>
+                                <select onchange="getCarModels()" class="form-control" id="type" name="type">
+                                    <option value="">Select a Type</option>
+                                    <c:forEach var="type" items="${carTypes}">
+                                        <option value="${type.typeId}">
+                                                ${type.typeName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
                                 <div class="input-group-text">
                                     <span class="bi bi-car"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <!-- Car Model -->
+                        <div class="col-md-6">
+                            <label for="model">Car Model</label>
+                            <div class="input-group mb-3">
+                                <select class="form-control" id="model" name="model">
+                                    <option value="">Select a Model</option>
+                                </select>
+                                <div class="input-group-text">
+                                    <span class="bi bi-car-front-fill"></span>
                                 </div>
                             </div>
                         </div>
@@ -155,21 +165,21 @@
                     </div>
 
                     <%--**********--%>
-                        <!-- Image Upload Section -->
-                        <div class="row mb-3" style="display: none">
-                            <div class="col-12">
-                                <label class="form-label">Car Images</label>
-                                <input type="file"
-                                       class="filepond"
-                                       name="carImages"
-                                       multiple
-                                       data-max-file-size="5MB"
-                                       accept="image/png, image/jpeg">
-                            </div>
+                    <!-- Image Upload Section -->
+                    <div class="row mb-3" style="display: none">
+                        <div class="col-12">
+                            <label class="form-label">Car Images</label>
+                            <input type="file"
+                                   class="filepond"
+                                   name="carImages"
+                                   multiple
+                                   data-max-file-size="5MB"
+                                   accept="image/png, image/jpeg">
                         </div>
+                    </div>
                     <input type="hidden" id="uploadedImages" name="imagePaths">
 
-                <%--**********--%>
+                    <%--**********--%>
 
 
                     <div class="mb-3">
@@ -189,6 +199,36 @@
 <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
 
 <script>
+    function getCarModels() {
+        var typeId = $('#type').val();
+        // Clear the car model dropdown if no car type is selected
+        if (!typeId) {
+            $('#model').html('<option value="">Select a Model<option>');
+            return;
+        }
+        $.ajax({
+            url: '${pageContext.request.contextPath}/getCarModels', // adjust your context path as needed
+            type: 'GET',
+            data: {typeId: typeId},
+            dataType: 'json',
+            success: function (data) {
+                var options = '<option value="">Select a Model</option>';
+                if (data && data.length > 0) {
+                    $.each(data, function (index, carModel) {
+                        options += '<option value="' + carModel.modelId + '">' + carModel.modelName + '</option>';
+                    });
+                } else {
+                    options += '<option value="">No models available</option>';
+                }
+                $('#model').html(options);
+            },
+            error: function () {
+                $('#model').html('<option value="">Error loading models</option>');
+            }
+        });
+
+    }
+
     // Register plugins
     FilePond.registerPlugin(
         FilePondPluginImagePreview,

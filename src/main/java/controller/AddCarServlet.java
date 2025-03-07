@@ -1,8 +1,6 @@
 package controller;
 
-import dao.CarDAO;
-import dao.CarImageDAO;
-import dao.DriverDAO;
+import dao.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,6 +15,8 @@ import util.FlashMessageUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 
@@ -33,11 +33,26 @@ public class AddCarServlet extends HttpServlet {
             throws ServletException, IOException {
         DriverDAO driverDAO = new DriverDAO();
         List<Driver> availableDrivers  = driverDAO.getAvailableDrivers();
+        request.setAttribute("availableDrivers", availableDrivers);
+
+        CarTypeDAO carType = new CarTypeDAO();
+        List<CarType> carTypes = new ArrayList<>();
+        try {
+            carTypes = carType.getAllCarTypes();
+        } catch (SQLException e) {
+        }
+        request.setAttribute("carTypes", carTypes);
+
+        CarModelDAO carModelDAO = new CarModelDAO();
+        List<CarModel> models = new ArrayList<>();
+        try {
+             models = carModelDAO.getCarModelsByTypeId(0);
+        } catch (SQLException e) {
+        }
+        request.setAttribute("models", models);
 
         String carId = CarUtil.generateCarId();
-
         request.setAttribute("carId", carId);
-        request.setAttribute("availableDrivers", availableDrivers);
         request.getRequestDispatcher("cars/add-car.jsp").forward(request, response);
     }
 
@@ -50,19 +65,18 @@ public class AddCarServlet extends HttpServlet {
         String type = request.getParameter("type");
         String regNumber = request.getParameter("regNumber");
         String seatingCapacityStr = request.getParameter("seatingCapacity");
-        String available = request.getParameter("available");
+        int available = Integer.parseInt(request.getParameter("available"));
         int seatingCapacity = Integer.parseInt(seatingCapacityStr);
 
-        CarType carType = new CarType();
-        carType.setTypeId(Integer.parseInt(type));
-
-        CarModel carModel = new CarModel();
-        carModel.setModelId(Integer.parseInt(model));
-
-        Car car = new Car(carId, carModel, carType, regNumber, seatingCapacity, available);
-        CarDAO carDAO = new CarDAO();
-
         try {
+            CarType carType = new CarType();
+            carType.setTypeId(Integer.parseInt(type));
+
+            CarModel carModel = new CarModel();
+            carModel.setModelId(Integer.parseInt(model));
+
+            Car car = new Car(carId, carModel, carType, regNumber, seatingCapacity, available);
+            CarDAO carDAO = new CarDAO();
             carDAO.addCar(car); // Insert into Car table
         } catch (Exception e) {
             e.printStackTrace();

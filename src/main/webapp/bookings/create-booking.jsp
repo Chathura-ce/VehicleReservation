@@ -257,7 +257,7 @@
                         <label class="form-label">&nbsp;</label>
                         <div class="">
                             <button onclick="saveData();" type="button" class="btn btn-primary me-2">Create</button>
-                            <button type="button" class="btn btn-success me-2">Print</button>
+                            <button onclick="printBill();" type="button" class="btn btn-success me-2">Print</button>
                             <button onclick="window.location.reload();" type="reset" class="btn btn-secondary">New
                             </button>
                         </div>
@@ -946,5 +946,16 @@
             }
         }
     }
+
+    function printBill() {
+        let bookingNumber = $('#bookingNumber').val();  // Get the booking number from the input field
+
+        // Construct the URL for the new page with the booking number as a query parameter
+        let url = '${pageContext.request.contextPath}/bill?bookingNumber=' + bookingNumber;
+
+        // Open the new page in a new tab
+        window.open(url, '_blank');
+    }
+
 
 </script>
