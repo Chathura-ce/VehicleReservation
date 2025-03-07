@@ -78,6 +78,9 @@ public class BookingController extends HttpServlet {
                 case "/get-details":
                     getBookingDetails(request, response);
                     break;
+                case "/all-bookings":
+                    listBooking(request, response);
+                    break;
                 default:
                     listBooking(request, response);
                     break;
@@ -91,7 +94,7 @@ public class BookingController extends HttpServlet {
             throws SQLException, IOException, ServletException {
         List<Booking> listBooking = bookingService.getAllBookings();
         request.setAttribute("listBooking", listBooking);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/booking-list.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/bookings/list.jsp");
         dispatcher.forward(request, response);
     }
 

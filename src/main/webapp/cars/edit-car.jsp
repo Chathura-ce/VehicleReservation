@@ -10,14 +10,15 @@
     <div class="col-sm-6">
         <ol class="breadcrumb float-sm-end">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Add Car</li>
+            <li class="breadcrumb-item">Car</li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Car</li>
         </ol>
     </div>
 </div>
 
 <div class="row d-flex justify-content-center mt-5">
     <div class="col-sm-8">
-        <div class="card card-success">
+        <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Edit Car</h3>
             </div>

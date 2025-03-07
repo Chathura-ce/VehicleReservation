@@ -1,17 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Booking List</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+
     <jsp:include page="/header.jsp" />
-    
+
     <div class="container mt-5">
         <div class="row mb-4">
             <div class="col">
@@ -21,65 +13,65 @@
                 <a href="${pageContext.request.contextPath}/booking/new" class="btn btn-primary">Create New Booking</a>
             </div>
         </div>
-        
+
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
+            <table class="table table-bordered table-striped table-hover">
+                <thead >
                     <tr>
                         <th>Booking ID</th>
                         <th>Pickup Location</th>
                         <th>Drop Location</th>
-                        <th>Pickup Date & Time</th>
+                        <th>Driver</th>
                         <th>Status</th>
                         <th>Fare</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="booking" items="${bookings}">
+                    <c:forEach var="booking" items="${listBooking}">
                         <tr>
-                            <td>${booking.bookingId}</td>
+                            <td>${booking.bookingNumber}</td>
                             <td>${booking.pickupLocation}</td>
-                            <td>${booking.dropLocation}</td>
-                            <td><fmt:formatDate value="${booking.pickupDateTime}" pattern="yyyy-MM-dd HH:mm" /></td>
+                            <td>${booking.destination}</td>
+                            <td>${booking.driver.getDriverName()}</td>
                             <td>
-                                <span class="badge bg-${booking.status == 'Pending' ? 'warning' : 
-                                    booking.status == 'Confirmed' ? 'success' : 
-                                    booking.status == 'Completed' ? 'info' : 'danger'}">
-                                    ${booking.status}
+                                <span class="badge bg-${booking.statusId == '1' ? 'warning' :
+                                    booking.statusId == '2' ? 'success' :
+                                    booking.statusId == '4' ? 'info' : 'danger'}">
+                                        ${booking.statusId == '1' ? 'Pending' :
+                                                booking.statusId == '2' ? 'Confirmed' :
+                                                        booking.statusId == '4' ? 'Completed' : 'Cancelled'}
                                 </span>
                             </td>
-                            <td>$${booking.fare}</td>
+                            <td>$${booking.getTotalAmount()}</td>
                             <td>
-                                <a href="${pageContext.request.contextPath}/booking/view?id=${booking.bookingId}" 
-                                   class="btn btn-info btn-sm">View</a>
-                                <c:if test="${sessionScope.userRole == 'admin'}">
-                                    <form action="${pageContext.request.contextPath}/booking/update-status" method="post" 
-                                          style="display: inline;">
-                                        <input type="hidden" name="bookingId" value="${booking.bookingId}">
-                                        <select name="status" class="form-select form-select-sm d-inline-block w-auto mx-1">
-                                            <option value="Confirmed">Confirm</option>
-                                            <option value="Completed">Complete</option>
-                                            <option value="Cancelled">Cancel</option>
-                                        </select>
-                                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                                    </form>
-                                </c:if>
+                                <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-success btn-sm">View</button>
+                                <button onclick="editBooking('${booking.bookingNumber}')" class="btn btn-primary btn-sm">Edit</button>
+                                <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-danger btn-sm">Cancel</button>
                             </td>
                         </tr>
                     </c:forEach>
                 </tbody>
             </table>
         </div>
-        
-        <c:if test="${empty bookings}">
-            <div class="alert alert-info text-center">
-                No bookings found.
-            </div>
-        </c:if>
+
     </div>
-    
+
     <jsp:include page="/footer.jsp" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+
+<script>
+    function printBill(bookingNumber) {
+        // Construct the URL for the new page with the booking number as a query parameter
+        let url = '${pageContext.request.contextPath}/bill?bookingNumber=' + bookingNumber;
+
+        // Open the new page in a new tab
+        window.open(url, '_blank');
+    }
+    function editBooking(bookingNumber) {
+        // Construct the URL for the new page with the booking number as a query parameter
+        let url = '${pageContext.request.contextPath}/booking/new?bookingNumber=' + bookingNumber;
+
+        // Open the new page in a new tab
+        window.open(url, '_blank');
+    }
+</script>

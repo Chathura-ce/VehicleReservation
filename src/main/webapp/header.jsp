@@ -152,7 +152,7 @@
                                     class="nav-icon bi bi-plus-circle"></i>
                                 <p>Create Booking</p>
                             </a></li>
-                            <li class="nav-item"><a href="${pageContext.request.contextPath}/all-bookings"
+                            <li class="nav-item"><a href="${pageContext.request.contextPath}/booking/all-bookings"
                                                     class="nav-link"> <i
                                     class="nav-icon bi bi-list-ul"></i>
                                 <p>All Bookings</p>

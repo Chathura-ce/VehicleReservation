@@ -258,7 +258,7 @@
                         <div class="">
                             <button onclick="saveData();" type="button" class="btn btn-primary me-2">Create</button>
                             <button onclick="printBill();" type="button" class="btn btn-success me-2">Print</button>
-                            <button onclick="window.location.reload();" type="reset" class="btn btn-secondary">New
+                            <button onclick="newBooking();" type="reset" class="btn btn-secondary">New
                             </button>
                         </div>
                     </div>
@@ -367,8 +367,8 @@
         // pickupTimeInput.addEventListener("change", calculateTimeAndFare);
         // dropOffTimeInput.addEventListener("change", calculateTimeAndFare);
         // priceForKmInput.addEventListener("input", calculateTimeAndFare);
-
-        getBookingNumbers();
+        var bookingNumber = getQueryParam("bookingNumber");
+        getBookingNumbers(bookingNumber,true);
 
         /*function calculateTimeAndFare() {
             const pickupTime = new Date(pickupTimeInput.value);
@@ -525,7 +525,7 @@
         });
     }
 
-    function getBookingNumbers(select = "") {
+    function getBookingNumbers(select = "",trigger=false) {
         $.ajax({
             url: "../booking/get-booking-numbers",
             type: "GET",
@@ -539,6 +539,7 @@
                     });
                     $("#bookingNumber").html(options);
                     $("#bookingNumber").val(select);
+                   if(trigger) getBookingDetails();
                 } else {
                     console.error("Error fetching booking numbers:", response.message);
                 }
@@ -955,6 +956,16 @@
 
         // Open the new page in a new tab
         window.open(url, '_blank');
+    }
+
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+
+    function newBooking() {
+        window.location.href = '/booking/new';
     }
 
 

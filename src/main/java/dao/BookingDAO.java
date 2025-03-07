@@ -90,7 +90,15 @@ public class BookingDAO {
 
     public List<Booking> selectAllBookings() throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM bookings ORDER BY booking_number DESC";
+        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+                " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
+                " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
+                " cars.capacity, cars.driver_id,du.full_name as driver_name " +
+                "FROM bookings LEFT JOIN customers ON bookings.customer_id = customers.customer_number " +
+                " LEFT JOIN users ON customers.user_id = users.user_id LEFT JOIN cars ON bookings.car_id = cars.car_id " +
+                " LEFT JOIN car_models ON cars.model = car_models.model_id left JOIN car_types ON car_types.type_id = cars.type" +
+                " LEFT JOIN drivers AS d ON bookings.driver_id = d.driver_id " +
+                " LEFT JOIN users AS du ON d.user_id = du.user_id ORDER BY bookings.booking_id DESC " ;
 
         try (Connection connection = getConnection();
              Statement stmt = connection.createStatement();
