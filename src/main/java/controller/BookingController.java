@@ -28,6 +28,7 @@ import service.CustomerService;
 import service.CarService;
 import service.UserService;
 import util.DateTimeUtil;
+import util.EmailSender;
 import util.PasswordUtil;
 import validator.CustomerValidator;
 import validator.UserValidator;
@@ -104,6 +105,9 @@ public class BookingController extends HttpServlet {
         List<Car> cars = carService.selectAllCars();
         request.setAttribute("customers", customers);
         request.setAttribute("cars", cars);
+        System.out.println("Classpath: " + System.getProperty("java.class.path"));
+
+        EmailSender.sendEmail("chathu.eac@gmail.com", "Test Email", "Hello from Java!");
         RequestDispatcher dispatcher = request.getRequestDispatcher("/bookings/create-booking.jsp");
         dispatcher.forward(request, response);
     }
@@ -189,6 +193,7 @@ public class BookingController extends HttpServlet {
 
                 // Use the transactional service method to insert user, customer, and booking together.
                 String bookingNumber = bookingService.createBookingTransaction(newBooking, user, customer);
+                EmailSender.sendEmail("chathu.eac@gmail.com", "Test Email", "Hello from Java!");
                 jsonResponse.put("status", "success");
                 jsonResponse.put("bookingNumber", bookingNumber);
             } else {
