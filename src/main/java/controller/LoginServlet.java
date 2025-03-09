@@ -51,7 +51,7 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect("home.jsp");
                         break;
                     case "driver":  // Driver role
-                        response.sendRedirect("driver-dashboard.jsp");
+                        response.sendRedirect("index.jsp");
                         break;
                     default:  // Default path if no role matches
 //                        response.sendRedirect("error.jsp");
