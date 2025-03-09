@@ -12,8 +12,8 @@ import static util.DatabaseUtil.getConnection;
 
 public class BookingDAO {
     public String insertBooking(Booking booking,Connection connection) throws SQLException {
-        String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, status_id, price_for_km, distance, total_fare, created_at,pickup_location) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  CURRENT_TIMESTAMP,?)";
+        String sql = "INSERT INTO bookings (booking_number, customer_id, driver_id, car_id, destination, status_id, price_for_km, distance, total_fare, created_at,pickup_location,pickup_date,pickup_time) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  CURRENT_TIMESTAMP,?,?,?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -23,13 +23,15 @@ public class BookingDAO {
             stmt.setObject(3, booking.getDriverId());
             stmt.setString(4, booking.getCarId());
             stmt.setString(5, booking.getDestination());
-//            stmt.setString(6, booking.getPickupTime());
 //            stmt.setString(7, booking.getDropOffTime());
             stmt.setInt(6, booking.getStatusId());
             stmt.setDouble(7, booking.getPriceForKm());
             stmt.setDouble(8, booking.getDistance());
             stmt.setDouble(9, booking.getTotalFare());
             stmt.setString(10, booking.getPickupLocation());
+            stmt.setString(11, booking.getPickupDate());
+            stmt.setString(12, booking.getPickupTime());
+//            stmt.setString(6, booking.getPickupTime());
 
             stmt.executeUpdate();
 

@@ -35,4 +35,11 @@ public class CarService {
     public List<Car> searchCars(String query) throws SQLException {
         return carDAO.searchCars(query);
     }
+
+    public List<Car> searchCars(int carType, int carModel,String sortBy) throws SQLException {
+        return carDAO.searchCars(carType,carModel, sortBy);
+    }
+    public Car getCarById(String carId) throws SQLException {
+        return carDAO.getCarById(carId);
+    }
 }

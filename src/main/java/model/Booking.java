@@ -26,6 +26,8 @@ public class Booking {
     private Driver driver;
     private String formattedDate;
     private Car car;
+    private String pickupDate;
+
     public Booking() {
     }
 
@@ -201,4 +203,10 @@ public class Booking {
         return calculateTotalAmount();  // get total amount when needed
     }
 
+    public void setPickupDate(String pickupDate) {
+        this.pickupDate = pickupDate;
+    }
+    public String getPickupDate() {
+        return pickupDate;
+    }
 }

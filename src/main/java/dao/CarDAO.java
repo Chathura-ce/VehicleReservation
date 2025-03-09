@@ -83,7 +83,8 @@ public class CarDAO {
                 "car_types.type_name,\n" +
                 "car_models.model_name,\n" +
                 "car_models.model_id,\n" +
-                "car_models.type_id\n" +
+                "car_models.type_id,\n" +
+                "cars.price_for_km\n" +
                 "FROM\n" +
                 "cars\n" +
                 "INNER JOIN car_types ON cars.type = car_types.type_id\n" +
@@ -96,6 +97,7 @@ public class CarDAO {
                 Car car = new Car();
                 car.setCarId(rs.getString("car_id"));
                 car.setDriverId(rs.getString("driver_id"));
+                car.setPriceForHr(rs.getDouble("price_for_km"));
 
                 CarType carType = new CarType(rs.getInt("type"),rs.getString("type_name"));
                 car.setType(carType);
@@ -250,4 +252,82 @@ public class CarDAO {
         }
         return models;
     }
+
+    public List<Car> searchCars(int carType, int carModel,String sortBy) throws SQLException {
+        List<Car> cars = new ArrayList<>();
+        String sql = "SELECT\n" +
+                "cars.id,\n" +
+                "cars.car_id,\n" +
+                "cars.model,\n" +
+                "cars.type,\n" +
+                "cars.reg_number,\n" +
+                "cars.capacity,\n" +
+                "cars.available,\n" +
+                "cars.driver_id,\n" +
+                "cars.price_for_km,\n" +
+                "cars.image_path,\n" +
+                "car_types.type_name,\n" +
+                "car_models.model_name,\n" +
+                "car_models.model_id,\n" +
+                "car_models.type_id,\n" +
+                "users.username as driver_name\n" +
+                "FROM\n" +
+                "cars\n" +
+                "INNER JOIN car_types ON cars.type = car_types.type_id\n" +
+                "INNER JOIN car_models ON car_models.type_id = car_types.type_id AND cars.model = car_models.model_id\n" +
+                "LEFT JOIN drivers ON cars.driver_id = drivers.driver_id\n" +
+                "LEFT JOIN users ON drivers.user_id = users.user_id\n" +
+                "WHERE  cars.available=1 ";
+        if(carType!=0) {
+           sql += " AND cars.type=?";
+        }
+        if(carModel!=0) {
+           sql += " AND cars.model=?";
+        }
+        if(!sortBy.isEmpty()) {
+            if(sortBy.equals("price-asc")) {
+                sql += " ORDER BY cars.price_for_km ASC";
+            }
+            if(sortBy.equals("price-desc")) {
+                sql += " ORDER BY cars.price_for_km DESC";
+            }
+        }
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            if(carType!=0) {
+                stmt.setInt(1, carType);
+            }
+            if(carModel!=0) {
+                stmt.setInt(1, carModel);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+
+                    Car car = new Car();
+                    car.setCarId(rs.getString("car_id"));
+                    car.setPriceForHr(rs.getDouble("price_for_km"));
+
+                    Driver driver = new Driver();
+                    driver.setDriverId(rs.getString("driver_id"));
+                    driver.setDriverName(rs.getString("driver_name"));
+
+                    CarType type = new CarType(rs.getInt("type"),rs.getString("type_name"));
+
+                    CarModel model = new CarModel(rs.getInt("model_id"),rs.getString("model_name"),rs.getInt("type_id"));
+
+                    car.setType(type);
+                    car.setModel(model);
+                    car.setDriver(driver);
+
+                    car.setRegNumber(rs.getString("reg_number"));
+                    car.setSeatingCapacity(rs.getInt("capacity"));
+                    car.setAvailable(rs.getInt("available"));
+                    cars.add(car);
+                }
+            }
+        }
+        return cars;
+    }
+
 }

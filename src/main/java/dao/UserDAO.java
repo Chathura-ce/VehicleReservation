@@ -30,7 +30,7 @@ public class UserDAO {
             stmt.setString(5, user.getEmail());
             stmt.setString(6, user.getRole());
             stmt.setString(7, user.getPhone());
-            stmt.setString(7, user.getNic());
+            stmt.setString(8, user.getNic());
             stmt.executeUpdate();
 
             // Retrieve the generated user ID
