@@ -5,3 +5,4 @@ build
 .idea/
 *.iml
 .qodo
+src/main/webapp/WEB-INF/classes/config.properties
