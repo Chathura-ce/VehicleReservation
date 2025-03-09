@@ -17,7 +17,7 @@ public class UserDAO {
     }
 
     public int addUser(User user,Connection connection) throws SQLException {
-        String sql = "INSERT INTO users (username, password_hash,salt, full_name, email, role,phone) VALUES (?, ?,?, ?, ?, ?,?)";
+        String sql = "INSERT INTO users (username, password_hash,salt, full_name, email, role,phone,nic) VALUES (?, ?,?, ?, ?, ?,?,?)";
         try (
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             String salt = PasswordUtil.generateSalt(); // Generate salt
@@ -30,6 +30,7 @@ public class UserDAO {
             stmt.setString(5, user.getEmail());
             stmt.setString(6, user.getRole());
             stmt.setString(7, user.getPhone());
+            stmt.setString(7, user.getNic());
             stmt.executeUpdate();
 
             // Retrieve the generated user ID
@@ -111,7 +112,7 @@ public class UserDAO {
         String hashedPassword = PasswordUtil.hashPassword(user.getPassword(), salt);
 
         // Base SQL query
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, status = ?";
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ? ,nic=?, status = ? ";
 
         // Check if password should be updated
         boolean updatePassword = (user.getPassword() != null && !user.getPassword().isEmpty());
@@ -127,9 +128,10 @@ public class UserDAO {
             statement.setString(1, user.getFullName());
             statement.setString(2, user.getEmail());
             statement.setString(3, user.getPhone());
-            statement.setInt(4, user.getStatus().equalsIgnoreCase("Active") ? 1 : 0);
+            statement.setString(4, user.getNic());
+            statement.setInt(5, user.getStatus().equalsIgnoreCase("Active") ? 1 : 0);
 
-            int index = 5;
+            int index = 6;
 
             // If password needs to be updated, set it dynamically
             if (updatePassword) {

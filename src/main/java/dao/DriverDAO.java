@@ -51,7 +51,7 @@ public class DriverDAO {
     }
 
     public Driver getDriverById(String driverId) throws SQLException {
-        String sql = "SELECT  d.user_id,  d.driver_id,  d.license_number,  d.created_at,  u.full_name, u.username, u.email,  u.phone,  u.role,  u.status  FROM  drivers AS d  INNER JOIN users AS u ON d.user_id = u.user_id " +
+        String sql = "SELECT  d.user_id,  d.driver_id,  d.license_number,  d.created_at,  u.full_name, u.username, u.email,  u.phone,  u.role,  u.status,  u.nic  FROM  drivers AS d  INNER JOIN users AS u ON d.user_id = u.user_id " +
                 " WHERE driver_id = ? ";
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -66,7 +66,7 @@ public class DriverDAO {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getInt("status"));
                 user.setPhone(rs.getString("phone"));
-                user.setPhone(rs.getString("phone"));
+                user.setNic(rs.getString("nic"));
 
                 Driver driver = new Driver();
                 driver.setDriverId(rs.getString("driver_id"));
