@@ -462,11 +462,17 @@
         $.ajax({
             url: url,
             type: 'POST',
-            data: $('#bookingForm').serialize(), // Serialize form data
+            data: $('#bookingForm').serialize() + '&' + $('#bookingForm').find(':disabled').map(function() {
+                return this.name + '=' + encodeURIComponent(this.value);
+            }).get().join('&'),
             // dataType: 'json',
+            beforeSend:function () {
+                blockUi();
+            },
             success: function (response) {
                 if (response.status === "success") {
-                    success("Booking saved successfully! Booking ID: " + response.bookingNumber);
+                    // success("Booking saved successfully! Booking ID: " + response.bookingNumber);
+                    success(response.message);
                     $("#bookingNumber").val(response.bookingNumber);
 
                     // Show print button
@@ -477,9 +483,14 @@
                 } else {
                     errorMsg("Error: " + response.message);
                 }
+                unblockUi();
             },
             error: function (xhr, status, error) {
                 errorMsg("Internal server error.Please Try again");
+                unblockUi();
+            },
+            complete:function () {
+                unblockUi();
             }
         });
     }
