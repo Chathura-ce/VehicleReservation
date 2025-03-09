@@ -1,11 +1,11 @@
 package util;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import javax.mail.internet.*;
 import java.util.Properties;
 
 public class EmailSender {
+
     public static void sendEmail(String to, String subject, String messageText) {
         // Load configurations from config.properties
         String host = ConfigLoader.get("SMTP_HOST");
@@ -33,7 +33,9 @@ public class EmailSender {
             message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
-            message.setText(messageText);
+
+            // Set the email content to HTML
+            message.setContent(messageText, "text/html; charset=UTF-8");
 
             // Send the email
             Transport.send(message);

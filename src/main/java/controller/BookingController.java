@@ -105,9 +105,6 @@ public class BookingController extends HttpServlet {
         List<Car> cars = carService.selectAllCars();
         request.setAttribute("customers", customers);
         request.setAttribute("cars", cars);
-        System.out.println("Classpath: " + System.getProperty("java.class.path"));
-
-        EmailSender.sendEmail("chathu.eac@gmail.com", "Test Email", "Hello from Java!");
         RequestDispatcher dispatcher = request.getRequestDispatcher("/bookings/create-booking.jsp");
         dispatcher.forward(request, response);
     }
@@ -193,8 +190,9 @@ public class BookingController extends HttpServlet {
 
                 // Use the transactional service method to insert user, customer, and booking together.
                 String bookingNumber = bookingService.createBookingTransaction(newBooking, user, customer);
-                EmailSender.sendEmail("chathu.eac@gmail.com", "Test Email", "Hello from Java!");
+
                 jsonResponse.put("status", "success");
+                jsonResponse.put("message", "Booking created successfully.Booking No: " + bookingNumber);
                 jsonResponse.put("bookingNumber", bookingNumber);
             } else {
                 // If the customer already exists, only create the booking.
@@ -215,6 +213,7 @@ public class BookingController extends HttpServlet {
 
                 String bookingNumber = bookingService.createBooking(newBooking);
                 jsonResponse.put("status", "success");
+                jsonResponse.put("message", "Booking updated successfully.Booking No: " + bookingNumber);
                 jsonResponse.put("bookingNumber", bookingNumber);
             }
         } catch (ValidationException e) {
@@ -254,6 +253,7 @@ public class BookingController extends HttpServlet {
             String carId = request.getParameter("carId");
             String destination = request.getParameter("destination");
             String pickupLocation = request.getParameter("pickupLocation");
+            String fullName = request.getParameter("customerName");
 
 //            String pickupTime = DateTimeUtil.formatDateTime(request.getParameter("pickupTime"));
 //            String dropOffTime = DateTimeUtil.formatDateTime(request.getParameter("dropOffTime"));
@@ -273,12 +273,18 @@ public class BookingController extends HttpServlet {
             existingBooking.setDistance(distance);
             existingBooking.setTotalFare(totalFare);
 
+            String email = request.getParameter("customerEmail");
+            User user = new User();
+            user.setEmail(email);
+            user.setFullName(fullName);
+            existingBooking.setUser(user);
+
             // Perform update
             bookingService.updateBooking(existingBooking);
 
             // Return success response
             jsonResponse.put("status", "success");
-            jsonResponse.put("message", "Booking updated successfully.");
+            jsonResponse.put("message", "Booking updated successfully.Booking No: " + bookingNum);
             jsonResponse.put("bookingNumber", bookingNum);
 
         } catch (IllegalArgumentException | ValidationException e) {
