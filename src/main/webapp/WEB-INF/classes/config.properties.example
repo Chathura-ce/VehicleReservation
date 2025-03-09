@@ -1,0 +1,5 @@
+# SMTP Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+EMAIL_USER=your_email
+EMAIL_PASSWORD=your_password

@@ -64,7 +64,8 @@
                         <div class="col-md-6">
                             <label for="username" class="form-label">Username</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username"
+                                <input type="text" class="form-control" id="username" name="username"
+                                       placeholder="Enter username"
                                        value="${driver.user.username}" required>
                                 <div class="input-group-text">
                                     <span class="bi bi-person-fill"></span>
@@ -83,14 +84,28 @@
                         </div>
                     </div>
 
-                    <!-- Full Name -->
-                    <div class="mb-3">
-                        <label for="fullName" class="form-label">Full Name</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Enter full name"
-                                   value="${driver.user.fullName}" required>
-                            <div class="input-group-text">
-                                <span class="bi bi-card-heading"></span>
+                    <div class="row mb-3">
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="fullName" name="fullName"
+                                       placeholder="Enter full name"
+                                       value="${driver.user.fullName}" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-card-heading"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- NIC -->
+                        <div class="col-md-6 mb-3">
+                            <label for="nic" class="form-label">NIC</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="nic" name="nic"
+                                       placeholder="NIC" value="${driver.user.nic}" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-file-person"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -126,7 +141,8 @@
                         <div class="col-md-6">
                             <label for="email" class="form-label">Email Address</label>
                             <div class="input-group">
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"
+                                <input type="email" class="form-control" id="email" name="email"
+                                       placeholder="Enter email"
                                        value="${driver.user.email}">
                                 <div class="input-group-text">
                                     <span class="bi bi-envelope-fill"></span>
@@ -137,8 +153,11 @@
                             <label for="status" class="form-label">Status</label>
                             <div class="input-group">
                                 <select class="form-select" id="status" name="status">
-                                    <option value="active" ${driver.user.status == 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="inactive" ${driver.user.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    <option value="active" ${driver.user.status == 'Active' ? 'selected' : ''}>Active
+                                    </option>
+                                    <option value="inactive" ${driver.user.status == 'Inactive' ? 'selected' : ''}>
+                                        Inactive
+                                    </option>
                                 </select>
                                 <div class="input-group-text">
                                     <span class="bi bi-toggle-on"></span>
@@ -150,8 +169,9 @@
                     <!-- Submit Button -->
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary">Save</button>
-<%--                        <button onclick="clearForm();" type="reset" class="btn btn-success">Reset</button>--%>
-                        <button onclick="location.href='/list-drivers'" type="reset" class="btn btn-success">Back</button>
+                        <%--                        <button onclick="clearForm();" type="reset" class="btn btn-success">Reset</button>--%>
+                        <button onclick="location.href='/list-drivers'" type="reset" class="btn btn-success">Back
+                        </button>
                     </div>
                 </form>
 

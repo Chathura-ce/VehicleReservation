@@ -22,7 +22,7 @@ public class AddDriverServlet extends HttpServlet {
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
 //        String address = request.getParameter("address");
-//        String nic = request.getParameter("nic");
+        String nic = request.getParameter("nic");
         String phoneNumber = request.getParameter("phoneNumber");
         String email = request.getParameter("email");
         String licenseNumber = request.getParameter("licenseNumber");
@@ -37,6 +37,7 @@ public class AddDriverServlet extends HttpServlet {
             user.setEmail(email);
             user.setRole(role);
             user.setPhone(phoneNumber);
+            user.setNic(nic);
 
             UserDAO userDAO = new UserDAO();
             int userId = userDAO.addUser(user);

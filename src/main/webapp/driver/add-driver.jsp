@@ -7,16 +7,15 @@
     <div class="col-sm-6">
         <ol class="breadcrumb float-sm-end">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">
-                Dashboard
-            </li>
+            <li class="breadcrumb-item">Driver</li>
+            <li class="breadcrumb-item active" aria-current="page">Add Driver</li>
         </ol>
     </div>
 </div>
 
 <div class="row d-flex justify-content-center mt-5">
     <div class="col-sm-8">
-        <div class="card card-primary">
+        <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Add New Driver</h3>
             </div>
@@ -53,73 +52,96 @@
 
 
                 <form action="${pageContext.request.contextPath}/add-driver" method="post">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="username" placeholder="Username"
-                               value="${username != null ? username : ''}" required>
-                        <div class="input-group-text">
-                            <span class="bi bi-person-fill"></span>
+                    <!-- Username & Password Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="username" name="username"
+                                       placeholder="Username" value="${username != null ? username : ''}" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-person-fill"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Password" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-lock-fill"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-group mb-3">
-                        <!-- Do not prefill password for security -->
-                        <input type="password" class="form-control" name="password" placeholder="Password"
-                               value="${password != null ? password : ''}" required>
-                        <div class="input-group-text">
-                            <span class="bi bi-lock-fill"></span>
+                    <!-- Full Name & NIC Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="fullName" name="fullName"
+                                       placeholder="Full Name" value="${fullName != null ? fullName : ''}" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-card-heading"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="nic" class="form-label">NIC</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="nic" name="nic"
+                                       placeholder="NIC" value="${nic != null ? nic : ''}" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-file-person"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="fullName" placeholder="Full Name"
-                               value="${fullName != null ? fullName : ''}" required>
-                        <div class="input-group-text">
-                            <span class="bi bi-card-heading"></span>
+                    <!-- Phone Number & Email Row -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber"
+                                       placeholder="Phone Number" value="${phoneNumber != null ? phoneNumber : ''}" required>
+                                <div class="input-group-text">
+                                    <span class="bi bi-telephone-fill"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <input type="email" class="form-control" id="email" name="email"
+                                       placeholder="Email" value="${email != null ? email : ''}">
+                                <div class="input-group-text">
+                                    <span class="bi bi-envelope-fill"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-group mb-3">
-                        <textarea class="form-control" name="address" placeholder="Address" required>${address != null ? address : ''}</textarea>
-                        <div class="input-group-text">
-                            <span class="bi bi-house-door-fill"></span>
+                    <!-- License Number Row -->
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="licenseNumber" class="form-label">License Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="licenseNumber" name="licenseNumber"
+                                       placeholder="License Number" value="${license != null ? license : ''}">
+                                <div class="input-group-text">
+                                    <span class="bi bi-person-badge"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <%--<div class="input-group mb-3">
-                        <input type="text" class="form-control" name="nic" placeholder="NIC"
-                               value="${nic != null ? nic : ''}" required>
-                        <div class="input-group-text">
-                            <span class="bi bi-file-person"></span>
-                        </div>
-                    </div>--%>
-
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="phoneNumber" placeholder="Phone Number"
-                               value="${phoneNumber != null ? phoneNumber : ''}" required>
-                        <div class="input-group-text">
-                            <span class="bi bi-telephone-fill"></span>
-                        </div>
-                    </div>
-
-                    <div class="input-group mb-3">
-                        <input type="email" class="form-control" name="email" placeholder="Email"
-                               value="${email != null ? email : ''}">
-                        <div class="input-group-text">
-                            <span class="bi bi-envelope-fill"></span>
-                        </div>
-                    </div>
-
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="licenseNumber" placeholder="License Number"
-                               value="${license != null ? license : ''}">
-                        <div class="input-group-text">
-                            <span class="bi bi-person-badge"></span>
-                        </div>
-                    </div>
+                    <!-- Submit Button -->
                     <div class="mb-3">
-                        <button type="submit" class="btn btn-primary">Add Driver</button>
+                        <button type="submit" class="btn btn-primary w-100">Add Driver</button>
                     </div>
-
                 </form>
             </div>
         </div>

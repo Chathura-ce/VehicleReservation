@@ -5,7 +5,7 @@
 <%
     User loggedInUser = (User) session.getAttribute("loggedInUser");
     if (loggedInUser == null) {
-        session.setAttribute("errorMessage","Your session expired. Please Login.");
+        session.setAttribute("errorMessage", "Your session expired. Please Login.");
         response.sendRedirect("login.jsp"); // Redirect to login page
         return; // Stop further execution
     }
@@ -79,7 +79,7 @@
                             </div> <!--end::Row-->
                         </li> <!--end::Menu Body--> <!--begin::Menu Footer-->
                         <li class="user-footer"><a href="#" class="btn btn-default btn-flat">Profile</a> <a
-                                href="logout"
+                                href="/logout"
                                 class="btn btn-default btn-flat float-end">Sign out</a></li> <!--end::Menu Footer-->
                     </ul>
                 </li> <!--end::User Menu Dropdown-->
@@ -95,9 +95,8 @@
         <div class="sidebar-wrapper">
             <nav class="mt-2"> <!--begin::Sidebar Menu-->
                 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-                    <%
-                        if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "admin")) { %>
-                    <li class="nav-item menu-open"><a href="#" class="nav-link active"> <i
+                    <% if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "admin")) { %>
+                    <li class="nav-item"><a href="#" class="nav-link "> <i
                             class="nav-icon bi bi-speedometer"></i>
                         <p>
                             Driver
@@ -105,7 +104,7 @@
                         </p>
                     </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="driver/add-driver.jsp" class="nav-link active"> <i
+                            <li class="nav-item"><a href="driver/add-driver.jsp" class="nav-link"> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Add Driver</p>
                             </a></li>
@@ -116,8 +115,8 @@
                             </a></li>
                         </ul>
                     </li>
-                    <% } %>
-                    <li class="nav-item menu-open"><a href="#" class="nav-link active"> <i
+
+                    <li class="nav-item"><a href="#" class="nav-link "> <i
                             class="nav-icon bi bi-car-front"></i>
                         <p>
                             Car
@@ -126,7 +125,7 @@
                     </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item"><a href="${pageContext.request.contextPath}/add-car"
-                                                    class="nav-link active"> <i
+                                                    class="nav-link "> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Add Car</p>
                             </a></li>
@@ -137,7 +136,7 @@
                             </a></li>
                         </ul>
                     </li>
-                    <li class="nav-item menu-open"><a href="#" class="nav-link active"> <i
+                    <li class="nav-item"><a href="#" class="nav-link "> <i
                             class="nav-icon bi bi-calendar-check"></i>
                         <p>
                             Bookings
@@ -148,7 +147,7 @@
                         <ul class="nav nav-treeview">
                             <li class="nav-item"><a
                                     href="${pageContext.request.contextPath}/booking/new"
-                                    class="nav-link active"> <i
+                                    class="nav-link "> <i
                                     class="nav-icon bi bi-plus-circle"></i>
                                 <p>Create Booking</p>
                             </a></li>
@@ -164,7 +163,16 @@
                             class="nav-icon bi bi-palette"></i>
                         <p>Theme Generate</p>
                     </a></li>
-                </ul> <!--end::Sidebar Menu-->
+                    <% } %>
+
+                    <% if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "driver")) { %>
+                    <li class="nav-item"><a href="driver-dashboard/assigned-bookings" class="nav-link"> <i class="nav-icon bi bi-palette"></i>
+                        <p>Assigned Bookings</p>
+                    </a></li>
+                    <% } %>
+                </ul>
+
+                <!--end::Sidebar Menu-->
             </nav>
         </div> <!--end::Sidebar Wrapper-->
     </aside> <!--end::Sidebar--> <!--begin::App Main-->

@@ -7,13 +7,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import dao.BookingDAO;
+import dao.CarDAO;
 import dao.CustomerDAO;
 import dao.UserDAO;
 import exception.ValidationException;
 import model.Booking;
+import model.Car;
 import model.Customer;
 import model.User;
 import util.DatabaseUtil;
+import util.EmailSender;
 import validator.BookingValidator;
 import validator.CustomerValidator;
 import validator.UserValidator;
@@ -80,6 +83,8 @@ public class BookingService {
             String bookingNumber = this.createBooking(booking, connection);  // Overloaded to accept Connection
 
             connection.commit(); // Commit the transaction
+
+            EmailSender.sendEmail(user.getEmail(), "Your Mega City Cab Booking Confirmation - #", generateEmailTemplate(booking));
             return bookingNumber;
         } catch (SQLException | ValidationException e) {
             if (connection != null) {
@@ -126,7 +131,12 @@ public class BookingService {
 //            throw new IllegalStateException("Cannot update booking that is not in Pending status");
 //        }
 //
-        return bookingDAO.updateBooking(booking);
+        if (bookingDAO.updateBooking(booking))
+        {
+            EmailSender.sendEmail(booking.getUser().getEmail(), "Your Mega City Cab Booking Updated - #", generateEmailTemplate(booking));
+            return true;
+        }
+        return false;
     }
 
     public double calculateTotalFare(double priceForKm, double distance, double taxRate, double discountRate) {
@@ -146,5 +156,36 @@ public class BookingService {
         return bookingDAO.fetchAllBookingNumbers();
     }
 
+
+    private String generateEmailTemplate(Booking booking) {
+        CarDAO  carDAO = new CarDAO();
+        String carModel = "";
+        try {
+            Car car = carDAO.getCarById(booking.getCarId());
+            carModel = car.getCarModel().getModelName();
+        } catch (Exception e) {
+
+        }
+
+        return "<div class='bill-container' style='font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px;'>"
+                + "<div class='bill-header' style='text-align: center; background-color: #007bff; color: white; padding: 10px;'>"
+                + "<h1>MEGA CITY CAB</h1><p>Booking Confirmation</p></div>"
+                + "<div class='bill-details' style='margin-top: 20px;'>"
+                + "<p><strong>Booking Number:</strong> " + booking.getBookingNumber() + "</p>"
+                + "<p><strong>Customer Name:</strong> " + booking.getUser().getFullName() + "</p>"
+                + "<p><strong>Destination:</strong> " + booking.getDestination() + "</p>"
+                + "<p><strong>Distance:</strong> " + booking.getDistance() + " km</p>"
+                + "<p><strong>Driver:</strong> " + booking.getDriver().getDriverName() + "</p>"
+                + "<p><strong>Vehicle:</strong> " + carModel + "</p>"
+                + "<p><strong>Booking Date:</strong> " + booking.getFormattedDate() + "</p>"
+                + "<p><strong>Total:</strong> " + booking.getTotalAmount() + "</p>"
+                + "</div><div class='bill-footer' style='text-align: center; margin-top: 20px;'>"
+                + "<p>Thank you for choosing Mega City Cab!</p>"
+                + "<p>© 2024 Mega City Cab. All Rights Reserved.</p></div></div>";
+    }
+
+    public List<Booking> getAssignedBookings(int userId) throws SQLException {
+        return bookingDAO.getAssignedBookings(userId);
+    }
 
 }

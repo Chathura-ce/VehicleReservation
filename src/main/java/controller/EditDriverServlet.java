@@ -62,6 +62,7 @@ public class EditDriverServlet extends HttpServlet {
         String licenseNumber = request.getParameter("licenseNumber");
         String email = request.getParameter("email");
         String statusStr = request.getParameter("status");
+        String nic = request.getParameter("nic");
 
         // Validate inputs
         Map<String, String> errors = ValidationUtil.validateDriverInput(Integer.parseInt(userId), driverId, username, fullName,
@@ -104,6 +105,7 @@ public class EditDriverServlet extends HttpServlet {
             user.setFullName(fullName);
             user.setPhone(phoneNumber);
             user.setEmail(email);
+            user.setNic(nic);
             user.setStatus(status);
 
             // Only update password if provided
