@@ -22,6 +22,7 @@
         integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script>
 <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
 <script src="${pageContext.request.contextPath}/js/adminlte.js"></script>
+<script src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body><!--end::Body-->
@@ -66,6 +67,21 @@
             icon: "error",
             title: title
         });
+    }
+    function blockUi() {
+        $.blockUI({ css: {
+                border: 'none',
+                padding: '15px',
+                backgroundColor: '#000',
+                '-webkit-border-radius': '10px',
+                '-moz-border-radius': '10px',
+                opacity: .5,
+                color: '#fff',
+                zIndex: '999999',
+            } });
+    }
+    function unblockUi() {
+        $.unblockUI();
     }
 </script>
 <%
