@@ -71,6 +71,41 @@
             margin-top: 1rem;
             text-align: center;
         }
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        .form-control.is-valid {
+            border-color: #198754;
+            padding-right: calc(1.5em + 0.75rem);
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            padding-left: 0.5rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+        .invalid-feedback.d-block {
+            display: block !important;
+            margin-bottom: 1rem;
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        .input-group + .invalid-feedback {
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+        }
+        .is-invalid ~ .invalid-feedback {
+            display: block;
+        }
     </style>
 </head> <!--end::Head--> <!--begin::Body-->
 
@@ -179,4 +214,108 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha256-whL0tQWoY1Ku1iskqPFvmZ+CHsvmRWx/PIoEvIeWh4I=" crossorigin="anonymous"></script> <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha256-YMa+wAM6QkVyz999odX7lPRxkoYAan8suedu4k2Zur8=" crossorigin="anonymous"></script> <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
 <script src="js/adminlte.js"></script> <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
+
+<!-- Add jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    const form = $('form');
+    
+    // Validation patterns
+    const patterns = {
+        username: /^[a-zA-Z0-9_]{4,20}$/,
+        password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+        fullName: /^[a-zA-Z\s]{2,50}$/,
+        nic: /^[0-9]{9}[vVxX]|[0-9]{12}$/,
+        phoneNumber: /^(?:\+94|0)?[0-9]{9}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    };
+
+    // Validation messages
+    const messages = {
+        username: 'Username must be 4-20 characters (letters, numbers, underscore)',
+        password: 'Password must be at least 8 characters with letters and numbers',
+        fullName: 'Please enter a valid full name',
+        nic: 'Please enter a valid NIC number',
+        phoneNumber: 'Please enter a valid Sri Lankan phone number',
+        email: 'Please enter a valid email address',
+        address: 'Address is required'
+    };
+
+    // Real-time validation
+    form.find('input, textarea').on('input', function() {
+        validateField($(this));
+    });
+
+    // Field validation function
+    function validateField($field) {
+        const fieldName = $field.attr('name');
+        const value = $field.val().trim();
+        let isValid = true;
+
+        // Remove existing feedback for this field
+        $field.removeClass('is-valid is-invalid');
+        $field.closest('.input-group').next('.invalid-feedback').remove();
+
+        // Required field validation
+        if ($field.prop('required') && !value) {
+            isValid = false;
+            showError($field, 'This field is required');
+            return false;
+        }
+
+        // Pattern validation
+        if (patterns[fieldName] && value) {
+            isValid = patterns[fieldName].test(value);
+            if (!isValid) {
+                showError($field, messages[fieldName]);
+                return false;
+            }
+        }
+
+        // Special validation for address
+        if (fieldName === 'address' && value.length < 5) {
+            isValid = false;
+            showError($field, 'Address must be at least 5 characters long');
+            return false;
+        }
+
+        if (isValid) {
+            $field.addClass('is-valid');
+        }
+        return true;
+    }
+
+    // Show error message
+    function showError($field, message) {
+        $field.addClass('is-invalid');
+        const $inputGroup = $field.closest('.input-group');
+        
+        // Remove any existing feedback for this field
+        $inputGroup.next('.invalid-feedback').remove();
+        
+        // Add new feedback with the message
+        $inputGroup.after("<div class='invalid-feedback d-block'>"+message+"</div>");
+    }
+
+    // Form submission
+    form.on('submit', function(e) {
+        e.preventDefault();
+        let isValid = true;
+
+        // Validate all fields
+        form.find('input, textarea').each(function() {
+            if (!validateField($(this))) {
+                isValid = false;
+            }
+        });
+
+        // Submit if valid
+        if (isValid) {
+            this.submit();
+        }
+    });
+});
+</script>
 
