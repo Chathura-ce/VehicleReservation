@@ -10,19 +10,20 @@ public class Car {
     private CarModel model;
     private String regNumber;
     private int seatingCapacity;
-
-    public double getPriceForHr() {
-        return priceForKm;
-    }
-
-    public void setPriceForHr(double priceForKm) {
-        this.priceForKm = priceForKm;
-    }
-
     private double priceForKm;
     private int available;
     private String driverId;
     private Driver driver;
+
+    public double getPriceForKm() {
+        return priceForKm;
+    }
+
+    public void setPriceForKm(double priceForKm) {
+        this.priceForKm = priceForKm;
+    }
+
+
     public Car() {
     }
     public String getImagePath() {
