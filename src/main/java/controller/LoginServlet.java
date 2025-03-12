@@ -41,6 +41,7 @@ public class LoginServlet extends HttpServlet {
                 // Store the user in the session
                 HttpSession session = request.getSession();
                 session.setAttribute("loggedInUser", user);
+                session.setAttribute("userId", user.getUserId());
 
                 // Role-based redirection
                 switch (user.getRole()) {
