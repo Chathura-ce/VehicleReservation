@@ -192,6 +192,7 @@
               <input type="hidden" id="txtTotalFare" name="txtTotalFare" value="">
               <input type="hidden" id="txtDistance" name="txtDistance" value="">
               <input type="hidden" id="carId" name="carId" value="${car.carId}">
+              <input type="hidden" id="priceForKm" name="priceForKm" value="${car.priceForKm}">
               <!-- Trip Details -->
               <div class="card mb-3">
                 <div class="card-header py-2 bg-light">
@@ -202,27 +203,27 @@
                     <div class="col-md-6">
                       <div class="input-group">
                         <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
-                        <input onblur="calculateDistance();" autocomplete="off" type="text" class="form-control" id="pickupLocation" placeholder="Pickup Location" required>
+                        <input onblur="calculateDistance();" autocomplete="off" type="text" class="form-control" id="pickupLocation"  name="pickupLocation" placeholder="Pickup Location" required>
                         <div id="pickupAutocomplete" class="autocomplete-items"></div>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="input-group">
                         <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
-                        <input onblur="calculateDistance();"  autocomplete="off"  type="text" class="form-control" id="destination" placeholder="Destination" required>
+                        <input onblur="calculateDistance();"  autocomplete="off"  type="text" class="form-control" id="destination" name="destination" placeholder="Destination" required>
                         <div id="destinationAutocomplete" class="autocomplete-items"></div>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="input-group">
                         <span class="input-group-text bg-light"><i class="fas fa-calendar"></i></span>
-                        <input type="date" class="form-control" id="pickupDate" required>
+                        <input type="date" class="form-control" id="pickupDate"  name="pickupDate" required>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="input-group">
                         <span class="input-group-text bg-light"><i class="fas fa-clock"></i></span>
-                        <input type="time" class="form-control" id="pickupTime" required>
+                        <input type="time" class="form-control" id="pickupTime" name="pickupTime" required>
                       </div>
                     </div>
                   </div>
@@ -267,7 +268,7 @@
               <div class="d-flex justify-content-between align-items-center">
                 <div class="form-check"></div>
                 <div>
-                  <button type="button" id="backToSearch" class="btn btn-outline-secondary">Back to Search</button>
+                  <button onclick="location.href='/home.jsp'" type="button" id="backToSearch" class="btn btn-outline-secondary">Back to Search</button>
                   <button onclick="confirmBooking(event);" type="button" class="btn btn-warning px-4">Confirm Booking</button>
                 </div>
               </div>
@@ -333,6 +334,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://js.stripe.com/v3/"></script>
+<script src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 </body>
 </html>
 <script>
@@ -554,8 +556,8 @@
     $('#distance').text(formattedDistance);
     $('#totalFare').text(totalChargeWithTax.toFixed(2));
 
-    $('#txtTotalFare').text(totalChargeWithTax.toFixed(totalChargeWithTax.toFixed(2)));
-    $('#txtDistance').text(formattedDistance);
+    $('#txtTotalFare').val(totalChargeWithTax.toFixed(2));
+    $('#txtDistance').val(formattedDistance);
   }
 
   function confirmBooking(e) {
@@ -615,30 +617,44 @@
       }).get().join('&'),
       // dataType: 'json',
       beforeSend:function () {
-        blockUi();
+        $.blockUI({ css: {
+            border: 'none',
+            padding: '15px',
+            backgroundColor: '#000',
+            '-webkit-border-radius': '10px',
+            '-moz-border-radius': '10px',
+            opacity: .5,
+            color: '#fff',
+            zIndex: '999999',
+          } });
       },
       success: function (response) {
         if (response.status === "success") {
           // success("Booking saved successfully! Booking ID: " + response.bookingNumber);
-          success(response.message);
-          $("#bookingNumber").val(response.bookingNumber);
-
-          // Show print button
-          $("#printButton").show();
-          // $("#bookingForm")[0].reset();
-          getBookingNumbers(response.bookingNumber);
-
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Your booking has been confirmed. A confirmation has been sent to your email.",
+          });
         } else {
-          errorMsg("Error: " + response.message);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Error: " + response.message,
+          });
         }
-        unblockUi();
+        $.unblockUI();
       },
       error: function (xhr, status, error) {
-        errorMsg("Internal server error.Please Try again");
-        unblockUi();
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Internal server error.Please Try again",
+        });
+        $.unblockUI();
       },
       complete:function () {
-        unblockUi();
+        $.unblockUI();
       }
     });
 
@@ -654,7 +670,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         $("#bookingForm").submit();
-        <%--window.location.href = "payment.jsp?pickupLocation="+encodeURIComponent(pickupLocation)+"&destination="+encodeURIComponent(destination)"&pickupDate=${pickupDate}&pickupTime=${pickupTime}&totalFare=${totalFare}`;--%>
+        window.location.href = "payment.jsp?pickupLocation="+encodeURIComponent(pickupLocation)+"&destination="+encodeURIComponent(destination)+"&pickupDate="+pickupDate+"&pickupTime="+pickupTime+"&totalFare="+totalFare;
       }
     });*/
   }
