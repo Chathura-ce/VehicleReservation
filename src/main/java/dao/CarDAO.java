@@ -97,7 +97,7 @@ public class CarDAO {
                 Car car = new Car();
                 car.setCarId(rs.getString("car_id"));
                 car.setDriverId(rs.getString("driver_id"));
-                car.setPriceForHr(rs.getDouble("price_for_km"));
+                car.setPriceForKm(rs.getDouble("price_for_km"));
 
                 CarType carType = new CarType(rs.getInt("type"),rs.getString("type_name"));
                 car.setType(carType);
@@ -306,7 +306,7 @@ public class CarDAO {
 
                     Car car = new Car();
                     car.setCarId(rs.getString("car_id"));
-                    car.setPriceForHr(rs.getDouble("price_for_km"));
+                    car.setPriceForKm(rs.getDouble("price_for_km"));
 
                     Driver driver = new Driver();
                     driver.setDriverId(rs.getString("driver_id"));
