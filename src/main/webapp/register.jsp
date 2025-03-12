@@ -115,14 +115,14 @@
         <div class="row g-0 registration-card">
             <!-- Left side - Image with overlay -->
             <div class="col-md-5 car-image-col d-none d-md-flex">
-                <div class="brand-logo">CityCab</div>
+                <div class="brand-logo">Mega CityCab</div>
                 <div class="brand-tagline">Your journey begins with us. Premium cars for every occasion.</div>
             </div>
 
             <!-- Right side - Registration form -->
             <div class="col-md-7 bg-white p-4 p-md-5">
                 <div class="text-center mb-4">
-                    <h2 class="h4 mb-1">Create Your CityCab Account</h2>
+                    <h2 class="h4 mb-1">Create Your Mega CityCab Account</h2>
                     <p class="text-muted">Join today to explore our fleet and enjoy exclusive benefits</p>
                 </div>
 
@@ -202,7 +202,7 @@
                     </div>
 
                     <div class="text-center">
-                        <p class="mb-0">Already have an account? <a href="login.jsp" class="text-decoration-none">Sign In</a></p>
+                        <p class="mb-0">Already have an account? <a href="login.jsp" class="text-decoration-none">Sign In</a><span>or</span> <a class="text-decoration-none" href="home.jsp">Back to Home</a></p>
                     </div>
                 </form>
             </div>
@@ -225,7 +225,7 @@ $(document).ready(function() {
     // Validation patterns
     const patterns = {
         username: /^[a-zA-Z0-9_]{4,20}$/,
-        password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+        password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/,
         fullName: /^[a-zA-Z\s]{2,50}$/,
         nic: /^[0-9]{9}[vVxX]|[0-9]{12}$/,
         phoneNumber: /^(?:\+94|0)?[0-9]{9}$/,
@@ -235,7 +235,7 @@ $(document).ready(function() {
     // Validation messages
     const messages = {
         username: 'Username must be 4-20 characters (letters, numbers, underscore)',
-        password: 'Password must be at least 8 characters with letters and numbers',
+        password: 'Password must be at least 8 characters with letters, numbers and special character',
         fullName: 'Please enter a valid full name',
         nic: 'Please enter a valid NIC number',
         phoneNumber: 'Please enter a valid Sri Lankan phone number',
