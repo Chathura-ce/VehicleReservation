@@ -202,4 +202,36 @@ public class CustomerDAO {
         }
         return customers;
     }
+
+    public Customer getCustomerByUserId(int userId) throws SQLException {
+        String sql = "SELECT c.*, u.* " +
+                "FROM customers c JOIN users u ON c.user_id = u.user_id " +
+                "WHERE u.user_id = ? ";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(rs.getInt("customer_id"));
+                    customer.setCustomerNumber(rs.getString("customer_number"));
+                    customer.setUserId(rs.getInt("user_id"));
+                    customer.setUsername(rs.getString("username"));
+                    customer.setAddress(rs.getString("address"));
+
+                    User user = new User();
+                    user.setFullName(rs.getString("full_name"));
+                    user.setUsername(rs.getString("username"));
+                    user.setNic(rs.getString("nic"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+
+                    customer.setUser(user);
+
+                    return customer;
+                }
+            }
+        }
+        return null;
+    }
 }
