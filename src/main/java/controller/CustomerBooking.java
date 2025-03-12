@@ -1,7 +1,9 @@
 package controller;
 
 import com.google.gson.Gson;
+import dao.CarDAO;
 import dao.CustomerDAO;
+import dao.DriverDAO;
 import dao.UserDAO;
 import exception.ValidationException;
 import jakarta.servlet.RequestDispatcher;
@@ -11,14 +13,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.Booking;
-import model.Car;
-import model.Customer;
-import model.User;
+import model.*;
 import service.BookingService;
 import service.CarService;
 import service.CustomerService;
 import service.UserService;
+import util.EmailSender;
 import util.PasswordUtil;
 import util.PricingConfig;
 import validator.CustomerValidator;
@@ -122,62 +122,85 @@ public class CustomerBooking extends HttpServlet {
             throws SQLException, IOException, ServletException {
         HttpSession session = request.getSession(false); // Get existing session, don't create a new one
 
-        if (session == null || session.getAttribute("loggedInUser") == null) {
-            // Redirect to login page if user is not logged in
-            response.sendRedirect("/login.jsp");
-            return;
-        }
-        User user = (User) session.getAttribute("loggedInUser");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         Gson gson = new Gson();
         Map<String, Object> jsonResponse = new HashMap<>();
 
-        try {
-            // Extract parameters from request
-            String bookingNum = request.getParameter("bookingNumber");
-            String customerIdStr = request.getParameter("customerId");
-            String driverId = request.getParameter("driver");
-            String carId = request.getParameter("carId");
-            String destination = request.getParameter("destination");
-            String pickupLocation = request.getParameter("pickupLocation");
-            String pickupDate = request.getParameter("pickupDate");
-            String pickupTime = request.getParameter("pickupTime");
-            double priceForKm = !request.getParameter("priceForKm").isEmpty() ? Double.parseDouble(request.getParameter("priceForKm")) : 0;
-            double distance = !request.getParameter("distance").isEmpty() ? Double.parseDouble(request.getParameter("distance")) : 0;
-            double totalFare = bookingService.calculateTotalFare(priceForKm, distance);
+        if (session == null || session.getAttribute("loggedInUser") == null) {
+            // Redirect to login page if user is not logged in
+//            response.sendRedirect("/login.jsp");
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", "Auth failed.");
+        }else{
+            try {
+                User user = (User) session.getAttribute("loggedInUser");
+                int userId = (int) session.getAttribute("userId");
+                CustomerDAO customerDAO = new CustomerDAO();
+                Customer customer = customerDAO.getCustomerByUserId(userId);
+                CarService carService = new CarService();
+                Car car = carService.getCarById(request.getParameter("carId"));
+
+                DriverDAO driverDAO = new DriverDAO();
+                Driver driver = driverDAO.getDriverById(car.getDriverId());
 
 
-            // If the customer already exists, only create the booking.
+
+                // Extract parameters from request
+                String bookingNum = request.getParameter("bookingNumber");
+                String customerIdStr = customer.getCustomerNumber();
+                String driverId = car.getDriverId();
+                String carId = request.getParameter("carId");
+                String destination = request.getParameter("destination");
+                String pickupLocation = request.getParameter("pickupLocation");
+                String pickupDate = request.getParameter("pickupDate");
+                String pickupTime = request.getParameter("pickupTime");
+                double priceForKm = car.getPriceForKm();
+                double distance = !request.getParameter("txtDistance").isEmpty() ? Double.parseDouble(request.getParameter("txtDistance")) : 0;
+                double totalFare = bookingService.calculateTotalFare(priceForKm, distance);
+
+
+                // If the customer already exists, only create the booking.
 //                int customerId = Integer.parseInt(customerIdStr);
 //                int customerId = customerService.getCustomerIdByNumber(customerIdStr);
-            Booking newBooking = new Booking();
-            newBooking.setBookingNumber(bookingNum);
-            newBooking.setCustomerId(customerIdStr);
-            newBooking.setDriverId(driverId);
-            newBooking.setCarId(carId);
-            newBooking.setDestination(destination);
-            newBooking.setPickupLocation(pickupLocation);
+                Booking newBooking = new Booking();
+                newBooking.setBookingNumber(bookingNum);
+                newBooking.setCustomerId(customerIdStr);
+                newBooking.setDriverId(driverId);
+                newBooking.setCarId(carId);
+                newBooking.setDestination(destination);
+                newBooking.setPickupLocation(pickupLocation);
                 newBooking.setPickupDate(pickupDate);
                 newBooking.setPickupTime(pickupTime);
 //                newBooking.setDropOffTime(dropOffTime);
-            newBooking.setPriceForKm(priceForKm);
-            newBooking.setDistance(distance);
-            newBooking.setTotalFare(totalFare);
+                newBooking.setPriceForKm(priceForKm);
+                newBooking.setDistance(distance);
+                newBooking.setTotalFare(totalFare);
+                newBooking.setCustomer(customer);
+                newBooking.setDriver(driver);
 
-            String bookingNumber = bookingService.createBooking(newBooking);
-            jsonResponse.put("status", "success");
-            jsonResponse.put("message", "Booking updated successfully.Booking No: " + bookingNumber);
-            jsonResponse.put("bookingNumber", bookingNumber);
-        } catch (ValidationException e) {
-            e.printStackTrace();
-            jsonResponse.put("status", "error");
-            jsonResponse.put("message", e.getMessage());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            jsonResponse.put("status", "error");
-            jsonResponse.put("message", "Database error while creating booking.");
+                String bookingNumber = bookingService.createBooking(newBooking);
+                jsonResponse.put("status", "success");
+                jsonResponse.put("message", "Booking updated successfully.Booking No: " + bookingNumber);
+                jsonResponse.put("bookingNumber", bookingNumber);
+                EmailSender.sendEmail(user.getEmail(), "Your Mega City Cab Booking Confirmation - #", generateEmailTemplate(newBooking));
+            } catch (ValidationException e) {
+                e.printStackTrace();
+                jsonResponse.put("status", "error");
+                jsonResponse.put("message", e.getMessage());
+            } catch (SQLException e) {
+                e.printStackTrace();
+                jsonResponse.put("status", "error");
+                jsonResponse.put("message", "Database error while creating booking.");
+            }catch (Exception e) {
+                e.printStackTrace();
+                jsonResponse.put("status", "error");
+                jsonResponse.put("message", "Error while creating booking.");
+            }
         }
+
+
+
         response.getWriter().write(gson.toJson(jsonResponse));
     }
 
@@ -209,6 +232,32 @@ public class CustomerBooking extends HttpServlet {
             // Invalid carId, redirect back
             response.sendRedirect("car-selection.jsp?message=Please select a valid car");
         }
+    }
+
+    private String generateEmailTemplate(Booking booking) {
+        CarDAO carDAO = new CarDAO();
+        String carModel = "";
+        try {
+            Car car = carDAO.getCarById(booking.getCarId());
+            carModel = car.getCarModel().getModelName();
+        } catch (Exception e) {
+
+        }
+
+        return "<div class='bill-container' style='font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px;'>"
+                + "<div class='bill-header' style='text-align: center; background-color: #007bff; color: white; padding: 10px;'>"
+                + "<h1>MEGA CITY CAB</h1><p>Booking Confirmation</p></div>"
+                + "<div class='bill-details' style='margin-top: 20px;'>"
+                + "<p><strong>Booking Number:</strong> " + booking.getBookingNumber() + "</p>"
+                + "<p><strong>Customer Name:</strong> " + booking.getCustomer().getUser().getFullName() + "</p>"
+                + "<p><strong>Destination:</strong> " + booking.getDestination() + "</p>"
+                + "<p><strong>Distance:</strong> " + booking.getDistance() + " km</p>"
+                + "<p><strong>Vehicle:</strong> " + carModel + "</p>"
+                + "<p><strong>Booking Date:</strong> " + booking.getFormattedDate() + "</p>"
+                + "<p><strong>Total:</strong> " + booking.getTotalAmount() + "</p>"
+                + "</div><div class='bill-footer' style='text-align: center; margin-top: 20px;'>"
+                + "<p>Thank you for choosing Mega City Cab!</p>"
+                + "<p>© 2024 Mega City Cab. All Rights Reserved.</p></div></div>";
     }
 
 }
