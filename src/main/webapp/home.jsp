@@ -1,3 +1,5 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,10 +61,11 @@
     </style>
 </head>
 <body>
+<div id="home"></div>
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="index.html">
+        <a  class="navbar-brand" href="/">
             <i class="fas fa-taxi me-2"></i>
             Mega City Cab
         </a>
@@ -72,19 +75,37 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#services">Services</a>
-                </li>
+                    <a class="nav-link active" href="#home">Home</a>
+                </li> 
                 <li class="nav-item">
                     <a class="nav-link" href="#about">About Us</a>
                 </li>
+<%--                <li class="nav-item">--%>
+<%--                    <a class="nav-link" href="#contact">Contact</a>--%>
+<%--                </li> --%>
                 <li class="nav-item">
-                    <a class="nav-link" href="#contact">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-warning text-dark ms-lg-3 px-4" href="booking.html">Book Now</a>
+                    <c:choose>
+                        <c:when test="${empty sessionScope.loggedInUser}">
+                            <a class="nav-link text-warning ms-lg-3 px-4" href="login.jsp">
+                                <span class="login-text">Login</span>
+                                <i class="fas fa-sign-in-alt login-icon" style="display: none;"></i>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="dropdown">
+                                <button class="nav-link text-warning ms-lg-3 px-4 dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="user-text"><i class="fas fa-user-circle me-1"></i>${sessionScope.loggedInUser.fullName}</span>
+                                    <i class="fas fa-user user-icon" style="display: none;"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="profile.jsp"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                    <li><a class="dropdown-item" href="my-bookings.jsp"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                </ul>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </li>
             </ul>
         </div>
@@ -96,12 +117,12 @@
     <div class="container text-center">
         <h1 class="display-3 fw-bold mb-4">Your Reliable Cab Service in Colombo</h1>
         <p class="lead mb-5">Thousands of satisfied customers choose Mega City Cab for safe, comfortable, and affordable rides.</p>
-        <a href="booking.html" class="btn btn-warning btn-lg px-5 py-3 fw-bold">Book Your Ride Now</a>
+        <a href="#book" class="btn btn-warning btn-lg px-5 py-3 fw-bold">Book Your Ride Now</a>
     </div>
 </section>
 
 <!-- Search Car Section -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-light" id="book">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -265,7 +286,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="/placeholder.svg?height=400&width=600" alt="About Mega City Cab" class="img-fluid rounded shadow">
+                <img src="/assets/img/aboutus.jpg" alt="About Mega City Cab" class="img-fluid rounded shadow">
             </div>
             <div class="col-lg-6">
                 <h2 class="fw-bold mb-4">About Mega City Cab</h2>
@@ -292,7 +313,7 @@
 </section>
 
 <!-- Contact Section -->
-<section class="py-5 bg-dark text-white" id="contact">
+<section style="display: none" class="py-5 bg-dark text-white" id="contact">
     <div class="container">
         <div class="row">
             <div class="col-lg-5 mb-4 mb-lg-0">
@@ -350,38 +371,6 @@
 <!-- Footer -->
 <footer class="bg-dark text-white-50 py-4">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4 mb-md-0">
-                <h5 class="text-white mb-3">Mega City Cab</h5>
-                <p>Your trusted cab service in Colombo City. Safe, reliable, and affordable transportation for all your needs.</p>
-            </div>
-            <div class="col-md-2 mb-4 mb-md-0">
-                <h5 class="text-white mb-3">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="index.html" class="text-white-50">Home</a></li>
-                    <li><a href="#services" class="text-white-50">Services</a></li>
-                    <li><a href="#about" class="text-white-50">About Us</a></li>
-                    <li><a href="#contact" class="text-white-50">Contact</a></li>
-                </ul>
-            </div>
-            <div class="col-md-2 mb-4 mb-md-0">
-                <h5 class="text-white mb-3">Services</h5>
-                <ul class="list-unstyled">
-                    <li><a href="booking.html" class="text-white-50">Book a Cab</a></li>
-                    <li><a href="booking.html" class="text-white-50">Airport Transfer</a></li>
-                    <li><a href="booking.html" class="text-white-50">Corporate Service</a></li>
-                    <li><a href="booking.html" class="text-white-50">Long Distance</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5 class="text-white mb-3">Download Our App</h5>
-                <p>Get the Mega City Cab app for faster bookings and exclusive deals.</p>
-                <div class="d-flex">
-                    <a href="#" class="me-2"><img src="/placeholder.svg?height=40&width=120" alt="App Store" class="img-fluid"></a>
-                    <a href="#"><img src="/placeholder.svg?height=40&width=120" alt="Google Play" class="img-fluid"></a>
-                </div>
-            </div>
-        </div>
         <hr class="my-4 bg-secondary">
         <div class="row">
             <div class="col-md-6 text-center text-md-start">
@@ -425,7 +414,7 @@
                 var rows = "";
                 if (data && data.length > 0) {
                     $.each(data, function (index, car) {
-                        var image = baseUrl + "/images/car-5.jpg";
+                        var image = baseUrl + "/uploads/car_images/"+car.carId+".jpg";
                         rows += '<div class="col-md-6" data-type="'+car.type.typeName+'" data-model="'+car.model.modelName+'" data-passengers="'+car.seatingCapacity+'" data-price="10">'+
                             '    <div class="card car-card h-100">'+
                             '        <div class="row g-0">'+
@@ -473,7 +462,7 @@
                             '                    </div>'+
                             '                    <div class="d-flex justify-content-between align-items-center mt-2">'+
                             '                        <div class="price-tag">'+car.priceForKm+' Rs<span class="text-muted" style="font-size: 0.8rem;">/hour</span></div>'+
-                            '                        <a href="customer-booking/book-car?carId='+car.carId+'" class="btn btn-warning">Select</a>'+
+                            '                        <a href="customer-booking/book-car?carId='+car.carId+'" class="btn btn-warning">Book</a>'+
                             '                    </div>'+
                             '                </div>'+
                             '            </div>'+
