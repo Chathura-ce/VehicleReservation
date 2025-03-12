@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book a Cab - Mega City Cab</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
+<jsp:include page="/customer-header.jsp"/>
+<style>
     .booking-header {
       background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/placeholder.svg?height=400&width=1600');
       background-size: cover;
@@ -101,40 +92,6 @@
       color: white;
     }
   </style>
-</head>
-<body>
-<!-- Navigation Bar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="index.html">
-      <i class="fas fa-taxi me-2"></i>
-      Mega City Cab
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="index.html">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.html#services">Services</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.html#about">About Us</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.html#contact">Contact</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active btn btn-warning text-dark ms-lg-3 px-4" href="booking.html">Book Now</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
 <section class="py-5 bg-light" id="bookingSection">
   <div class="container">
     <div class="row justify-content-center">
@@ -149,14 +106,13 @@
               <!-- Car Details -->
               <div class="col-md-5">
                 <div class="text-center">
-                  <img src="${pageContext.request.contextPath}/images/car-5.jpg" id="selectedCarImage" class="img-fluid mb-2" alt="Selected Car">
-                  <h5 class="mb-1" id="selectedCarName">Toyota Corolla</h5>
+                  <img src="/uploads/car_images/${car.getCarId()}.jpg" id="selectedCarImage" class="img-fluid mb-2" alt="Selected Car">
+                  <h5 class="mb-1" id="selectedCarName">${car.model.getModelName()}</h5>
                   <div class="d-flex justify-content-center flex-wrap">
-                    <span class="badge bg-primary m-1" id="selectedCarType">Sedan</span>
-                    <span class="badge bg-info m-1" id="selectedCarModel">Toyota</span>
-                    <span class="badge bg-success m-1" id="selectedCarCapacity">4 Seats</span>
+                    <span class="badge bg-primary m-1" id="selectedCarType">${car.type.getTypeName()}</span>
+                    <span class="badge bg-success m-1" id="selectedCarCapacity">${car.seatingCapacity} Seats</span>
                   </div>
-                  <h6 class="mt-2 text-warning fw-bold" id="selectedCarPrice">$10/hour</h6>
+                  <h6 class="mt-2 text-warning fw-bold" id="selectedCarPrice">${car.priceForKm} Rs/km</h6>
                 </div>
               </div>
 
@@ -280,63 +236,9 @@
   </div>
 </section>
 
+<jsp:include page="/customer-footer.jsp"/>
 
-
-<!-- Footer -->
-<footer class="bg-dark text-white-50 py-4 mt-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4 mb-4 mb-md-0">
-        <h5 class="text-white mb-3">Mega City Cab</h5>
-        <p>Your trusted cab service in Colombo City. Safe, reliable, and affordable transportation for all your needs.</p>
-      </div>
-      <div class="col-md-2 mb-4 mb-md-0">
-        <h5 class="text-white mb-3">Quick Links</h5>
-        <ul class="list-unstyled">
-          <li><a href="index.html" class="text-white-50">Home</a></li>
-          <li><a href="index.html#services" class="text-white-50">Services</a></li>
-          <li><a href="index.html#about" class="text-white-50">About Us</a></li>
-          <li><a href="index.html#contact" class="text-white-50">Contact</a></li>
-        </ul>
-      </div>
-      <div class="col-md-2 mb-4 mb-md-0">
-        <h5 class="text-white mb-3">Services</h5>
-        <ul class="list-unstyled">
-          <li><a href="booking.html" class="text-white-50">Book a Cab</a></li>
-          <li><a href="booking.html" class="text-white-50">Airport Transfer</a></li>
-          <li><a href="booking.html" class="text-white-50">Corporate Service</a></li>
-          <li><a href="booking.html" class="text-white-50">Long Distance</a></li>
-        </ul>
-      </div>
-      <div class="col-md-4">
-        <h5 class="text-white mb-3">Contact Us</h5>
-        <p class="mb-1"><i class="fas fa-map-marker-alt me-2 text-warning"></i> 123 Main Street, Colombo, Sri Lanka</p>
-        <p class="mb-1"><i class="fas fa-phone me-2 text-warning"></i> +94 11 234 5678</p>
-        <p class="mb-1"><i class="fas fa-envelope me-2 text-warning"></i> info@megacitycab.com</p>
-      </div>
-    </div>
-    <hr class="my-4 bg-secondary">
-    <div class="row">
-      <div class="col-md-6 text-center text-md-start">
-        <p class="mb-0">&copy; 2025 Mega City Cab. All rights reserved.</p>
-      </div>
-      <div class="col-md-6 text-center text-md-end">
-        <a href="#" class="text-white-50 me-3">Privacy Policy</a>
-        <a href="#" class="text-white-50 me-3">Terms of Service</a>
-        <a href="#" class="text-white-50">FAQ</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<!-- Bootstrap 5 JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
-</body>
-</html>
 <script>
   let taxPercentage = parseFloat("${taxPercentage}");
   let baseCharge = parseFloat("${baseCharge}");
@@ -426,7 +328,10 @@
   // Function to fetch address suggestions from Nominatim API
   async function fetchAddressSuggestions(query) {
     try {
-      const response = await fetch("https://nominatim.openstreetmap.org/search?format=json&q="+encodeURIComponent(query)+"&limit=5");
+      const response = await fetch("https://nominatim.openstreetmap.org/search?format=json&q="+encodeURIComponent(query)
+              +"&limit=5"+
+      "&countrycodes=lk&limit=5"
+      );
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -440,7 +345,7 @@
   // Function to geocode an address using the OpenStreetMap Nominatim API
   async function geocodeAddress(address) {
     try {
-      const response = await fetch("https://nominatim.openstreetmap.org/search?format=json&q="+encodeURIComponent(address));
+      const response = await fetch("https://nominatim.openstreetmap.org/search?format=json&q="+encodeURIComponent(address)+"&countrycodes=lk");
       const data = await response.json();
 
       if (data && data.length > 0) {
@@ -559,51 +464,52 @@
     $('#txtTotalFare').val(totalChargeWithTax.toFixed(2));
     $('#txtDistance').val(formattedDistance);
   }
-
   function confirmBooking(e) {
     e.preventDefault(); // Prevent form submission
+    
+    // Reset previous validation messages
+    clearValidationMessages();
+    
+    let isValid = true;
 
     // Get input values
-    const pickupLocation = document.getElementById("pickupLocation").value.trim();
-    const destination = document.getElementById("destination").value.trim();
-    const pickupDate = document.getElementById("pickupDate").value;
-    const pickupTime = document.getElementById("pickupTime").value;
+    const pickupLocation = document.getElementById("pickupLocation");
+    const destination = document.getElementById("destination");
+    const pickupDate = document.getElementById("pickupDate");
+    const pickupTime = document.getElementById("pickupTime");
     const totalFare = document.getElementById("totalFare").textContent.trim();
 
     // Validation
-    if (pickupLocation === "" || destination === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Information",
-        text: "Please enter both pickup location and destination.",
-      });
-      return;
+    if (pickupLocation.value.trim() === "") {
+      showValidationError(pickupLocation, "Please enter pickup location");
+      isValid = false;
     }
 
-    if (pickupDate === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Date",
-        text: "Please select a pickup date.",
-      });
-      return;
+    if (destination.value.trim() === "") {
+      showValidationError(destination, "Please enter destination");
+      isValid = false;
     }
 
-    if (pickupTime === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Time",
-        text: "Please select a pickup time.",
-      });
-      return;
+    if (pickupDate.value === "") {
+      showValidationError(pickupDate, "Please select a pickup date");
+      isValid = false;
+    }
+
+    if (pickupTime.value === "") {
+      showValidationError(pickupTime, "Please select a pickup time");
+      isValid = false;
     }
 
     if (totalFare === "0.00" || totalFare === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Fare",
-        text: "Fare calculation is incomplete. Please check your trip details.",
-      });
+      // Show error for distance calculation
+      const distanceError = document.createElement("div");
+      distanceError.className = "alert alert-danger mt-2";
+      distanceError.textContent = "Fare calculation is incomplete. Please check your trip details.";
+      document.querySelector(".card-body").insertBefore(distanceError, document.getElementById("bookingForm"));
+      isValid = false;
+    }
+
+    if (!isValid) {
       return;
     }
 
@@ -615,65 +521,89 @@
       data: $('#bookingForm').serialize() + '&' + $('#bookingForm').find(':disabled').map(function() {
         return this.name + '=' + encodeURIComponent(this.value);
       }).get().join('&'),
-      // dataType: 'json',
-      beforeSend:function () {
-        $.blockUI({ css: {
-            border: 'none',
-            padding: '15px',
-            backgroundColor: '#000',
-            '-webkit-border-radius': '10px',
-            '-moz-border-radius': '10px',
-            opacity: .5,
-            color: '#fff',
-            zIndex: '999999',
-          } });
+      beforeSend: function () {
+        // Show loading indicator
+        const loadingIndicator = document.createElement("div");
+        loadingIndicator.id = "loadingIndicator";
+        loadingIndicator.className = "alert alert-info text-center";
+        loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing your booking...';
+        document.querySelector(".card-body").insertBefore(loadingIndicator, document.getElementById("bookingForm"));
       },
       success: function (response) {
+        // Remove loading indicator
+        document.getElementById("loadingIndicator").remove();
+        
         if (response.status === "success") {
-          // success("Booking saved successfully! Booking ID: " + response.bookingNumber);
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "Your booking has been confirmed. A confirmation has been sent to your email.",
-          });
+          // Show success message
+          const successMessage = document.createElement("div");
+          successMessage.className = "alert alert-success";
+          successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Your booking has been confirmed. A confirmation has been sent to your email.';
+          document.querySelector(".card-body").insertBefore(successMessage, document.getElementById("bookingForm"));
+          
+          // Disable form inputs and buttons
+          disableFormElements();
         } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Error: " + response.message,
-          });
+          // Show error message
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "alert alert-danger";
+          errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Error: ' + response.message;
+          document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
+          setTimeout(function () {
+            location.href = '${pageContext.request.contextPath}'+"/customer-booking/my-booking";
+          })
         }
-        $.unblockUI();
       },
       error: function (xhr, status, error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Internal server error.Please Try again",
-        });
-        $.unblockUI();
-      },
-      complete:function () {
-        $.unblockUI();
+        // Remove loading indicator
+        document.getElementById("loadingIndicator").remove();
+        
+        // Show error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "alert alert-danger";
+        errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Internal server error. Please try again.';
+        document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
       }
     });
-
-    // Confirmation alert
-   /* Swal.fire({
-      title: "Confirm Your Booking",
-      text: "Are you sure you want to proceed to payment?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, Proceed",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        $("#bookingForm").submit();
-        window.location.href = "payment.jsp?pickupLocation="+encodeURIComponent(pickupLocation)+"&destination="+encodeURIComponent(destination)+"&pickupDate="+pickupDate+"&pickupTime="+pickupTime+"&totalFare="+totalFare;
-      }
-    });*/
   }
+  
+  // Helper functions for validation
+  function showValidationError(inputElement, message) {
+    // Add is-invalid class to the input
+    inputElement.classList.add("is-invalid");
+    
+    // Create error message element
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "invalid-feedback";
+    errorDiv.textContent = message;
+    
+    // Add error message after the input
+    const parentElement = inputElement.closest(".input-group") || inputElement.parentElement;
+    parentElement.appendChild(errorDiv);
+  }
+  
+  function clearValidationMessages() {
+    // Remove all validation messages
+    document.querySelectorAll(".is-invalid").forEach(element => {
+      element.classList.remove("is-invalid");
+    });
+    
+    document.querySelectorAll(".invalid-feedback").forEach(element => {
+      element.remove();
+    });
+    
+    document.querySelectorAll(".alert").forEach(element => {
+      element.remove();
+    });
+  }
+  
+  function disableFormElements() {
+    // Disable all form inputs and buttons
+    document.querySelectorAll("#bookingForm input, #bookingForm button, #bookingForm select").forEach(element => {
+      element.disabled = true;
+    });
+  }
+   
+  
   // Credit card type detection
   document.getElementById('cardNumber').addEventListener('input', function() {
     let cardNumber = this.value.replace(/\s+/g, '');

@@ -187,5 +187,8 @@ public class BookingService {
     public List<Booking> getAssignedBookings(int userId) throws SQLException {
         return bookingDAO.getAssignedBookings(userId);
     }
+    public List<Booking> getCustomerRelatedBookings(String customerId) throws SQLException {
+        return bookingDAO.getCustomerRelatedBookings(customerId);
+    }
 
 }

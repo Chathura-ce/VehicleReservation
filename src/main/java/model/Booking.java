@@ -209,4 +209,13 @@ public class Booking {
     public String getPickupDate() {
         return pickupDate;
     }
+
+    public String getStatusLabel() {
+        switch (statusId) {
+            case 1: return "Pending";
+            case 2: return "Approved";
+            case 3: return "Cancelled";
+            default: return "";
+        }
+    }
 }

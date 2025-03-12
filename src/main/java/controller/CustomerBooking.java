@@ -35,11 +35,13 @@ public class CustomerBooking extends HttpServlet {
 
     private CarService carService;
     private BookingService bookingService;
+    private CustomerService customerService;
 
     @Override
     public void init() throws ServletException {
         bookingService = new BookingService();
         carService = new CarService();
+        customerService = new CustomerService();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -52,6 +54,9 @@ public class CustomerBooking extends HttpServlet {
                     break;
                 case "/create-booking":
                     createBooking(request, response);
+                    break;
+                case "/my-booking":
+                    myBookings(request, response);
                     break;
                 default:
                     break;
@@ -232,6 +237,28 @@ public class CustomerBooking extends HttpServlet {
             // Invalid carId, redirect back
             response.sendRedirect("car-selection.jsp?message=Please select a valid car");
         }
+    }
+
+    protected void myBookings(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession(false); // Get existing session, don't create a new one
+        if (session == null || session.getAttribute("loggedInUser") == null) {
+            // Redirect to login page if user is not logged in
+            response.sendRedirect("/login.jsp");
+        } else {
+            int userId = (int) session.getAttribute("userId");
+            Customer customer = customerService.getCustomerByUserId(userId);
+            List<Booking> bookings = null;
+            try {
+                bookings = bookingService.getCustomerRelatedBookings(customer.getCustomerNumber());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            request.setAttribute("bookings", bookings);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/customer/my-bookings.jsp");
+            dispatcher.forward(request, response);
+        }
+
     }
 
     private String generateEmailTemplate(Booking booking) {
