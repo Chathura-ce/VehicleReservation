@@ -2,14 +2,12 @@ package controller;
 
 
 import dao.UserDAO;
+import jakarta.servlet.http.*;
 import model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 
 //@WebServlet("/login")
@@ -43,6 +41,22 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("loggedInUser", user);
                 session.setAttribute("userId", user.getUserId());
 
+                // Create session cookies that persist for the browser session
+                Cookie usernameCookie = new Cookie("username", username);
+                usernameCookie.setPath("/");
+
+                Cookie userIdCookie = new Cookie("userId", String.valueOf(user.getUserId()));
+                userIdCookie.setPath("/");
+
+                // Create role cookie
+                Cookie roleCookie = new Cookie("userRole", user.getRole());
+                roleCookie.setPath("/");
+
+                // Add cookies to response
+                response.addCookie(usernameCookie);
+                response.addCookie(userIdCookie);
+                response.addCookie(roleCookie);
+
                 // Role-based redirection
                 switch (user.getRole()) {
                     case "admin":  // Admin role
@@ -55,7 +69,6 @@ public class LoginServlet extends HttpServlet {
                         response.sendRedirect("index.jsp");
                         break;
                     default:  // Default path if no role matches
-//                        response.sendRedirect("error.jsp");
                         // Invalid login
                         request.setAttribute("errorMessage", "Invalid user credentials");
                         request.getRequestDispatcher("/login.jsp").forward(request, response);
@@ -68,8 +81,6 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
         } catch (Exception e) {
-//            e.printStackTrace();
-//            response.sendRedirect("error.jsp");
             // Invalid login
             request.setAttribute("username", username);
             request.setAttribute("errorMessage", "Internal server error. Please try again later.");
