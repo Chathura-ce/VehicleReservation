@@ -5,6 +5,8 @@ import util.PricingConfig;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Booking {
     private int bookingId;
@@ -32,7 +34,7 @@ public class Booking {
     }
 
     public Booking(String customerId, String driverId, String carId, String destination,
-                   String pickupTime, String dropOffTime,   int statusId,
+                   String pickupTime, String dropOffTime, int statusId,
                    double priceForKm, double distance, double totalFare) {
         this.customerId = customerId;
         this.driverId = driverId;
@@ -51,6 +53,7 @@ public class Booking {
     public int getBookingId() {
         return bookingId;
     }
+
     public void setBookingId(int bookingId) {
         this.bookingId = bookingId;
     }
@@ -58,6 +61,7 @@ public class Booking {
     public String getBookingNumber() {
         return bookingNumber;
     }
+
     public void setBookingNumber(String bookingNumber) {
         this.bookingNumber = bookingNumber;
     }
@@ -65,6 +69,7 @@ public class Booking {
     public String getCustomerId() {
         return customerId;
     }
+
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
@@ -72,6 +77,7 @@ public class Booking {
     public String getDriverId() {
         return driverId;
     }
+
     public void setDriverId(String driverId) {
         this.driverId = driverId;
     }
@@ -79,6 +85,7 @@ public class Booking {
     public String getCarId() {
         return carId;
     }
+
     public void setCarId(String carId) {
         this.carId = carId;
     }
@@ -86,12 +93,15 @@ public class Booking {
     public String getDestination() {
         return destination;
     }
+
     public void setDestination(String destination) {
         this.destination = destination;
     }
+
     public String getPickupLocation() {
         return pickupLocation;
     }
+
     public void setPickupLocation(String pickupLocation) {
         this.pickupLocation = pickupLocation;
     }
@@ -99,6 +109,7 @@ public class Booking {
     public String getPickupTime() {
         return pickupTime;
     }
+
     public void setPickupTime(String pickupTime) {
         this.pickupTime = pickupTime;
     }
@@ -106,6 +117,7 @@ public class Booking {
     public String getDropOffTime() {
         return dropOffTime;
     }
+
     public void setDropOffTime(String dropOffTime) {
         this.dropOffTime = dropOffTime;
     }
@@ -114,6 +126,7 @@ public class Booking {
     public int getStatusId() {
         return statusId;
     }
+
     public void setStatusId(int statusId) {
         this.statusId = statusId;
     }
@@ -121,6 +134,7 @@ public class Booking {
     public Timestamp getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
@@ -128,6 +142,7 @@ public class Booking {
     public double getPriceForKm() {
         return priceForKm;
     }
+
     public void setPriceForKm(double priceForKm) {
         this.priceForKm = priceForKm;
     }
@@ -135,6 +150,7 @@ public class Booking {
     public double getDistance() {
         return distance;
     }
+
     public void setDistance(double distance) {
         this.distance = distance;
     }
@@ -142,6 +158,7 @@ public class Booking {
     public double getTotalFare() {
         return totalFare;
     }
+
     public void setTotalFare(double totalFare) {
         this.totalFare = totalFare;
     }
@@ -149,9 +166,11 @@ public class Booking {
     public void setUser(User user) {
         this.user = user;
     }
+
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
     public void setCar(Car car) {
         this.car = car;
     }
@@ -180,7 +199,7 @@ public class Booking {
         if (timestamp != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy | hh:mm a");
             this.formattedDate = sdf.format(timestamp);
-        }else {
+        } else {
             this.formattedDate = "";
         }
 
@@ -196,7 +215,7 @@ public class Booking {
     }
 
     public double calculateTotalAmount() {
-        return (distance*priceForKm) + calculateTax();  // total includes subtotal + tax
+        return (distance * priceForKm) + calculateTax();  // total includes subtotal + tax
     }
 
     public double getTotalAmount() {
@@ -206,16 +225,35 @@ public class Booking {
     public void setPickupDate(String pickupDate) {
         this.pickupDate = pickupDate;
     }
+
     public String getPickupDate() {
         return pickupDate;
     }
 
     public String getStatusLabel() {
         switch (statusId) {
-            case 1: return "Pending";
-            case 2: return "Approved";
-            case 3: return "Cancelled";
-            default: return "";
+            case 1:
+                return "Pending";
+            case 2:
+                return "Approved";
+            case 3:
+                return "Cancelled";
+            default:
+                return "";
+        }
+    }
+
+    public String getFormattedTime() {
+        try {
+            // Parse the input time
+            LocalTime time = LocalTime.parse(pickupTime);
+
+            // Format to desired output
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+            String formattedTime = time.format(formatter);
+            return formattedTime;
+        } catch (Exception e) {
+            return "00:00:00";
         }
     }
 }
