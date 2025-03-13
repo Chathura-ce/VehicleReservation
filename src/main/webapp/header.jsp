@@ -6,7 +6,7 @@
     User loggedInUser = (User) session.getAttribute("loggedInUser");
     if (loggedInUser == null) {
         session.setAttribute("errorMessage", "Your session expired. Please Login.");
-        response.sendRedirect("login.jsp"); // Redirect to login page
+        response.sendRedirect("/login.jsp"); // Redirect to login page
         return; // Stop further execution
     }
 %>
@@ -15,7 +15,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>City Cab</title><!--begin::Primary Meta Tags-->
+    <title>Mega City Cab</title><!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="title" content="AdminLTE v4 | Dashboard">
     <meta name="author" content="Chathura">
@@ -55,30 +55,20 @@
                         class="bi bi-list"></i> </a></li>
                 <li class="nav-item d-none d-md-block"><a href="${pageContext.request.contextPath}/home.jsp"
                                                           class="nav-link">Home</a></li>
-                <li class="nav-item d-none d-md-block"><a href="${pageContext.request.contextPath}/contact.jsp"
-                                                          class="nav-link">Contact</a></li>
             </ul> <!--end::Start Navbar Links--> <!--begin::End Navbar Links-->
             <ul class="navbar-nav ms-auto"> <!--begin::Navbar Search-->
                 <li class="nav-item dropdown user-menu"><a href="#" class="nav-link dropdown-toggle"
-                                                           data-bs-toggle="dropdown"> <img
-                        src="assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow"
-                        alt="User Image"> <span class="d-none d-md-inline">Alexander Pierce</span> </a>
+                                                           data-bs-toggle="dropdown"> <img src="/assets/img/admin-avatar.jpg" class="user-image rounded-circle shadow"
+                        alt="User Image"> <span class="d-none d-md-inline">${loggedInUser.fullName}</span> </a>
                     <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end"> <!--begin::User Image-->
-                        <li class="user-header text-bg-primary"><img src="assets/img/user2-160x160.jpg"
+                        <li class="user-header text-bg-primary"><img src="/assets/img/admin-avatar.jpg"
                                                                      class="rounded-circle shadow" alt="User Image">
                             <p>
-                                Alexander Pierce - Web Developer
-                                <small>Member since Nov. 2023</small>
+                                ${loggedInUser.fullName}
+                                <small>Member since ${loggedInUser.createdAt}</small>
                             </p>
                         </li> <!--end::User Image--> <!--begin::Menu Body-->
-                        <li class="user-body"> <!--begin::Row-->
-                            <div class="row">
-                                <div class="col-4 text-center"><a href="#">Followers</a></div>
-                                <div class="col-4 text-center"><a href="#">Sales</a></div>
-                                <div class="col-4 text-center"><a href="#">Friends</a></div>
-                            </div> <!--end::Row-->
-                        </li> <!--end::Menu Body--> <!--begin::Menu Footer-->
-                        <li class="user-footer"><a href="#" class="btn btn-default btn-flat">Profile</a> <a
+                        <li class="user-footer"><a href="#" class="btn btn-default btn-flat"></a> <a
                                 href="/logout"
                                 class="btn btn-default btn-flat float-end">Sign out</a></li> <!--end::Menu Footer-->
                     </ul>
@@ -90,7 +80,7 @@
         <div class="sidebar-brand"> <!--begin::Brand Link--> <a href="./index.html" class="brand-link">
             <!--begin::Brand Image--> <img style="display:none" src="" alt=""
                                            class="brand-image opacity-75 shadow"> <!--end::Brand Image-->
-            <!--begin::Brand Text--> <span class="brand-text fw-light">City Cab</span> <!--end::Brand Text--> </a>
+            <!--begin::Brand Text--> <span class="brand-text fw-light">Mega City Cab</span> <!--end::Brand Text--> </a>
             <!--end::Brand Link--> </div> <!--end::Sidebar Brand--> <!--begin::Sidebar Wrapper-->
         <div class="sidebar-wrapper">
             <nav class="mt-2"> <!--begin::Sidebar Menu-->
@@ -104,7 +94,7 @@
                         </p>
                     </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item"><a href="driver/add-driver.jsp" class="nav-link"> <i
+                            <li class="nav-item"><a href="/driver/add-driver.jsp" class="nav-link"> <i
                                     class="nav-icon bi bi-circle"></i>
                                 <p>Add Driver</p>
                             </a></li>
@@ -159,7 +149,7 @@
                         </ul>
                         <% } %>
                     </li>
-                    <li class="nav-item"><a href="./generate/theme.html" class="nav-link"> <i
+                    <li style="display: none" class="nav-item"><a href="./generate/theme.html" class="nav-link"> <i
                             class="nav-icon bi bi-palette"></i>
                         <p>Theme Generate</p>
                     </a></li>
