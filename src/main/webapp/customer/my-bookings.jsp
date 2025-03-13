@@ -96,7 +96,7 @@
 <section class="py-5 bg-light" id="bookingSection">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-lg-8">
+      <div class="col-lg-10">
         <div class="card shadow">
           <div class="card-header bg-warning text-dark py-2">
             <h4 class="mb-0">My Bookings</h4>
@@ -111,7 +111,7 @@
                     <th>Date</th>
                     <th>Total Price</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th>View</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -119,11 +119,11 @@
                     <tr>
                       <td>${booking.bookingNumber}</td>
                       <td>${booking.car.type.typeName} ${booking.car.model.modelName}</td>
-                      <td>${booking.formattedDate}</td>
+                      <td>${booking.pickupDate} ${booking.formattedTime}</td>
                       <td>${booking.totalFare} Rs</td>
                       <td>${booking.statusLabel}</td>
                       <td>
-                        <button onclick="printBill('${booking.bookingNumber}');"  class="btn btn-primary btn-sm">Details</button>
+                        <button onclick="printBill('${booking.bookingNumber}');"  class="btn btn-primary btn-sm">View</button>
                       </td>
                     </tr>
                   </c:forEach>

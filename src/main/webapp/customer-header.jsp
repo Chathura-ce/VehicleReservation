@@ -65,7 +65,7 @@
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
   <div class="container">
-    <a  class="navbar-brand" href="/">
+    <a  class="navbar-brand" href="/home.jsp">
       <i class="fas fa-taxi me-2"></i>
       Mega City Cab
     </a>
@@ -98,7 +98,7 @@
                   <i class="fas fa-user user-icon" style="display: none;"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                  <li><a class="dropdown-item" href="profile.jsp"><i class="fas fa-user me-2"></i>Profile</a></li>
+                  <li><a class="dropdown-item" href="/customer-data/customer-profile"><i class="fas fa-user me-2"></i>Profile</a></li>
                   <li><a class="dropdown-item" href="/customer-booking/my-booking"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
