@@ -4,15 +4,20 @@
 
     <jsp:include page="/header.jsp" />
 
+<div class="row">
+    <div class="col-sm-6">
+        <h3 class="mb-0">Dashboard</h3>
+    </div>
+    <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-end">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item">Booking</li>
+            <li class="breadcrumb-item active" aria-current="page">Bookings List</li>
+        </ol>
+    </div>
+</div>
     <div class="container mt-5">
-        <div class="row mb-4">
-            <div class="col">
-                <h2>Booking List</h2>
-            </div>
-            <div class="col text-end">
-                <a href="${pageContext.request.contextPath}/booking/new" class="btn btn-primary">Create New Booking</a>
-            </div>
-        </div>
+
 
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover">

@@ -104,7 +104,7 @@ public class Car {
         return available;
     }
     public String getAvailableStr() {
-        if(Objects.equals(available, "1")){return "Available";}
+        if(available == 1){return "Available";}
         return "Booked";
     }
     public int getAvailableId() {
