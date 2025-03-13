@@ -225,7 +225,7 @@
                 <div class="form-check"></div>
                 <div>
                   <button onclick="location.href='/home.jsp'" type="button" id="backToSearch" class="btn btn-outline-secondary">Back to Search</button>
-                  <button onclick="confirmBooking(event);" type="button" class="btn btn-warning px-4">Confirm Booking</button>
+                  <button id="confirmButton" onclick="confirmBooking(event);" type="button" class="btn btn-warning px-4">Confirm Booking</button>
                 </div>
               </div>
             </form>
@@ -600,6 +600,7 @@
     // Disable all form inputs and buttons
     document.querySelectorAll("#bookingForm input, #bookingForm button, #bookingForm select").forEach(element => {
       element.disabled = true;
+      $("#confirmButton").prop('disabled', true);
     });
   }
    
