@@ -1,5 +1,42 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="../header.jsp" %>
+ <style>
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    .form-control.is-valid {
+        border-color: #198754;
+        padding-right: calc(1.5em + 0.75rem);
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    .invalid-feedback {
+        display: none;
+        width: 100%;
+        margin-top: 0.25rem;
+        padding-left: 0.5rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+    .invalid-feedback.d-block {
+        display: block !important;
+        margin-bottom: 1rem;
+        color: #dc3545;
+        font-size: 0.875em;
+    }
+    .input-group + .invalid-feedback {
+        margin-top: -0.5rem;
+        margin-bottom: 1rem;
+    }
+    .is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+</style>
 <div class="row">
     <div class="col-sm-6">
         <h3 class="mb-0">Dashboard</h3>
@@ -51,7 +88,7 @@
                 %>
 
 
-                <form action="${pageContext.request.contextPath}/add-driver" method="post">
+                <form action="${pageContext.request.contextPath}/add-driver" method="post" id="driverForm" class="needs-validation" novalidate>
                     <!-- Username & Password Row -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -62,6 +99,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-person-fill"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -72,6 +110,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-lock-fill"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -86,6 +125,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-card-heading"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -96,6 +136,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-file-person"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -110,6 +151,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-telephone-fill"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -120,6 +162,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-envelope-fill"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -134,6 +177,7 @@
                                 <div class="input-group-text">
                                     <span class="bi bi-person-badge"></span>
                                 </div>
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -151,3 +195,91 @@
 
 
 <%@ include file="../footer.jsp" %>
+
+
+<script>
+$(document).ready(function() {
+    const form = $('#driverForm');
+    
+    // Validation patterns
+    const patterns = {
+        username: /^[a-zA-Z0-9_]{3,20}$/,
+        password: /^.{6,}$/,
+        fullName: /^[a-zA-Z\s]{2,50}$/,
+        nic: /^([0-9]{9}[vVxX]|[0-9]{12})$/,
+        phoneNumber: /^(?:\+94|0)?[0-9]{9}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        licenseNumber: /^[A-Z0-9]{7,12}$/
+    };
+
+    // Validation messages
+    const messages = {
+        username: 'Username must be 3-20 characters',
+        password: 'Password must be at least 6 characters',
+        fullName: 'Please enter a valid full name',
+        nic: 'Please enter a valid NIC number',
+        phoneNumber: 'Please enter a valid Sri Lankan phone number',
+        email: 'Please enter a valid email address',
+        licenseNumber: 'Please enter a valid license number'
+    };
+
+    // Real-time validation
+    form.find('input').on('input', function() {
+        validateField($(this));
+    });
+
+    // Field validation function
+    function validateField($field) {
+        const fieldName = $field.attr('name');
+        const value = $field.val().trim();
+        let isValid = true;
+
+        // Remove existing feedback
+        $field.removeClass('is-valid is-invalid');
+        $field.closest('.input-group').next('.invalid-feedback').remove();
+
+        // Required field validation
+        if ($field.prop('required') && !value) {
+            isValid = false;
+            showError($field, 'This field is required');
+            return false;
+        }
+
+        // Pattern validation
+        if (patterns[fieldName] && value) {
+            isValid = patterns[fieldName].test(value);
+            if (!isValid) {
+                showError($field, messages[fieldName]);
+                return false;
+            }
+        }
+
+        if (isValid) {
+            $field.addClass('is-valid');
+        }
+        return true;
+    }
+
+    // Show error message
+    function showError($field, message) {
+        $field.addClass('is-invalid');
+        const $inputGroup = $field.closest('.input-group');
+        $inputGroup.after("<div class='invalid-feedback d-block'>"+message+"</div>");
+    }
+
+    // Form submission
+    form.on('submit', function(e) {
+        let isValid = true;
+        form.find('input').each(function() {
+            if (!validateField($(this))) {
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+
