@@ -99,6 +99,8 @@ public class RegisterServlet extends HttpServlet {
             user.setPassword(password);
             user.setFullName(fullName);
             user.setEmail(email);
+            user.setNic(nic);
+            user.setPhone(phoneNumber);
             user.setRole("customer");
 
             int userId = userDAO.addUser(user);

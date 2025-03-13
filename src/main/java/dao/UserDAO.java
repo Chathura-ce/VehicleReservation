@@ -2,6 +2,7 @@ package dao;
 
 import exception.ValidationException;
 import model.Booking;
+import model.Customer;
 import util.DatabaseUtil;
 import model.User;
 import util.PasswordUtil;
@@ -64,6 +65,7 @@ public class UserDAO {
                     user.setFullName(rs.getString("full_name"));
                     user.setEmail(rs.getString("email"));
                     user.setRole(rs.getString("role"));
+                    user.setCreatedAt(rs.getString("created_at"));
                     return user;
                 }
             }
@@ -186,5 +188,29 @@ public class UserDAO {
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
         }
+    }
+
+    public User getUser(int userId) throws SQLException {
+        String sql = "SELECT c.*, u.* " +
+                "FROM customers c JOIN users u ON c.user_id = u.user_id " +
+                "WHERE u.user_id = ? ";
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setFullName(rs.getString("full_name"));
+                    user.setUsername(rs.getString("username"));
+                    user.setNic(rs.getString("nic"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+
+
+                    return user;
+                }
+            }
+        }
+        return null;
     }
 }

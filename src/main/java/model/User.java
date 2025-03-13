@@ -1,5 +1,9 @@
 package model;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class User {
     private int userId;
     private String username;
@@ -10,6 +14,30 @@ public class User {
     private String role;
     private String phone;
     private int status;
+    private String createdAt;
+
+    public String getCreatedAt() {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            // or whatever format your createdAt string is in
+
+            Date date = inputFormat.parse(createdAt);
+
+            // Then format to the desired pattern "d MMM. yyyy"
+            SimpleDateFormat outputFormat = new SimpleDateFormat("d MMM. yyyy", Locale.ENGLISH);
+
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            // Handle parsing error
+            return ""; // Return original if parsing fails
+        }
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+
 
     // Getters and Setters
     public int getUserId() { return userId; }
