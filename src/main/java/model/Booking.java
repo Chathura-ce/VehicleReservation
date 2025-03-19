@@ -29,6 +29,21 @@ public class Booking {
     private String formattedDate;
     private Car car;
     private String pickupDate;
+    private int isPaid;
+
+    public BookingStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BookingStatus status) {
+        this.status = status;
+    }
+
+    public void setFormattedDate(String formattedDate) {
+        this.formattedDate = formattedDate;
+    }
+
+    private BookingStatus status;
 
     public Booking() {
     }
@@ -255,5 +270,13 @@ public class Booking {
         } catch (Exception e) {
             return "00:00:00";
         }
+    }
+
+    public void isPaid(int isPaid) {
+        this.isPaid = isPaid;
+    }
+
+    public int getIsPaid() {
+        return isPaid;
     }
 }

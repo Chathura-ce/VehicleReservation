@@ -217,13 +217,13 @@ $(document).ready(function() {
         }
 
         // Pattern validation
-        if (patterns[fieldName] && value) {
+        /*if (patterns[fieldName] && value) {
             isValid = patterns[fieldName].test(value);
             if (!isValid) {
                 showError($field, messages[fieldName]);
                 return false;
             }
-        }
+        }*/
 
         if (isValid) {
             $field.addClass('is-valid');
@@ -264,3 +264,10 @@ $(document).ready(function() {
 </script>
 </body><!--end::Body-->
 </html>
+
+
+<%
+    // Remove the attribute so it doesn't persist
+    session.removeAttribute("errorMessage");
+    session.removeAttribute("successMessage");
+%>

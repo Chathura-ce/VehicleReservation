@@ -17,6 +17,7 @@ import service.BookingService;
 import service.CarService;
 import service.CustomerService;
 import util.EmailSender;
+import util.FlashMessageUtil;
 import util.PricingConfig;
 
 import java.io.IOException;
@@ -52,6 +53,15 @@ public class CustomerBooking extends HttpServlet {
                     break;
                 case "/my-booking":
                     myBookings(request, response);
+                    break;
+                case "/payment-success":
+                    paymentSuccess(request, response);
+                    break;
+                case "/payment-cancel":
+                    paymentCancel(request, response);
+                    break;
+                case "/cancel-booking":
+                    cancelBooking(request, response);
                     break;
                 default:
                     break;
@@ -89,7 +99,13 @@ public class CustomerBooking extends HttpServlet {
             // Redirect to login page if user is not logged in
             response.sendRedirect("/login.jsp");
             return;
+        } else if (!"customer".equals(session.getAttribute("role"))) {
+            // Redirect to login page if user is not logged in
+            FlashMessageUtil.setFlashMessage("errorMessage", request, "Please create customer account.");
+            response.sendRedirect("/login.jsp");
+            return;
         }
+
         String carId = request.getParameter("carId");
 
         if (carId != null && !carId.isEmpty()) {
@@ -132,7 +148,7 @@ public class CustomerBooking extends HttpServlet {
 //            response.sendRedirect("/login.jsp");
             jsonResponse.put("status", "error");
             jsonResponse.put("message", "Auth failed.");
-        }else{
+        } else {
             try {
                 User user = (User) session.getAttribute("loggedInUser");
                 int userId = (int) session.getAttribute("userId");
@@ -143,7 +159,6 @@ public class CustomerBooking extends HttpServlet {
 
                 DriverDAO driverDAO = new DriverDAO();
                 Driver driver = driverDAO.getDriverById(car.getDriverId());
-
 
 
                 // Extract parameters from request
@@ -178,12 +193,14 @@ public class CustomerBooking extends HttpServlet {
                 newBooking.setTotalFare(totalFare);
                 newBooking.setCustomer(customer);
                 newBooking.setDriver(driver);
+                newBooking.setStatusId(0);
 
                 String bookingNumber = bookingService.createBooking(newBooking);
+                newBooking.setBookingNumber(bookingNumber);
                 jsonResponse.put("status", "success");
                 jsonResponse.put("message", "Booking updated successfully.Booking No: " + bookingNumber);
                 jsonResponse.put("bookingNumber", bookingNumber);
-                EmailSender.sendEmail(user.getEmail(), "Your Mega City Cab Booking Confirmation - #", generateEmailTemplate(newBooking));
+                EmailSender.sendEmail(user.getEmail(), "Your Mega City Cab Booking Confirmation - #", generateEmailTemplate(bookingNumber));
             } catch (ValidationException e) {
                 e.printStackTrace();
                 jsonResponse.put("status", "error");
@@ -192,7 +209,7 @@ public class CustomerBooking extends HttpServlet {
                 e.printStackTrace();
                 jsonResponse.put("status", "error");
                 jsonResponse.put("message", "Database error while creating booking.");
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 jsonResponse.put("status", "error");
                 jsonResponse.put("message", "Error while creating booking.");
@@ -200,38 +217,7 @@ public class CustomerBooking extends HttpServlet {
         }
 
 
-
         response.getWriter().write(gson.toJson(jsonResponse));
-    }
-
-    protected void paymentPage(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String carId = request.getParameter("carId");
-
-        if (carId != null && !carId.isEmpty()) {
-            CarService carService = new CarService();
-            Car car = null;
-            try {
-                car = carService.getCarById(carId);
-            } catch (SQLException e) {
-                System.out.println("SQLException: " + e.getMessage());
-            }
-
-            if (car != null) {
-                // Car exists, forward to book-car.jsp with car data
-                request.setAttribute("car", car);
-                request.setAttribute("baseCharge", PricingConfig.BASE_CHARGE);
-                request.setAttribute("taxPercentage", PricingConfig.TAX_PERCENTAGE);
-                RequestDispatcher dispatcher = request.getRequestDispatcher("/customer/customer-booking-payment.jsp");
-                dispatcher.forward(request, response);
-            } else {
-                // Car not found, redirect to an error page or show a message
-                response.sendRedirect("error.jsp?message=Car not available");
-            }
-        } else {
-            // Invalid carId, redirect back
-            response.sendRedirect("car-selection.jsp?message=Please select a valid car");
-        }
     }
 
     protected void myBookings(HttpServletRequest request, HttpServletResponse response)
@@ -256,30 +242,113 @@ public class CustomerBooking extends HttpServlet {
 
     }
 
-    private String generateEmailTemplate(Booking booking) {
-        CarDAO carDAO = new CarDAO();
-        String carModel = "";
+    private void paymentSuccess(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
         try {
-            Car car = carDAO.getCarById(booking.getCarId());
-            carModel = car.getCarModel().getModelName();
-        } catch (Exception e) {
+            // Get customer ID from session
+            HttpSession session = request.getSession();
+            Integer userId = (Integer) session.getAttribute("userId");
 
+            if (userId == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+            String bookingNo = request.getParameter("bookingNo");
+            // Get booking data
+            Booking booking = bookingService.getBookingByNumber(bookingNo);
+
+            request.setAttribute("booking", booking);
+            // Forward to profile JSP
+            String jspPath = "/customer/payment-success.jsp";
+            request.getRequestDispatcher(jspPath).forward(request, response);
+
+        } catch (Exception e) {
+            throw new ServletException("Error retrieving customer profile", e);
+        }
+    }
+
+    private void paymentCancel(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        try {
+            // Get customer ID from session
+            HttpSession session = request.getSession();
+            Integer userId = (Integer) session.getAttribute("userId");
+
+            if (userId == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+            String bookingNo = request.getParameter("bookingNo");
+            // Get booking data
+            Booking booking = bookingService.getBookingByNumber(bookingNo);
+
+            request.setAttribute("booking", booking);
+            // Forward to profile JSP
+            String jspPath = "/customer/payment-cancel.jsp";
+            request.getRequestDispatcher(jspPath).forward(request, response);
+
+        } catch (Exception e) {
+            throw new ServletException("Error retrieving customer profile", e);
+        }
+    }
+
+    private void cancelBooking(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new Gson();
+        Map<String, Object> jsonResponse = new HashMap<>();
+        try {
+            String bookingNo = request.getParameter("bookingNumber");
+
+            Booking booking = bookingService.getBookingByNumber(bookingNo);
+            if (booking.getStatusId() != 0) {
+                jsonResponse.put("status", "error");
+                jsonResponse.put("message", "Only unpaid bookings can be cancelled.");
+                response.getWriter().write(gson.toJson(jsonResponse));
+                return;
+            }
+
+            bookingService.cancelBooking(bookingNo);
+
+            jsonResponse.put("status", "success");
+            jsonResponse.put("message", "Booking cancelled successfully.");
+            response.getWriter().write(gson.toJson(jsonResponse));
+        } catch (Exception e) {
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", "Error while cancelling booking.");
+            response.getWriter().write(gson.toJson(jsonResponse));
+            e.printStackTrace();
+        }
+    }
+
+    private String generateEmailTemplate(String bookingNumber) {
+        try {
+            BookingService bookingService = new BookingService();
+            Booking booking = bookingService.getBookingByNumber(bookingNumber);
+
+
+            return "<div class='bill-container' style='font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px;'>"
+                    + "<div class='bill-header' style='text-align: center; background-color: #007bff; color: white; padding: 10px;'>"
+                    + "<h1>MEGA CITY CAB</h1><p>Booking Confirmation</p></div>"
+                    + "<div class='bill-details' style='margin-top: 20px;'>"
+                    + "<p><strong>Booking Number:</strong> " + booking.getBookingNumber() + "</p>"
+                    + "<p><strong>Customer Name:</strong> " + booking.getUser().getFullName() + "</p>"
+                    + "<p><strong>Destination:</strong> " + booking.getDestination() + "</p>"
+                    + "<p><strong>Distance:</strong> " + booking.getDistance() + " km</p>"
+                    + "<p><strong>Vehicle:</strong> " + booking.getCar().getModel().getModelName() + "</p>"
+                    + "<p><strong>Booking Date:</strong> " + booking.getFormattedDate() + "</p>"
+                    + "<p><strong>Total:</strong> " + booking.getTotalAmount() + "</p>"
+                    + "</div><div class='bill-footer' style='text-align: center; margin-top: 20px;'>"
+                    + "<p>Thank you for choosing Mega City Cab!</p>"
+                    + "<p>© 2024 Mega City Cab. All Rights Reserved.</p></div></div>";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
         }
 
-        return "<div class='bill-container' style='font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px;'>"
-                + "<div class='bill-header' style='text-align: center; background-color: #007bff; color: white; padding: 10px;'>"
-                + "<h1>MEGA CITY CAB</h1><p>Booking Confirmation</p></div>"
-                + "<div class='bill-details' style='margin-top: 20px;'>"
-                + "<p><strong>Booking Number:</strong> " + booking.getBookingNumber() + "</p>"
-                + "<p><strong>Customer Name:</strong> " + booking.getCustomer().getUser().getFullName() + "</p>"
-                + "<p><strong>Destination:</strong> " + booking.getDestination() + "</p>"
-                + "<p><strong>Distance:</strong> " + booking.getDistance() + " km</p>"
-                + "<p><strong>Vehicle:</strong> " + carModel + "</p>"
-                + "<p><strong>Booking Date:</strong> " + booking.getFormattedDate() + "</p>"
-                + "<p><strong>Total:</strong> " + booking.getTotalAmount() + "</p>"
-                + "</div><div class='bill-footer' style='text-align: center; margin-top: 20px;'>"
-                + "<p>Thank you for choosing Mega City Cab!</p>"
-                + "<p>© 2024 Mega City Cab. All Rights Reserved.</p></div></div>";
+
     }
+
 
 }

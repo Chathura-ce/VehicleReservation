@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="activation-1.1.1">
+    <archive path="C:/Users/chathura/eclipse-workspace/vehicleReservation/src/main/webapp/WEB-INF/lib/activation-1.1.1.jar" />
+  </library>
+  <library name="jakarta.servlet-api-5.0.0">
+    <archive path="C:/Users/chathura/eclipse-workspace/vehicleReservation/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-5.0.0.jar" />
+  </library>
+  <library name="jakarta.mail-1.6.7">
+    <archive path="C:/Users/chathura/eclipse-workspace/vehicleReservation/src/main/webapp/WEB-INF/lib/jakarta.mail-1.6.7.jar" />
+  </library>
+</eclipse-userlibraries>
+

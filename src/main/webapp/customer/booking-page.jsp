@@ -186,46 +186,21 @@
                 </div>
               </div>
 
-              <%--Payment--%>
-              <div style="display:none" id="cardPaymentForm" class="card mb-4" >
-                <div class="card-header bg-light py-2">
-                  <h5 class="mb-0">Card Details</h5>
-                </div>
-                <div class="card-body py-3">
-                  <form id="creditCardForm">
-                    <div class="position-relative mb-3">
-                      <label for="cardNumber" class="form-label">Card Number</label>
-                      <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" required>
-                      <div class="cc-type"><i id="cardTypeIcon" class="far fa-credit-card"></i></div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <div class="col-md-6">
-                        <label for="cardName" class="form-label">Cardholder Name</label>
-                        <input type="text" class="form-control" id="cardName" placeholder="John Smith" required>
-                      </div>
-
-                      <div class="col-md-3">
-                        <label for="expiryDate" class="form-label">Expiry Date</label>
-                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" required>
-                      </div>
-
-                      <div class="col-md-3">
-                        <label for="cvv" class="form-label">CVV</label>
-                        <input type="text" class="form-control" id="cvv" placeholder="123" required>
-                      </div>
-                    </div>
-
-                  </form>
-                </div>
-              </div>
-
               <!-- Terms and Submit -->
               <div class="d-flex justify-content-between align-items-center">
                 <div class="form-check"></div>
                 <div>
-                  <button onclick="location.href='/home.jsp'" type="button" id="backToSearch" class="btn btn-outline-secondary">Back to Search</button>
-                  <button id="confirmButton" onclick="confirmBooking(event);" type="button" class="btn btn-warning px-4">Confirm Booking</button>
+                  <button onclick="location.href='/home.jsp'" type="button" id="backToSearch" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Search
+                  </button>
+
+                  <button id="confirmButton" onclick="confirmBooking(event);" type="button" class="btn btn-warning px-4">
+                    <i class="fas fa-check"></i> Confirm Booking
+                  </button>
+
+                  <button style="display: none" id="paymentButton" onclick="confirmPayment(event);" type="button" class="btn btn-warning px-4">
+                    <i class="fas fa-credit-card"></i> Pay Now
+                  </button>
                 </div>
               </div>
             </form>
@@ -239,11 +214,143 @@
 <jsp:include page="/customer-footer.jsp"/>
 
 <script src="https://js.stripe.com/v3/"></script>
+
 <script>
   let taxPercentage = parseFloat("${taxPercentage}");
   let baseCharge = parseFloat("${baseCharge}");
   let priceForKm = parseFloat("${car.priceForKm}");
-  function debounce(func, wait) {
+  const stripe = Stripe('pk_test_51R2xBMHBoMeUyf28bznECFFunlTYFzYEmJ7enSGhUuxrBe9b5TLq7Pj9QED3sWitNCzFdycdxC4SZukmPj8l0eQl00fVrOCA5K'); // Your Publishable Key
+
+
+  function confirmBooking(e) {
+    e.preventDefault(); // Prevent form submission
+
+    // Reset previous validation messages
+    clearValidationMessages();
+
+    let isValid = true;
+
+    // Get input values
+    const pickupLocation = document.getElementById("pickupLocation");
+    const destination = document.getElementById("destination");
+    const pickupDate = document.getElementById("pickupDate");
+    const pickupTime = document.getElementById("pickupTime");
+    const totalFare = document.getElementById("totalFare").textContent.trim();
+
+    // Validation
+    if (pickupLocation.value.trim() === "") {
+      showValidationError(pickupLocation, "Please enter pickup location");
+      isValid = false;
+    }
+
+    if (destination.value.trim() === "") {
+      showValidationError(destination, "Please enter destination");
+      isValid = false;
+    }
+
+    if (pickupDate.value === "") {
+      showValidationError(pickupDate, "Please select a pickup date");
+      isValid = false;
+    }
+
+    if (pickupTime.value === "") {
+      showValidationError(pickupTime, "Please select a pickup time");
+      isValid = false;
+    }
+
+    if (totalFare === "0.00" || totalFare === "") {
+      // Show error for distance calculation
+      const distanceError = document.createElement("div");
+      distanceError.className = "alert alert-danger mt-2";
+      distanceError.textContent = "Fare calculation is incomplete. Please check your trip details.";
+      document.querySelector(".card-body").insertBefore(distanceError, document.getElementById("bookingForm"));
+      isValid = false;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    let url = '${pageContext.request.contextPath}/customer-booking/create-booking';
+
+    $.ajax({
+      url: url,
+      type: 'POST',
+      data: $('#bookingForm').serialize() + '&' + $('#bookingForm').find(':disabled').map(function() {
+        return this.name + '=' + encodeURIComponent(this.value);
+      }).get().join('&'),
+      beforeSend: function () {
+        // Show loading indicator
+        const loadingIndicator = document.createElement("div");
+        loadingIndicator.id = "loadingIndicator";
+        loadingIndicator.className = "alert alert-info text-center";
+        loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing your booking...';
+        document.querySelector(".card-body").insertBefore(loadingIndicator, document.getElementById("bookingForm"));
+        disableFormElements();
+      },
+      success: function (response) {
+        // Remove loading indicator
+        document.getElementById("loadingIndicator").remove();
+
+        if (response.status === "success") {
+          let bookingNumber = response.bookingNumber;
+          // Show success message
+          const successMessage = document.createElement("div");
+          successMessage.className = "alert alert-success";
+          successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Your booking has been confirmed. A confirmation has been sent to your email.';
+          document.querySelector(".card-body").insertBefore(successMessage, document.getElementById("bookingForm"));
+
+        } else {
+          // Show error message
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "alert alert-danger";
+          errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Error: ' + response.message;
+          document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
+
+        }
+      },
+      error: function (xhr, status, error) {
+        // Remove loading indicator
+        document.getElementById("loadingIndicator").remove();
+
+        // Show error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "alert alert-danger";
+        errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Internal server error. Please try again.';
+        document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
+      }
+    });
+  }
+
+  function confirmPayment(e) {
+    e.preventDefault();
+    //create session for booking
+
+    $.ajax({
+      url: '/create-checkout-session', // The endpoint to create a checkout session
+      method: 'POST',                  // HTTP method
+      dataType: 'json'  ,              // Expect JSON response
+      data:{
+        bookingNumber: bookingNumber
+      }
+    }).done(function (session) {
+      // Redirect to Stripe Checkout using the session ID
+      stripe.redirectToCheckout({sessionId: session.id})
+              .then(function (result) {
+                // Handle any errors from redirectToCheckout
+                if (result.error) {
+                  alert(result.error.message);
+                }
+              });
+    })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+              // Handle any errors that occurred during the AJAX request
+              console.error('Error creating checkout session:', textStatus, errorThrown);
+              alert('An error occurred while creating the checkout session.');
+            });
+  }
+
+    function debounce(func, wait) {
     let timeout;
     return function(...args) {
       clearTimeout(timeout);
@@ -464,107 +571,6 @@
     $('#txtTotalFare').val(totalChargeWithTax.toFixed(2));
     $('#txtDistance').val(formattedDistance);
   }
-  function confirmBooking(e) {
-    e.preventDefault(); // Prevent form submission
-    
-    // Reset previous validation messages
-    clearValidationMessages();
-    
-    let isValid = true;
-
-    // Get input values
-    const pickupLocation = document.getElementById("pickupLocation");
-    const destination = document.getElementById("destination");
-    const pickupDate = document.getElementById("pickupDate");
-    const pickupTime = document.getElementById("pickupTime");
-    const totalFare = document.getElementById("totalFare").textContent.trim();
-
-    // Validation
-    if (pickupLocation.value.trim() === "") {
-      showValidationError(pickupLocation, "Please enter pickup location");
-      isValid = false;
-    }
-
-    if (destination.value.trim() === "") {
-      showValidationError(destination, "Please enter destination");
-      isValid = false;
-    }
-
-    if (pickupDate.value === "") {
-      showValidationError(pickupDate, "Please select a pickup date");
-      isValid = false;
-    }
-
-    if (pickupTime.value === "") {
-      showValidationError(pickupTime, "Please select a pickup time");
-      isValid = false;
-    }
-
-    if (totalFare === "0.00" || totalFare === "") {
-      // Show error for distance calculation
-      const distanceError = document.createElement("div");
-      distanceError.className = "alert alert-danger mt-2";
-      distanceError.textContent = "Fare calculation is incomplete. Please check your trip details.";
-      document.querySelector(".card-body").insertBefore(distanceError, document.getElementById("bookingForm"));
-      isValid = false;
-    }
-
-    if (!isValid) {
-      return;
-    }
-
-    let url = '${pageContext.request.contextPath}/customer-booking/create-booking';
-
-    $.ajax({
-      url: url,
-      type: 'POST',
-      data: $('#bookingForm').serialize() + '&' + $('#bookingForm').find(':disabled').map(function() {
-        return this.name + '=' + encodeURIComponent(this.value);
-      }).get().join('&'),
-      beforeSend: function () {
-        // Show loading indicator
-        const loadingIndicator = document.createElement("div");
-        loadingIndicator.id = "loadingIndicator";
-        loadingIndicator.className = "alert alert-info text-center";
-        loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing your booking...';
-        document.querySelector(".card-body").insertBefore(loadingIndicator, document.getElementById("bookingForm"));
-      },
-      success: function (response) {
-        // Remove loading indicator
-        document.getElementById("loadingIndicator").remove();
-        
-        if (response.status === "success") {
-          // Show success message
-          const successMessage = document.createElement("div");
-          successMessage.className = "alert alert-success";
-          successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Your booking has been confirmed. A confirmation has been sent to your email.';
-          document.querySelector(".card-body").insertBefore(successMessage, document.getElementById("bookingForm"));
-          
-          // Disable form inputs and buttons
-          disableFormElements();
-        } else {
-          // Show error message
-          const errorMessage = document.createElement("div");
-          errorMessage.className = "alert alert-danger";
-          errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Error: ' + response.message;
-          document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
-          setTimeout(function () {
-            location.href = '${pageContext.request.contextPath}'+"/customer-booking/my-booking";
-          })
-        }
-      },
-      error: function (xhr, status, error) {
-        // Remove loading indicator
-        document.getElementById("loadingIndicator").remove();
-        
-        // Show error message
-        const errorMessage = document.createElement("div");
-        errorMessage.className = "alert alert-danger";
-        errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Internal server error. Please try again.';
-        document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
-      }
-    });
-  }
   
   // Helper functions for validation
   function showValidationError(inputElement, message) {
@@ -604,51 +610,4 @@
     });
   }
    
-  
-  // Credit card type detection
-  document.getElementById('cardNumber').addEventListener('input', function() {
-    let cardNumber = this.value.replace(/\s+/g, '');
-    let cardIcon = document.getElementById('cardTypeIcon');
-
-    // Basic card type detection based on first digits
-    if (cardNumber.startsWith('4')) {
-      cardIcon.className = 'fab fa-cc-visa';
-    } else if (/^5[1-5]/.test(cardNumber)) {
-      cardIcon.className = 'fab fa-cc-mastercard';
-    } else if (/^3[47]/.test(cardNumber)) {
-      cardIcon.className = 'fab fa-cc-amex';
-    } else if (/^6(?:011|5)/.test(cardNumber)) {
-      cardIcon.className = 'fab fa-cc-discover';
-    } else {
-      cardIcon.className = 'far fa-credit-card';
-    }
-
-    // Format card number with spaces
-    let formattedNumber = '';
-    for (let i = 0; i < cardNumber.length; i++) {
-      if (i > 0 && i % 4 === 0) {
-        formattedNumber += ' ';
-      }
-      formattedNumber += cardNumber[i];
-    }
-    this.value = formattedNumber;
-  });
-
-  // Format expiry date
-  document.getElementById('expiryDate').addEventListener('input', function() {
-    let expiry = this.value.replace(/\D/g, '');
-    if (expiry.length > 2) {
-      this.value = expiry.substring(0, 2) + '/' + expiry.substring(2, 4);
-    } else {
-      this.value = expiry;
-    }
-  });
-
-  // Format CVV - numbers only
-  document.getElementById('cvv').addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g, '').substring(0, 3);
-  });
-
-
-
 </script>

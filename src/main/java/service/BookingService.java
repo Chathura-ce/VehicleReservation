@@ -1,5 +1,7 @@
 package service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -43,11 +45,11 @@ public class BookingService {
     }
 
     public String createBooking(Booking booking,Connection connection) throws SQLException {
-        double totalFare = booking.getPriceForKm() * booking.getDistance();
-        booking.setTotalFare(totalFare);
+//        double totalFare = booking.getPriceForKm() * booking.getDistance();
+//        booking.setTotalFare(totalFare);
 
-        booking.setStatusId(1);
-        booking.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+//        booking.setStatusId(1);
+//        booking.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
 
         return bookingDAO.insertBooking(booking,connection);
     }
@@ -140,13 +142,23 @@ public class BookingService {
     }
 
     public double calculateTotalFare(double priceForKm, double distance, double taxRate, double discountRate) {
+        // Calculate subtotal, tax amount, and discount amount
         double subtotal = priceForKm * distance;
         double taxAmount = subtotal * taxRate;
         double discountAmount = subtotal * discountRate;
-        return subtotal + taxAmount - discountAmount;
+
+        // Calculate total fare before rounding
+        double totalFare = subtotal + taxAmount - discountAmount;
+
+        // Round the result to 2 decimal places using BigDecimal
+        BigDecimal roundedTotalFare = new BigDecimal(totalFare)
+                .setScale(2, RoundingMode.HALF_UP); // Round to 2 decimal places
+
+        // Return the rounded value as a double
+        return roundedTotalFare.doubleValue();
     }
 
-    // Overloaded version using default tax and discount rates
+        // Overloaded version using default tax and discount rates
     public double calculateTotalFare(double priceForKm, double distance) {
         return calculateTotalFare(priceForKm, distance, DEFAULT_TAX_RATE, DEFAULT_DISCOUNT_RATE);
     }
@@ -191,4 +203,15 @@ public class BookingService {
         return bookingDAO.getCustomerRelatedBookings(customerId);
     }
 
+    public boolean updateBookingPayment(int status,String bookingNumber) throws SQLException {
+        return bookingDAO.updateBookingPayment(status, bookingNumber);
+    }
+
+    public void cancelBooking(String bookingNo) {
+        try {
+            bookingDAO.cancelBooking(bookingNo);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

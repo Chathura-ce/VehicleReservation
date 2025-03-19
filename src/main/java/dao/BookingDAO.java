@@ -2,6 +2,7 @@ package dao;
 
 import model.*;
 import model.Driver;
+import service.BookingStatusService;
 import util.BookingUtil;
 import util.DatabaseUtil;
 import java.sql.*;
@@ -45,7 +46,7 @@ public class BookingDAO {
 
     public Booking selectBooking(String id) throws SQLException {
 //        String sql = "SELECT * FROM bookings WHERE booking_id = ?";
-        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+        String sql = "SELECT bookings.booking_id,bookings.is_paid, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
                 "  pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
                 " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_name," +
                 " cars.capacity, cars.driver_id FROM bookings LEFT JOIN customers ON bookings.customer_id = customers.customer_number,pickup_date,pickup_time " +
@@ -66,7 +67,7 @@ public class BookingDAO {
     }
 
     public Booking getBookingByNumber(String no) throws SQLException {
-        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+        String sql = "SELECT bookings.booking_id,bookings.is_paid, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
                 " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
                 " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
                 " cars.capacity, cars.driver_id,du.full_name as driver_name,pickup_date,pickup_time " +
@@ -92,7 +93,7 @@ public class BookingDAO {
 
     public List<Booking> selectAllBookings() throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+        String sql = "SELECT bookings.booking_id,bookings.is_paid, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
                 " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
                 " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
                 " cars.capacity, cars.driver_id,du.full_name as driver_name,pickup_date,pickup_time " +
@@ -165,6 +166,7 @@ public class BookingDAO {
         booking.setTotalFare(rs.getDouble("total_fare"));
         booking.setCreatedAt(rs.getTimestamp("created_at"));
         booking.setFormattedDate(rs.getTimestamp("created_at"));
+        booking.isPaid(rs.getInt("is_paid"));
 
         User user = new User();
         user.setFullName(rs.getString("full_name"));
@@ -187,6 +189,10 @@ public class BookingDAO {
 
         car.setSeatingCapacity(rs.getInt("capacity"));
 
+        BookingStatusService bookingStatusService = new BookingStatusService();
+        BookingStatus bookingStatus = bookingStatusService.getBookingStatusById(booking.getStatusId());
+
+        booking.setStatus(bookingStatus);
         booking.setUser(user);
         booking.setCustomer(customer);
         booking.setCar(car);
@@ -228,7 +234,7 @@ public class BookingDAO {
 
     public List<Booking> getAssignedBookings(int userId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+        String sql = "SELECT bookings.booking_id,bookings.pickup_date,bookings.pickup_time,bookings.is_paid, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
                 " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
                 " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
                 " cars.capacity, cars.driver_id,du.full_name as driver_name " +
@@ -256,7 +262,7 @@ public class BookingDAO {
 
     public List<Booking> getCustomerRelatedBookings(String customerId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT bookings.booking_id, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
+        String sql = "SELECT bookings.booking_id,bookings.is_paid, bookings.booking_number, bookings.customer_id, bookings.driver_id, bookings.car_id," +
                 " pickup_location, bookings.destination,  bookings.status_id, bookings.price_for_km, bookings.distance, bookings.total_fare," +
                 " bookings.created_at, users.full_name, users.nic, customers.address, users.email, users.phone,car_types.type_id, car_types.type_name, car_models.model_id,car_models.model_name," +
                 " cars.capacity, cars.driver_id,du.full_name as driver_name ,pickup_date,pickup_time " +
@@ -280,5 +286,31 @@ public class BookingDAO {
             }
         }
         return bookings;
+    }
+
+    public boolean updateBookingPayment(int status,String bookingNumber) throws SQLException {
+        String sql = "UPDATE bookings SET is_paid = ? WHERE booking_number = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, status);
+            stmt.setString(2, bookingNumber);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public void cancelBooking(String bookingNo) {
+        String sql = "UPDATE bookings SET status_id = 9 WHERE booking_number = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, bookingNo);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

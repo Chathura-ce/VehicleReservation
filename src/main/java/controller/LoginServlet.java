@@ -40,6 +40,7 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("loggedInUser", user);
                 session.setAttribute("userId", user.getUserId());
+                session.setAttribute("role", user.getRole());
 
                 // Create session cookies that persist for the browser session
                 Cookie usernameCookie = new Cookie("username", username);
@@ -49,7 +50,7 @@ public class LoginServlet extends HttpServlet {
                 userIdCookie.setPath("/");
 
                 // Create role cookie
-                Cookie roleCookie = new Cookie("userRole", user.getRole());
+                Cookie roleCookie = new Cookie("role", user.getRole());
                 roleCookie.setPath("/");
 
                 // Add cookies to response

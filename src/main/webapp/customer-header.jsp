@@ -75,10 +75,10 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="#home">Home</a>
+          <a class="nav-link active" href="/home.jsp#home">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#about">About Us</a>
+          <a class="nav-link" href="/home.jsp#about">About Us</a>
         </li>
         <%--                <li class="nav-item">--%>
         <%--                    <a class="nav-link" href="#contact">Contact</a>--%>
