@@ -289,7 +289,7 @@ public class BookingDAO {
     }
 
     public boolean updateBookingPayment(int status,String bookingNumber) throws SQLException {
-        String sql = "UPDATE bookings SET is_paid = ? WHERE booking_number = ?";
+        String sql = "UPDATE bookings SET is_paid = ?, status_id=1 WHERE booking_number = ?";
 
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -302,7 +302,7 @@ public class BookingDAO {
     }
 
     public void cancelBooking(String bookingNo) {
-        String sql = "UPDATE bookings SET status_id = 9 WHERE booking_number = ?";
+        String sql = "UPDATE bookings SET status_id = 6 WHERE booking_number = ?";
 
         try (Connection connection = getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {

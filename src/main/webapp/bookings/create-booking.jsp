@@ -256,7 +256,8 @@
                     <div class="col-md-6">
                         <label class="form-label">&nbsp;</label>
                         <div class="">
-                            <button onclick="saveData();" type="button" class="btn btn-primary me-2">Create</button>
+                            <button onclick="saveData();" type="button" class="btn btn-primary me-2">Save</button>
+                            <button onclick="cancelBooking();" type="button" class="btn btn-danger me-2">Cancel</button>
                             <button onclick="printBill();" type="button" class="btn btn-success me-2">Print</button>
                             <button onclick="newBooking();" type="reset" class="btn btn-secondary">New
                             </button>
@@ -978,6 +979,38 @@
     function newBooking() {
         window.location.href = '/booking/new';
     }
+
+    function cancelBooking() {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you really want to cancel this booking?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, cancel it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/booking/cancel',
+                    type: 'POST',
+                    data: { bookingNumber: $('#bookingNumber').val() },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === "success") {
+                            Swal.fire("Cancelled!", "Booking cancelled successfully.", "success");
+                        } else {
+                            Swal.fire("Error!", "Error cancelling booking: " + response.message, "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire("Error!", "Error cancelling booking: " + error, "error");
+                    }
+                });
+            }
+        });
+    }
+
 
 
 </script>

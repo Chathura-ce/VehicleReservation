@@ -73,6 +73,9 @@ public class BookingController extends HttpServlet {
                 case "/update":
                     updateBooking(request, response);
                     break;
+                case "/cancel":
+                    cancelBooking(request, response);
+                    break;
                 case "/get-booking-numbers":
                     getBookingNumbers(request, response);
                     break; 
@@ -382,4 +385,24 @@ public class BookingController extends HttpServlet {
     }
 
 
+    private void cancelBooking(HttpServletRequest request, HttpServletResponse response) throws IOException {
+               response.setContentType("application/json");
+               response.setCharacterEncoding("UTF-8");
+               Gson gson = new Gson();
+        Map<String, Object> jsonResponse = new HashMap<>();
+        try {
+            String bookingNumber = request.getParameter("bookingNumber");
+            bookingService.cancelBooking(bookingNumber);
+
+            jsonResponse.put("status", "success");
+            jsonResponse.put("message", "Booking cancelled successfully.Booking No: " + bookingNumber);
+            response.getWriter().write(gson.toJson(jsonResponse));
+        } catch (Exception e) {
+
+            jsonResponse.put("status", "error");
+            jsonResponse.put("message", "Database error while cancelling booking.");
+            response.getWriter().write(gson.toJson(jsonResponse));
+        }
+
+           }
 }
