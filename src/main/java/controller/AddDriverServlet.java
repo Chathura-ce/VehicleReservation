@@ -99,7 +99,7 @@ public class AddDriverServlet extends HttpServlet {
                 + "<p><strong>Username:</strong> " + user.getUsername() + "</p>"
                 + "<p><strong>Temporary Password:</strong> " + password + "</p>"
                 + "<p>Please log in and change your password immediately for security purposes.</p>"
-                + "<p><a href='https://yourcabapp.com/login' style='color: #007bff;'>Login Here</a></p>"
+                + "<p><a href='http://localhost:8080/login.jsp' style='color: #007bff;'>Login Here</a></p>"
                 + "</div><div class='email-footer' style='text-align: center; margin-top: 20px;'>"
                 + "<p>Thank you for joining Mega City Cab!</p>"
                 + "<p>© 2024 Mega City Cab. All Rights Reserved.</p></div></div>";
