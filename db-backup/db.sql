@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80031
 File Encoding         : 65001
 
-Date: 2025-03-14 01:58:29
+Date: 2025-03-23 05:01:53
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -21,18 +21,22 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `booking_status`;
 CREATE TABLE `booking_status` (
   `status_id` int NOT NULL AUTO_INCREMENT,
-  `status_name` varchar(20) NOT NULL,
+  `status_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`status_id`),
   UNIQUE KEY `status_name` (`status_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of booking_status
 -- ----------------------------
-INSERT INTO `booking_status` VALUES ('3', ' On the Way');
-INSERT INTO `booking_status` VALUES ('2', 'Approved');
-INSERT INTO `booking_status` VALUES ('4', 'Completed');
-INSERT INTO `booking_status` VALUES ('1', 'Pending');
+INSERT INTO `booking_status` VALUES ('0', 'Pending Payment', 'Booking created, Pending payment.');
+INSERT INTO `booking_status` VALUES ('1', 'Pending', 'Payment done. Weiting driver approval.');
+INSERT INTO `booking_status` VALUES ('4', 'In Progress', 'The ride has started.');
+INSERT INTO `booking_status` VALUES ('5', 'Completed', 'The ride is finished.');
+INSERT INTO `booking_status` VALUES ('6', 'Canceled by System', 'Booking was canceled by the admin.');
+INSERT INTO `booking_status` VALUES ('7', 'Driver Canceled', 'The booking was canceled by the driver.');
+INSERT INTO `booking_status` VALUES ('9', 'Customer Canceled', 'Booking was canceled by the customer.');
 
 -- ----------------------------
 -- Table structure for bookings
@@ -43,23 +47,33 @@ CREATE TABLE `bookings` (
   `booking_number` varchar(50) DEFAULT NULL,
   `customer_id` varchar(255) NOT NULL,
   `driver_id` varchar(50) DEFAULT NULL,
-  `car_id` varchar(50) NOT NULL,
+  `car_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `pickup_location` varchar(255) DEFAULT NULL,
   `destination` varchar(255) NOT NULL,
-  `status_id` int NOT NULL,
+  `status_id` int DEFAULT NULL,
   `price_for_km` decimal(10,2) DEFAULT NULL,
   `distance` decimal(10,2) DEFAULT NULL,
   `total_fare` decimal(10,2) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `pickup_date` date DEFAULT NULL,
   `pickup_time` time DEFAULT NULL,
-  PRIMARY KEY (`booking_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `is_paid` tinyint DEFAULT '0',
+  PRIMARY KEY (`booking_id`),
+  KEY `car_id` (`car_id`),
+  KEY `driver_id` (`driver_id`),
+  KEY `bookings_ibfk_1` (`status_id`),
+  CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `booking_status` (`status_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`car_id`) REFERENCES `cars` (`car_id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `bookings_ibfk_3` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`driver_id`) ON DELETE SET NULL ON UPDATE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of bookings
 -- ----------------------------
-INSERT INTO `bookings` VALUES ('46', 'BK20250313-0046', 'CUST0106', 'd0110', 'C0001', 'Colombo, Colombo District, Western Province, Sri Lanka', 'Kurunegala, Kurunegala District, North Western Province, 60000, Sri Lanka', '1', '100.00', '83.00', '8300.00', '2025-03-13 11:28:58', '2025-03-13', '10:25:00');
+INSERT INTO `bookings` VALUES ('65', 'BK20250322-0001', 'CUST0106', null, 'C0002', 'Gampaha, Gampaha District, Western Province, 11030, Sri Lanka', 'Department of Education, William Gopallawa Mawatha, Bogambara, Bahirawakanda, Kandy, Kandy District, Central Province, 20000, Sri Lanka', '6', '98.00', '73.79', '7592.99', '2025-03-22 20:08:12', '2025-03-24', '05:22:00', '0');
+INSERT INTO `bookings` VALUES ('66', 'BK20250322-0066', 'CUST0106', null, 'C0002', 'Ambepussa, Mahena, Kegalle District, Sabaragamuwa Province, 71600, Sri Lanka', 'Department of Education, William Gopallawa Mawatha, Bogambara, Bahirawakanda, Kandy, Kandy District, Central Province, 20000, Sri Lanka', '1', '98.00', '46.91', '4827.04', '2025-03-22 20:11:05', '2025-03-26', '10:22:00', '1');
+INSERT INTO `bookings` VALUES ('67', 'BK20250322-0067', 'CUST0106', null, 'C0008', 'D. R. Wijewardene Mawatha, Suduwella, Slave Island, Colombo, Colombo District, Western Province, 00200, Sri Lanka', 'Department of Education, William Gopallawa Mawatha, Bogambara, Bahirawakanda, Kandy, Kandy District, Central Province, 20000, Sri Lanka', '1', '110.00', '94.62', '10928.61', '2025-03-22 20:14:14', '2025-03-26', '14:22:00', '1');
+INSERT INTO `bookings` VALUES ('68', 'BK20250322-0068', 'CUST0106', 'd0126', 'C0008', 'Gampaha, Gampaha District, Western Province, 11030, Sri Lanka', 'Department of Education, William Gopallawa Mawatha, Bogambara, Bahirawakanda, Kandy, Kandy District, Central Province, 20000, Sri Lanka', '5', '110.00', '73.00', '8431.50', '2025-03-22 20:33:24', '2025-03-27', '10:25:00', '1');
 
 -- ----------------------------
 -- Table structure for car_image
@@ -143,8 +157,8 @@ DROP TABLE IF EXISTS `cars`;
 CREATE TABLE `cars` (
   `id` int NOT NULL AUTO_INCREMENT,
   `car_id` varchar(255) NOT NULL,
-  `model` varchar(100) NOT NULL,
-  `type` varchar(50) NOT NULL,
+  `model` int DEFAULT NULL,
+  `type` int DEFAULT NULL,
   `reg_number` varchar(20) NOT NULL,
   `capacity` int NOT NULL,
   `available` tinyint(1) DEFAULT '1',
@@ -153,26 +167,31 @@ CREATE TABLE `cars` (
   `price_for_km` decimal(11,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `reg_number` (`reg_number`),
+  KEY `car_id` (`car_id`),
+  KEY `cars_ibfk_2` (`model`),
+  KEY `type` (`type`),
   KEY `driver_id` (`driver_id`),
-  CONSTRAINT `cars_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`driver_id`) ON DELETE SET NULL
+  CONSTRAINT `cars_ibfk_2` FOREIGN KEY (`model`) REFERENCES `car_models` (`model_id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `cars_ibfk_3` FOREIGN KEY (`type`) REFERENCES `car_types` (`type_id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `cars_ibfk_4` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`driver_id`) ON DELETE SET NULL ON UPDATE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of cars
 -- ----------------------------
-INSERT INTO `cars` VALUES ('1', 'C0001', '1', '1', 'ABC123', '5', '1', 'd0110', '/images/toyota_camry.jpg', '100.00');
-INSERT INTO `cars` VALUES ('2', 'C0002', '2', '1', 'DEF456', '5', '0', 'D002', '/images/honda_accord.jpg', '98.00');
-INSERT INTO `cars` VALUES ('3', 'C0003', '3', '2', 'GHI789', '7', '0', 'D003', '/images/ford_explorer.jpg', '130.00');
-INSERT INTO `cars` VALUES ('4', 'C0004', '4', '2', 'JKL101', '4', '0', 'D004', '/images/jeep_wrangler.jpg', '135.00');
-INSERT INTO `cars` VALUES ('5', 'C0005', '5', '3', 'MNO112', '5', '0', 'D005', '/images/vw_golf.jpg', '90.00');
-INSERT INTO `cars` VALUES ('6', 'C0006', '6', '4', 'PQR131', '4', '0', 'D006', '/images/bmw_4series.jpg', '200.00');
-INSERT INTO `cars` VALUES ('7', 'C0007', '7', '5', 'STU415', '3', '0', 'D007', '/images/ford_f150.jpg', '160.00');
-INSERT INTO `cars` VALUES ('8', 'C0008', '8', '1', 'TES567', '5', '1', 'D008', '/images/tesla_model_s.jpg', '110.00');
-INSERT INTO `cars` VALUES ('9', 'C0009', '9', '2', 'CHE789', '8', '0', 'D009', '/images/chevrolet_tahoe.jpg', '140.00');
-INSERT INTO `cars` VALUES ('10', 'C0010', '10', '2', 'MAZ234', '5', '1', 'D010', '/images/mazda_cx5.jpg', '120.00');
-INSERT INTO `cars` VALUES ('11', 'C0011', '11', '3', 'SUB456', '5', '0', 'D011', '/images/subaru_impreza.jpg', '95.00');
-INSERT INTO `cars` VALUES ('12', 'C0012', '12', '4', 'POR911', '2', '1', 'D012', '/images/porsche_911.jpg', '250.00');
-INSERT INTO `cars` VALUES ('13', 'C0013', '13', '5', 'RAM150', '3', '0', 'D013', '/images/ram_1500.jpg', '175.00');
+INSERT INTO `cars` VALUES ('1', 'C0001', '1', '1', 'ABC123', '5', '1', 'd0126', '/images/toyota_camry.jpg', '100.00');
+INSERT INTO `cars` VALUES ('2', 'C0002', '2', '1', 'DEF456', '5', '1', 'd0126', '/images/honda_accord.jpg', '98.00');
+INSERT INTO `cars` VALUES ('3', 'C0003', '3', '2', 'GHI789', '7', '0', 'd0126', '/images/ford_explorer.jpg', '130.00');
+INSERT INTO `cars` VALUES ('4', 'C0004', '4', '2', 'JKL101', '4', '0', 'd0126', '/images/jeep_wrangler.jpg', '135.00');
+INSERT INTO `cars` VALUES ('5', 'C0005', '5', '3', 'MNO112', '5', '0', 'd0126', '/images/vw_golf.jpg', '90.00');
+INSERT INTO `cars` VALUES ('6', 'C0006', '6', '4', 'PQR131', '4', '0', 'd0126', '/images/bmw_4series.jpg', '200.00');
+INSERT INTO `cars` VALUES ('7', 'C0007', '7', '5', 'STU415', '3', '0', 'd0126', '/images/ford_f150.jpg', '160.00');
+INSERT INTO `cars` VALUES ('8', 'C0008', '8', '1', 'TES567', '5', '1', 'd0126', '/images/tesla_model_s.jpg', '110.00');
+INSERT INTO `cars` VALUES ('9', 'C0009', '9', '2', 'CHE789', '8', '0', 'd0126', '/images/chevrolet_tahoe.jpg', '140.00');
+INSERT INTO `cars` VALUES ('10', 'C0010', '10', '2', 'MAZ234', '5', '1', 'd0126', '/images/mazda_cx5.jpg', '120.00');
+INSERT INTO `cars` VALUES ('11', 'C0011', '11', '3', 'SUB456', '5', '0', 'd0126', '/images/subaru_impreza.jpg', '95.00');
+INSERT INTO `cars` VALUES ('12', 'C0012', '12', '4', 'POR911', '2', '1', 'd0126', '/images/porsche_911.jpg', '250.00');
+INSERT INTO `cars` VALUES ('13', 'C0013', '13', '5', 'RAM150', '3', '0', 'd0126', '/images/ram_1500.jpg', '175.00');
 
 -- ----------------------------
 -- Table structure for customers
@@ -187,21 +206,14 @@ CREATE TABLE `customers` (
   PRIMARY KEY (`customer_id`),
   KEY `customers_ibfk_1` (`user_id`),
   CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of customers
 -- ----------------------------
-INSERT INTO `customers` VALUES ('63', 'CUST0095', '95', 'Irure sint est quam ', '2025-03-09 22:40:44');
-INSERT INTO `customers` VALUES ('64', 'CUST0096', '96', 'Eu ea ratione accusa', '2025-03-12 09:39:17');
-INSERT INTO `customers` VALUES ('65', 'CUST0102', '102', 'Sed hic aperiam ulla', '2025-03-12 09:39:41');
-INSERT INTO `customers` VALUES ('66', 'CUST0103', '103', 'Elit distinctio In', '2025-03-12 09:40:32');
-INSERT INTO `customers` VALUES ('67', 'CUST0104', '104', 'Magni dignissimos nu', '2025-03-12 10:50:13');
-INSERT INTO `customers` VALUES ('68', 'CUST0105', '105', 'Rerum minim cupidata', '2025-03-12 11:50:29');
 INSERT INTO `customers` VALUES ('69', 'CUST0106', '106', 'Magni dolor eu numqu', '2025-03-12 14:07:38');
-INSERT INTO `customers` VALUES ('70', 'CUST0107', '107', 'Lorem qui iure eum a', '2025-03-13 08:52:30');
-INSERT INTO `customers` VALUES ('71', 'CUST0111', '111', 'No 123, Test road', '2025-03-13 18:47:32');
-INSERT INTO `customers` VALUES ('72', 'CUST0112', '112', 'No 56, abc road', '2025-03-13 18:54:16');
+INSERT INTO `customers` VALUES ('73', 'CUST0127', '127', 'No 123', '2025-03-22 17:00:59');
+INSERT INTO `customers` VALUES ('74', 'CUST0128', '128', 'kurunegala colany', '2025-03-22 17:48:01');
 
 -- ----------------------------
 -- Table structure for drivers
@@ -213,24 +225,16 @@ CREATE TABLE `drivers` (
   `license_number` varchar(50) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`driver_id`,`user_id`),
-  UNIQUE KEY `license_number` (`license_number`)
+  UNIQUE KEY `license_number` (`license_number`),
+  KEY `driver_id` (`driver_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `drivers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of drivers
 -- ----------------------------
-INSERT INTO `drivers` VALUES ('34', 'd0034', '462', '2025-02-22 17:45:01');
-INSERT INTO `drivers` VALUES ('36', 'd0036', '59', '2025-02-22 17:45:34');
-INSERT INTO `drivers` VALUES ('38', 'd0038', '734', '2025-02-22 17:47:43');
-INSERT INTO `drivers` VALUES ('39', 'd0039', '768', '2025-02-22 17:48:02');
-INSERT INTO `drivers` VALUES ('40', 'd0040', '795', '2025-02-22 17:50:18');
-INSERT INTO `drivers` VALUES ('41', 'd0041', '929', '2025-02-22 17:52:07');
-INSERT INTO `drivers` VALUES ('42', 'd0042', '158', '2025-02-22 17:52:28');
-INSERT INTO `drivers` VALUES ('43', 'd0043', '369', '2025-02-22 17:55:54');
-INSERT INTO `drivers` VALUES ('44', 'd0044', '976', '2025-02-22 17:58:33');
-INSERT INTO `drivers` VALUES ('92', 'd0092', '808-5454-4545', '2025-03-08 10:31:19');
-INSERT INTO `drivers` VALUES ('94', 'd0094', '376', '2025-03-08 10:51:50');
-INSERT INTO `drivers` VALUES ('110', 'd0110', 'B1234567', '2025-03-13 10:44:03');
+INSERT INTO `drivers` VALUES ('126', 'd0126', 'ABC1234', '2025-03-21 23:04:26');
 
 -- ----------------------------
 -- Table structure for users
@@ -251,20 +255,13 @@ CREATE TABLE `users` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('28', 'admin', 'Admin chathura', '4rKWDl1E+H5ZfHY18rLRK9TpPMOyU6d6EsOSqDzbDq4=', 'FV4/A6ZFiAp/97L62yEJaA==', '964515750v', '0457805450', 'admin@gmail.com', 'admin', '2025-02-20 19:20:36', '1');
-INSERT INTO `users` VALUES ('95', 'ryfixib', 'Jocelyn Owens', '22CmYMOlQ8cHqTeE1VTXuCcu2YJAVilYgG+7r1JoJ7A=', 'vvcJZPEoEjGE2DbKMz9zkw==', null, null, 'chathu.eac@gmail.com', 'customer', '2025-03-09 22:40:43', '1');
-INSERT INTO `users` VALUES ('96', 'juqodo', 'Rhiannon Sheppard', '6In1ppaPVBWoluLs62BqTeAy4l602cetAq0GAKgGpO0=', 'bGeKrnrf6NQCNw/OgqwBUA==', null, null, 'cynoti@mailinator.com', 'customer', '2025-03-12 09:39:16', '1');
-INSERT INTO `users` VALUES ('102', 'hypikakaba', 'Jayme Beach', 'SUuhleGvpvuIawDfUhCHVmymSAQuRrygAHiVFOnSLms=', 'f7+JQwxlDMmjoAWam8vn9g==', null, null, 'voxuw@mailinator.com', 'customer', '2025-03-12 09:39:41', '1');
-INSERT INTO `users` VALUES ('103', 'palasat', 'Shellie Wade', '5XI4Puc7kIEq2SN5cGqm5iprTZRIMf8q92NAMFs99kg=', 'MA+k9RsKQAQ5TjDou6RmuA==', null, null, 'tamapa@mailinator.com', 'customer', '2025-03-12 09:40:32', '1');
-INSERT INTO `users` VALUES ('104', 'zetujecu', 'Camden Hanson', 'Oagl2735h1slFUOMdACKNBpLSaZM4R/4eOU9n5331Uw=', 'n/U+5+EVaJ0Z/rtdc51BkQ==', null, null, 'cikep@mailinator.com', 'customer', '2025-03-12 10:50:13', '1');
-INSERT INTO `users` VALUES ('105', 'qyzunozug', 'Harding Sweeney', '4rKWDl1E+H5ZfHY18rLRK9TpPMOyU6d6EsOSqDzbDq4=', 'FV4/A6ZFiAp/97L62yEJaA==', null, null, 'qugog@mailinator.com', 'customer', '2025-03-12 11:50:29', '1');
-INSERT INTO `users` VALUES ('106', 'dinuka25', 'Dinuka Dilshan', '+pAQ9qisVbzaKgCHvk8H3dElnFsVd1yIdMTAKcus4tQ=', 'u0xZphxG9yZNDCIOtX3EzA==', null, null, 'gyfadoxa@mailinator.com', 'customer', '2025-03-12 14:07:37', '1');
-INSERT INTO `users` VALUES ('107', 'nakyqyny', 'Chase Crawford', 'b0Q0znKaiNHjYsIqOOufq5OJrCMEFEf7/8btciHWuuI=', 'AzpZhiTN+dQMlPLgffzoIg==', '915422580v', '0787325051', 'mycloud.eac@gmail.com', 'customer', '2025-03-13 08:52:30', '1');
-INSERT INTO `users` VALUES ('110', 'ssss', 'Pradeep Kumara', 'tbqHu5w22OumFsOdrCSh102er6Aur2oGpL3yTsRFlL8=', 'qSUAXoppkGJMaMmq96vAng==', '956525452v', '0787325051', 'pradeepkumara@gmail.com', 'driver', '2025-03-13 10:44:03', '1');
-INSERT INTO `users` VALUES ('111', 'TestUser', 'Todd Avila', 'lXmIcROIOi3qxRe4TREZKJHbAUm80SouiQ2LE33CfYg=', 'zcxcEK6ZVRTX/0zKOWOmPA==', '994885820v', '0754585025', 'test@mailinator.com', 'customer', '2025-03-13 18:47:32', '1');
-INSERT INTO `users` VALUES ('112', 'Test2', 'Second test user', 'mH6nQaGIwu6w/AcTwQDyAAiwdK3uOm7EsuutTiEOIKs=', 'CZRIr4lj3PxXc7cMhX6Aug==', '985682250v', '0758265485', 'test3@mailinator.com', 'customer', '2025-03-13 18:54:16', '1');
+INSERT INTO `users` VALUES ('28', 'admin', 'Admin chathura', '4rKWDl1E+H5ZfHY18rLRK9TpPMOyU6d6EsOSqDzbDq4=', 'FV4/A6ZFiAp/97L62yEJaA==', '964515750v', '0457805450', 'chathu.eac@gmail.com', 'admin', '2025-02-20 19:20:36', '1');
+INSERT INTO `users` VALUES ('106', 'dinuka25', 'Dinuka Dilshan', '+pAQ9qisVbzaKgCHvk8H3dElnFsVd1yIdMTAKcus4tQ=', 'u0xZphxG9yZNDCIOtX3EzA==', '874574251v', '0457805450', '1test.96c@gmail.com', 'customer', '2025-03-12 14:07:37', '1');
+INSERT INTO `users` VALUES ('126', 'driversandun', 'Sandun', '4rKWDl1E+H5ZfHY18rLRK9TpPMOyU6d6EsOSqDzbDq4=', 'FV4/A6ZFiAp/97L62yEJaA==', '771642280V', '0754475741', 'chathura19960612@gmail.com', 'driver', '2025-03-21 23:04:26', '1');
+INSERT INTO `users` VALUES ('127', 'Thisara', 'Thisara lakmal', 'lxf2yqZbX5SrQ/RTal5low5WL3tp8OAGePjwHjJ+KZk=', 'tpeEIExQDfZ6M3R69xnxoQ==', '995415250v', '0745825051', 'mycloudeac@gmail.com', 'customer', '2025-03-22 17:00:57', '1');
+INSERT INTO `users` VALUES ('128', 'tester', 'Lakmal Edirisinghe', 'g5mfwmBTFHQQe/JF3vfrmotjP+D/SxXvLsBvz+X7J24=', 'jeAECJylBBxs0FutUpCz1A==', '223256432345', '0775567435', 'fghghjjh@gmail.com', 'customer', '2025-03-22 17:48:01', '1');
