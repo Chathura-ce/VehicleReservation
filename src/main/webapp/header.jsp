@@ -156,7 +156,7 @@
                     <% } %>
 
                     <% if (loggedInUser == null || Objects.equals(loggedInUser.getRole(), "driver")) { %>
-                    <li class="nav-item"><a href="driver-dashboard/assigned-bookings" class="nav-link"> <i class="nav-icon bi bi-palette"></i>
+                    <li class="nav-item"><a href="/driver-dashboard/assigned-bookings" class="nav-link"> <i class="nav-icon bi bi-palette"></i>
                         <p>Assigned Bookings</p>
                     </a></li>
                     <% } %>
@@ -169,3 +169,4 @@
     <main class="app-main"> <!--begin::App Content Header-->
         <div class="app-content-header"> <!--begin::Container-->
             <div class="container-fluid"> <!--begin::Row-->
+

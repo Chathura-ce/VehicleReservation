@@ -141,14 +141,20 @@
                                         <td>${booking.status.statusName}</td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${booking.isPaid == 0}">
+                                                <c:when test="${booking.isPaid == 0 and booking.statusId == 0}">
                                                     <button onclick="openPayment('${booking.bookingNumber}');"
                                                             data-booking-number="${booking.bookingNumber}"
                                                             class="btn btn-success btn-sm pay-btn">Pay Now
                                                     </button>
                                                 </c:when>
+                                                <c:when test="${booking.isPaid == 1}">
+                                                    <button onclick="openPayment('${booking.bookingNumber}');"
+                                                            data-booking-number="${booking.bookingNumber}"
+                                                            class="btn btn-success btn-sm pay-btn">Paid
+                                                    </button>
+                                                </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge bg-success">Paid</span>
+                                                    -
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
@@ -156,9 +162,13 @@
                                             <button onclick="printBill('${booking.bookingNumber}');"
                                                     class="btn btn-primary btn-sm">View
                                             </button>
-                                            <button onclick="cancelBooking('${booking.bookingNumber}');"
-                                                    class="btn btn-danger btn-sm">Cancel
-                                            </button>
+                                            <c:choose>
+                                                <c:when test="${booking.statusId == 0}">
+                                                    <button onclick="cancelBooking('${booking.bookingNumber}');"
+                                                            class="btn btn-danger btn-sm">Cancel
+                                                    </button>
+                                                </c:when>
+                                            </c:choose>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -254,7 +264,7 @@
                             });
                         }
                     }
-                }) ;
+                });
             }
         });
     }

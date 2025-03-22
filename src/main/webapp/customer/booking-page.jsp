@@ -287,6 +287,8 @@
         loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing your booking...';
         document.querySelector(".card-body").insertBefore(loadingIndicator, document.getElementById("bookingForm"));
         disableFormElements();
+        $('#confirmButton').hide()
+
       },
       success: function (response) {
         // Remove loading indicator
@@ -299,6 +301,7 @@
           successMessage.className = "alert alert-success";
           successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Your booking has been confirmed. A confirmation has been sent to your email.';
           document.querySelector(".card-body").insertBefore(successMessage, document.getElementById("bookingForm"));
+          $('#paymentButton').show()
 
         } else {
           // Show error message
@@ -306,7 +309,8 @@
           errorMessage.className = "alert alert-danger";
           errorMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Error: ' + response.message;
           document.querySelector(".card-body").insertBefore(errorMessage, document.getElementById("bookingForm"));
-
+          $('#paymentButton').hide()
+          $('#confirmButton').show()
         }
       },
       error: function (xhr, status, error) {
@@ -606,7 +610,6 @@
     // Disable all form inputs and buttons
     document.querySelectorAll("#bookingForm input, #bookingForm button, #bookingForm select").forEach(element => {
       element.disabled = true;
-      $("#confirmButton").prop('disabled', true);
     });
   }
    

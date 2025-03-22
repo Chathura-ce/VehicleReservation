@@ -3,7 +3,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <jsp:include page="/header.jsp" />
-
+<div class="row">
+    <div class="col-sm-6">
+        <h3 class="mb-0">My Booking</h3>
+    </div>
+    <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-end">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Driver</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                My Bookings
+            </li>
+        </ol>
+    </div>
+</div>
 <div class="container mt-5">
 
     <div class="table-responsive">
@@ -13,10 +26,8 @@
                 <th>Booking ID</th>
                 <th>Pickup Location</th>
                 <th>Drop Location</th>
-                <th>Driver</th>
                 <th>Status</th>
-                <th>Fare</th>
-                <th>Actions</th>
+                <th style="width: 120px;">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -25,21 +36,31 @@
                     <td>${booking.bookingNumber}</td>
                     <td>${booking.pickupLocation}</td>
                     <td>${booking.destination}</td>
-                    <td>${booking.driver.getDriverName()}</td>
                     <td>
-                                <span class="badge bg-${booking.statusId == '1' ? 'warning' :
-                                    booking.statusId == '2' ? 'success' :
-                                    booking.statusId == '4' ? 'info' : 'danger'}">
-                                        ${booking.statusId == '1' ? 'Pending' :
-                                                booking.statusId == '2' ? 'Confirmed' :
-                                                        booking.statusId == '4' ? 'Completed' : 'Cancelled'}
+                                <span class="badge bg-${booking.statusId == '4' ? 'info' :
+                                    booking.statusId == '5' ? 'success' :
+                                    booking.statusId == '7' ? 'danger' : 'danger'}">
+                                        ${booking.statusId == '4' ? 'In Progress' :
+                                                booking.statusId == '5' ? 'Completed' :
+                                                        booking.statusId == '7' ? 'Cancelled' : 'Cancelled'}
                                 </span>
                     </td>
-                    <td>$${booking.getTotalAmount()}</td>
                     <td>
-                        <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-success btn-sm">View</button>
-                        <button onclick="editBooking('${booking.bookingNumber}')" class="btn btn-primary btn-sm">Edit</button>
-                        <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-danger btn-sm">Cancel</button>
+                        <c:choose>
+                            <c:when test="${booking.statusId == '1'}">
+                                <button onclick="startBooking('${booking.bookingNumber}')" class="btn btn-success btn-sm">
+                                    Start
+                                </button>
+                                <button onclick="cancelBooking('${booking.bookingNumber}')" class="btn btn-danger btn-sm">
+                                    Cancel
+                                </button>
+                            </c:when>
+                            <c:when test="${booking.statusId == '4'}">
+                                <button onclick="finishBooking('${booking.bookingNumber}')"
+                                        class="btn btn-primary btn-sm">Finish
+                                </button>
+                            </c:when>
+                        </c:choose>
                     </td>
                 </tr>
             </c:forEach>
