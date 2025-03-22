@@ -92,6 +92,47 @@
       color: white;
     }
   </style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet Routing Machine CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+<style>
+  #map { height: 400px; width: 100%; }
+  .custom-marker-red { color: #dc3545; }
+  .custom-marker-green { color: #28a745; }
+  .leaflet-routing-container { display: none; }
+  .address-display {
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+  .autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+  }
+  .autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+  }
+  .autocomplete-items div:hover {
+    background-color: #e9e9e9;
+  }
+</style>
 <section class="py-5 bg-light" id="bookingSection">
   <div class="container">
     <div class="row justify-content-center">
@@ -156,14 +197,14 @@
                 </div>
                 <div class="card-body py-3">
                   <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
+                        <span onclick="showMapModal()" class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
                         <input onblur="calculateDistance();" autocomplete="off" type="text" class="form-control" id="pickupLocation"  name="pickupLocation" placeholder="Pickup Location" required>
                         <div id="pickupAutocomplete" class="autocomplete-items"></div>
                       </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <div class="input-group">
                         <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt"></i></span>
                         <input onblur="calculateDistance();"  autocomplete="off"  type="text" class="form-control" id="destination" name="destination" placeholder="Destination" required>
@@ -210,16 +251,178 @@
     </div>
   </div>
 </section>
-
+<!-- Map Modal -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mapModalLabel">Trip Route</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="hidden" id="startLocation">
+<input type="hidden" id="endLocation">
 <jsp:include page="/customer-footer.jsp"/>
 
 <script src="https://js.stripe.com/v3/"></script>
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Routing Machine JS -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<%--map script--%>
+<script src="map.js"></script>
 
 <script>
+  let map;
+  const sriLankaBounds = L.latLngBounds([[5.93, 79.5], [9.83, 81.9]]);
+
+  document.getElementById('mapModal').addEventListener('shown.bs.modal', function () {
+    if (!map) {
+      map = L.map('map', {
+        maxBounds: sriLankaBounds,
+        maxBoundsViscosity: 0.8
+      }).setView([7.8731, 80.7718], 7);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const redMarker = L.divIcon({
+        className: 'custom-marker-red',
+        html: '<i class="fas fa-map-marker-alt fa-2x"></i>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
+      });
+
+      const greenMarker = L.divIcon({
+        className: 'custom-marker-green',
+        html: '<i class="fas fa-map-marker-alt fa-2x"></i>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
+      });
+
+      const marker1 = L.marker([6.9271, 79.8612], {
+        draggable: true,
+        icon: redMarker
+      }).addTo(map);
+
+      const marker2 = L.marker([7.2906, 80.6337], {
+        draggable: true,
+        icon: greenMarker
+      }).addTo(map);
+
+      [marker1, marker2].forEach(marker => {
+        marker.on('dragstart', function () {
+          this._lastValidPosition = this.getLatLng();
+        });
+
+        marker.on('dragend', function (e) {
+          const newPosition = e.target.getLatLng();
+          if (!sriLankaBounds.contains(newPosition)) {
+            alert('Location must be within Sri Lanka!');
+            e.target.setLatLng(this._lastValidPosition);
+          }
+          calculateRoute();
+        });
+      });
+
+      let routingControl;
+
+      async function getAddress(lat, lng, elementId) {
+        try {
+          const response = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1');
+          const data = await response.json();
+          document.getElementById(elementId).value = data.display_name || "Address not found";
+          calculateDistance();
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          document.getElementById(elementId).value = "Error fetching address";
+        }
+      }
+
+      function updateLocationInputs() {
+        const startLatLng = marker1.getLatLng();
+        const endLatLng = marker2.getLatLng();
+
+        document.getElementById('startLocation').value = startLatLng.lat.toFixed(6) + ', ' + startLatLng.lng.toFixed(6);
+        document.getElementById('endLocation').value = endLatLng.lat.toFixed(6) + ', ' + endLatLng.lng.toFixed(6);
+      }
+
+      function calculateRoute() {
+        const waypoints = [marker1.getLatLng(), marker2.getLatLng()];
+
+        getAddress(waypoints[0].lat, waypoints[0].lng, "pickupLocation");
+        getAddress(waypoints[1].lat, waypoints[1].lng, "destination");
+
+        updateLocationInputs();
+
+        if (routingControl) {
+          map.removeControl(routingControl);
+        }
+
+        routingControl = L.Routing.control({
+          waypoints: waypoints,
+          routeWhileDragging: false,
+          showAlternatives: false,
+          show: false,
+          lineOptions: {styles: [{color: '#2196F3', weight: 4}]},
+          createMarker: function() { return null; }
+        }).addTo(map);
+
+        routingControl.on('routesfound', function(e) {
+          const route = e.routes[0];
+          document.getElementById('distance').textContent = (route.summary.totalDistance / 1000).toFixed(2);
+          // document.getElementById('routeDuration').textContent = Math.round(route.summary.totalTime % 3600 / 60);
+          // document.getElementById('routeResult').classList.remove('d-none');
+        });
+
+        routingControl.on('routingerror', function() {
+          alert('No route found. Please check marker positions.');
+          document.getElementById('routeResult').classList.add('d-none');
+        });
+      }
+
+      calculateRoute();
+    } else {
+      map.invalidateSize();
+    }
+  });
+</script>
+
+
+
+<script>
+  let bookingNumber = '';
+  $(function () {
+    let today = new Date().toISOString().split('T')[0];
+    let dateInput = document.getElementById("pickupDate");
+    dateInput.setAttribute("min", today);
+  })
   let taxPercentage = parseFloat("${taxPercentage}");
   let baseCharge = parseFloat("${baseCharge}");
   let priceForKm = parseFloat("${car.priceForKm}");
   const stripe = Stripe('pk_test_51R2xBMHBoMeUyf28bznECFFunlTYFzYEmJ7enSGhUuxrBe9b5TLq7Pj9QED3sWitNCzFdycdxC4SZukmPj8l0eQl00fVrOCA5K'); // Your Publishable Key
+
+  function showMapModal() {
+    // Get location values
+    const pickup = document.getElementById('pickupLocation').value;
+    const destination = document.getElementById('destination').value;
+
+    // Update modal with current values
+    // document.getElementById('modalPickupLocation').textContent = pickup || '-';
+    // document.getElementById('modalDestination').textContent = destination || '-';
+
+    // Show the modal
+    const mapModal = new bootstrap.Modal(document.getElementById('mapModal'));
+    mapModal.show();
+  }
 
 
   function confirmBooking(e) {
@@ -295,7 +498,7 @@
         document.getElementById("loadingIndicator").remove();
 
         if (response.status === "success") {
-          let bookingNumber = response.bookingNumber;
+           bookingNumber = response.bookingNumber;
           // Show success message
           const successMessage = document.createElement("div");
           successMessage.className = "alert alert-success";
@@ -607,10 +810,16 @@
   }
   
   function disableFormElements() {
-    // Disable all form inputs and buttons
-    document.querySelectorAll("#bookingForm input, #bookingForm button, #bookingForm select").forEach(element => {
-      element.disabled = true;
-    });
+    $('#pickupLocation').prop('disabled',true)
+    $('#destination').prop('disabled',true)
+    $('#pickupDate').prop('disabled',true)
+    $('#pickupTime').prop('disabled',true)
+  }
+  function enableFormElements() {
+    $('#pickupLocation').prop('disabled',false)
+    $('#destination').prop('disabled',false)
+    $('#pickupDate').prop('disabled',false)
+    $('#pickupTime').prop('disabled',false)
   }
    
 </script>

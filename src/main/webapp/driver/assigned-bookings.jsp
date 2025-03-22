@@ -37,13 +37,34 @@
                     <td>${booking.pickupLocation}</td>
                     <td>${booking.destination}</td>
                     <td>
-                                <span class="badge bg-${booking.statusId == '4' ? 'info' :
-                                    booking.statusId == '5' ? 'success' :
-                                    booking.statusId == '7' ? 'danger' : 'danger'}">
-                                        ${booking.statusId == '4' ? 'In Progress' :
-                                                booking.statusId == '5' ? 'Completed' :
-                                                        booking.statusId == '7' ? 'Cancelled' : 'Cancelled'}
-                                </span>
+                        <c:choose>
+                            <c:when test="${booking.statusId == '0'}">
+                                <span class="badge bg-warning">Pending Payment</span>
+                            </c:when>
+                            <c:when test="${booking.statusId == '1'}">
+                                <span class="badge bg-primary">Waiting Start</span>
+                            </c:when>
+                            <c:when test="${booking.statusId == '4'}">
+                                <span class="badge bg-info">In Progress</span>
+                            </c:when>
+                            <c:when test="${booking.statusId == '5'}">
+                                <span class="badge bg-success">Completed</span>
+                            </c:when>
+                            <c:when test="${booking.statusId == '6'}">
+                                <span class="badge bg-danger">Canceled by System</span>
+                            </c:when>
+                            <c:when test="${booking.statusId == '7'}">
+                                <span class="badge bg-danger">Driver Canceled</span>
+                            </c:when>
+                            <c:when test="${booking.statusId == '9'}">
+                                <span class="badge bg-danger">Customer Canceled</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="badge bg-secondary">Unknown</span>
+                            </c:otherwise>
+                        </c:choose>
+
+
                     </td>
                     <td>
                         <c:choose>
@@ -87,4 +108,90 @@
         // Open the new page in a new tab
         window.open(url, '_blank');
     }
+
+    function startBooking(bookingNumber) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to start this booking?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, start it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("${pageContext.request.contextPath}" + "/driver-dashboard/start-booking",
+                    { bookingNumber: bookingNumber })
+                    .done(function (data) {
+                        if (data.success) {
+                            Swal.fire("Started!", "Booking has been started.", "success")
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire("Error!", "Failed to start booking: " + data.message, "error");
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire("Error!", "An error occurred while starting the booking.", "error");
+                    });
+            }
+        });
+    }
+
+    function cancelBooking(bookingNumber) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to cancel this booking?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, cancel it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("${pageContext.request.contextPath}" + "/driver-dashboard/cancel-booking",
+                    { bookingNumber: bookingNumber })
+                    .done(function (data) {
+                        if (data.success) {
+                            Swal.fire("Cancelled!", "Booking has been cancelled.", "success")
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire("Error!", "Failed to cancel booking: " + data.message, "error");
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire("Error!", "An error occurred while canceling the booking.", "error");
+                    });
+            }
+        });
+    }
+
+    function finishBooking(bookingNumber) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to finish this booking?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, finish it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("${pageContext.request.contextPath}" + "/driver-dashboard/finish-booking",
+                    { bookingNumber: bookingNumber })
+                    .done(function (data) {
+                        if (data.success) {
+                            Swal.fire("Finished!", "Booking has been finished.", "success")
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire("Error!", "Failed to finish booking: " + data.message, "error");
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire("Error!", "An error occurred while finishing the booking.", "error");
+                    });
+            }
+        });
+    }
+
+
 </script>

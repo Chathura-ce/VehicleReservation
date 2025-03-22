@@ -313,4 +313,15 @@ public class BookingDAO {
             e.printStackTrace();
         }
     }
+
+    public boolean updateBookingStatus(String bookingNumber, int status) throws SQLException {
+        String sql = "UPDATE bookings SET status_id = ? WHERE booking_number = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, status);
+            stmt.setString(2, bookingNumber);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
 }

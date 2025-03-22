@@ -214,4 +214,9 @@ public class BookingService {
             System.out.println(e.getMessage());
         }
     }
+
+    public boolean updateBookingStatus(String bookingNumber, int status) throws SQLException {
+        return bookingDAO.updateBookingStatus(bookingNumber, status);
+    }
+
 }

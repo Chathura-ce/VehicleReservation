@@ -40,19 +40,38 @@
                             <td>${booking.destination}</td>
                             <td>${booking.driver.getDriverName()}</td>
                             <td>
-                                <span class="badge bg-${booking.statusId == '1' ? 'warning' :
-                                    booking.statusId == '2' ? 'success' :
-                                    booking.statusId == '4' ? 'info' : 'danger'}">
-                                        ${booking.statusId == '1' ? 'Pending' :
-                                                booking.statusId == '2' ? 'Confirmed' :
-                                                        booking.statusId == '4' ? 'Completed' : 'Cancelled'}
-                                </span>
+                                <c:choose>
+                                    <c:when test="${booking.statusId == '0'}">
+                                        <span class="badge bg-warning">Pending Payment</span>
+                                    </c:when>
+                                    <c:when test="${booking.statusId == '1'}">
+                                        <span class="badge bg-primary">Waiting Start</span>
+                                    </c:when>
+                                    <c:when test="${booking.statusId == '4'}">
+                                        <span class="badge bg-info">In Progress</span>
+                                    </c:when>
+                                    <c:when test="${booking.statusId == '5'}">
+                                        <span class="badge bg-success">Completed</span>
+                                    </c:when>
+                                    <c:when test="${booking.statusId == '6'}">
+                                        <span class="badge bg-danger">Canceled by System</span>
+                                    </c:when>
+                                    <c:when test="${booking.statusId == '7'}">
+                                        <span class="badge bg-danger">Driver Canceled</span>
+                                    </c:when>
+                                    <c:when test="${booking.statusId == '9'}">
+                                        <span class="badge bg-danger">Customer Canceled</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-secondary">Unknown</span>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
-                            <td>$${booking.getTotalAmount()}</td>
+                            <td>${booking.getTotalAmount()} Rs</td>
                             <td>
                                 <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-success btn-sm">View</button>
                                 <button onclick="editBooking('${booking.bookingNumber}')" class="btn btn-primary btn-sm">Edit</button>
-                                <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-danger btn-sm">Cancel</button>
+<%--                                <button onclick="printBill('${booking.bookingNumber}')" class="btn btn-danger btn-sm">Cancel</button>--%>
                             </td>
                         </tr>
                     </c:forEach>

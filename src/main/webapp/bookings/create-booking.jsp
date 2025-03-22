@@ -171,10 +171,13 @@
                     <div class="col-md-4">
                         <label for="bookingStatus" class="form-label">Booking Status</label>
                         <select class="form-select" id="bookingStatus" name="bookingStatus">
-<%--                            <option value="1">Pending</option>--%>
-                            <option value="2">Confirmed</option>
-<%--                            <option value="3">Completed</option>--%>
-                            <option value="4">Cancelled</option>
+                            <option value="0">Pending Payment</option>
+                            <option value="1">Pending</option>
+                            <option value="4">In Progress</option>
+                            <option value="5">Completed</option>
+                            <option value="6">Canceled by System</option>
+                            <option value="7">Driver Canceled</option>
+                            <option value="9">Customer Canceled</option>
                         </select>
                     </div>
                 </div>

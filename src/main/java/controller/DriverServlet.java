@@ -36,13 +36,23 @@ public class DriverServlet extends HttpServlet {
                 case "/assigned-bookings":
                     assignedBookings(request, response);
                     break;
+                case "/start-booking":
+                    startBooking(request, response);
+                    break;
+                case "/cancel-booking":
+                    cancelBooking(request, response);
+                    break;
+                case "/finish-booking":
+                    finishBooking(request, response);
+                    break;
                 default:
-
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid action");
                     break;
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);
         }
+
     }
 
     private void assignedBookings(HttpServletRequest request, HttpServletResponse response)
@@ -67,4 +77,62 @@ public class DriverServlet extends HttpServlet {
         }
 
     }
+
+    private void startBooking(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, SQLException {
+        HttpSession session = request.getSession(false);
+
+        if (session != null && session.getAttribute("loggedInUser") != null) {
+            User loggedInUser = (User) session.getAttribute("loggedInUser");
+            int userId = loggedInUser.getUserId();
+
+            String bookingNumber = request.getParameter("bookingNumber");
+
+            boolean success = bookingService.updateBookingStatus(bookingNumber, 4); // 4 = In Progress
+
+            response.setContentType("application/json");
+            response.getWriter().write("{\"success\": " + success + "}");
+        } else {
+            response.sendRedirect("../login.jsp");
+        }
+    }
+
+    private void cancelBooking(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, SQLException {
+        HttpSession session = request.getSession(false);
+
+        if (session != null && session.getAttribute("loggedInUser") != null) {
+            User loggedInUser = (User) session.getAttribute("loggedInUser");
+            int userId = loggedInUser.getUserId();
+
+            String bookingNumber = request.getParameter("bookingNumber");
+
+            boolean success = bookingService.updateBookingStatus(bookingNumber, 7); // 7 = Driver Canceled
+
+            response.setContentType("application/json");
+            response.getWriter().write("{\"success\": " + success + "}");
+        } else {
+            response.sendRedirect("../login.jsp");
+        }
+    }
+
+    private void finishBooking(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, SQLException {
+        HttpSession session = request.getSession(false);
+
+        if (session != null && session.getAttribute("loggedInUser") != null) {
+            User loggedInUser = (User) session.getAttribute("loggedInUser");
+            int userId = loggedInUser.getUserId();
+
+            String bookingNumber = request.getParameter("bookingNumber");
+
+            boolean success = bookingService.updateBookingStatus(bookingNumber, 5); // 5 = Completed
+
+            response.setContentType("application/json");
+            response.getWriter().write("{\"success\": " + success + "}");
+        } else {
+            response.sendRedirect("../login.jsp");
+        }
+    }
+
 }
